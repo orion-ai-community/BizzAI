@@ -1,0 +1,92 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories
+node_modules/
+bower_components/
+jspm_packages/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Virtualenv
+*.env
+*.venv
+
+# Environment files
+.env
+.env.*.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Build output
+dist/
+build/
+tmp/
+temp/
+out/
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Typescript
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Parcel-bundler cache
+.cache
+
+# Svelte / Vite cache
+.svelte-kit
+.vite
+
+# JetBrains
+*.iml
+*.ipr
+*.iws
+out/
+
+# Mac system files
+.AppleDouble
+.LSOverride
+
+# Bash history
+.bash_history
+
+# Misc
+*.tgz
+*.zip
+*.tar
+*.7z
+*.rar
