@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Item from "../models/Item.js";
 import { checkStockAlerts } from "../utils/stockAlert.js";
 import { info, error } from "../utils/logger.js";
@@ -64,6 +65,11 @@ export const getAllItems = async (req, res) => {
  */
 export const getSingleItem = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item ID format" });
+    }
+
     const item = await Item.findOne({ 
       _id: req.params.id, 
       addedBy: req.user._id 
@@ -86,6 +92,11 @@ export const getSingleItem = async (req, res) => {
  */
 export const updateItem = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item ID format" });
+    }
+
     // First check if item belongs to this owner
     const item = await Item.findOne({ 
       _id: req.params.id, 
@@ -127,6 +138,11 @@ export const updateItem = async (req, res) => {
  */
 export const deleteItem = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid item ID format" });
+    }
+
     const item = await Item.findOne({ 
       _id: req.params.id, 
       addedBy: req.user._id 

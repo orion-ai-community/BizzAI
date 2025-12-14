@@ -15,35 +15,79 @@ import Invoices from './pages/Invoice';
 import InvoiceDetail from './pages/InvoiceDetail';
 import Reports from './pages/Reports';
 
+// Sales
+import SalesInvoice from './pages/sales/SalesInvoice';
+import Estimate from './pages/sales/Estimate';
+import ProformaInvoice from './pages/sales/ProformaInvoice';
+import PaymentIn from './pages/sales/PaymentIn';
+import SalesOrder from './pages/sales/SalesOrder';
+import DeliveryChallan from './pages/sales/DeliveryChallan';
+import SalesReturn from './pages/sales/SalesReturn';
+
+// Purchase
+import Purchase from './pages/purchase/Purchase';
+import Bills from './pages/purchase/Bills';
+import PaymentOut from './pages/purchase/PaymentOut';
+import Expenses from './pages/purchase/Expenses';
+import PurchaseOrder from './pages/purchase/PurchaseOrder';
+import PurchaseReturn from './pages/purchase/PurchaseReturn';
+
+// Reports
+import ReportsDashboard from './pages/reports/ReportsDashboard';
+
+// Cash & Bank
+import BankAccounts from './pages/cashbank/BankAccounts';
+import CashInHand from './pages/cashbank/CashInHand';
+import Cheques from './pages/cashbank/Cheques';
+import LoanAccounts from './pages/cashbank/LoanAccounts';
+
+// Business
+import OnlineShop from './pages/business/OnlineShop';
+import GoogleProfile from './pages/business/GoogleProfile';
+import MarketingTools from './pages/business/MarketingTools';
+import WhatsAppMarketing from './pages/business/WhatsAppMarketing';
+
+// Sync
+import SyncShare from './pages/sync/SyncShare';
+import Backup from './pages/sync/Backup';
+import Restore from './pages/sync/Restore';
+
+// Utilities
+import BarcodeGenerator from './pages/utilities/BarcodeGenerator';
+import ImportItems from './pages/utilities/ImportItems';
+import BusinessSetup from './pages/utilities/BusinessSetup';
+import DataExport from './pages/utilities/DataExport';
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
-  
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return children;
 };
 
 // Public Route Component (redirect to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
-  
+
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
-  
+
   return children;
 };
 
 function App() {
+  console.log(import.meta.env.VITE_BACKEND_URL);
   return (
     <Router>
       <Routes>
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-        
+
         {/* Public Routes */}
         <Route
           path="/login"
@@ -61,7 +105,7 @@ function App() {
             </PublicRoute>
           }
         />
-        
+
         {/* Protected Routes */}
         <Route
           path="/dashboard"
@@ -71,7 +115,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+
         {/* Customer Routes - Use nested routes for better organization */}
         <Route path="/customers">
           <Route
@@ -164,16 +208,61 @@ function App() {
           />
         </Route>
 
+        {/* Sales Routes */}
+        <Route path="/sales">
+          <Route path="invoice" element={<ProtectedRoute><SalesInvoice /></ProtectedRoute>} />
+          <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
+          <Route path="proforma" element={<ProtectedRoute><ProformaInvoice /></ProtectedRoute>} />
+          <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
+          <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
+          <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
+          <Route path="return" element={<ProtectedRoute><SalesReturn /></ProtectedRoute>} />
+        </Route>
+
+        {/* Purchase Routes */}
+        <Route path="/purchase">
+          <Route path="entry" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
+          <Route path="bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
+          <Route path="payment-out" element={<ProtectedRoute><PaymentOut /></ProtectedRoute>} />
+          <Route path="expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
+          <Route path="order" element={<ProtectedRoute><PurchaseOrder /></ProtectedRoute>} />
+          <Route path="return" element={<ProtectedRoute><PurchaseReturn /></ProtectedRoute>} />
+        </Route>
+
+        {/* Cash & Bank Routes */}
+        <Route path="/cashbank">
+          <Route path="bank-accounts" element={<ProtectedRoute><BankAccounts /></ProtectedRoute>} />
+          <Route path="cash-in-hand" element={<ProtectedRoute><CashInHand /></ProtectedRoute>} />
+          <Route path="cheques" element={<ProtectedRoute><Cheques /></ProtectedRoute>} />
+          <Route path="loan-accounts" element={<ProtectedRoute><LoanAccounts /></ProtectedRoute>} />
+        </Route>
+
+        {/* Business Growth Routes */}
+        <Route path="/business">
+          <Route path="online-shop" element={<ProtectedRoute><OnlineShop /></ProtectedRoute>} />
+          <Route path="google-profile" element={<ProtectedRoute><GoogleProfile /></ProtectedRoute>} />
+          <Route path="marketing-tools" element={<ProtectedRoute><MarketingTools /></ProtectedRoute>} />
+          <Route path="whatsapp-marketing" element={<ProtectedRoute><WhatsAppMarketing /></ProtectedRoute>} />
+        </Route>
+
+        {/* Sync & Backup Routes */}
+        <Route path="/sync">
+          <Route path="share" element={<ProtectedRoute><SyncShare /></ProtectedRoute>} />
+          <Route path="backup" element={<ProtectedRoute><Backup /></ProtectedRoute>} />
+          <Route path="restore" element={<ProtectedRoute><Restore /></ProtectedRoute>} />
+        </Route>
+
+        {/* Utilities Routes */}
+        <Route path="/utilities">
+          <Route path="barcode" element={<ProtectedRoute><BarcodeGenerator /></ProtectedRoute>} />
+          <Route path="import-items" element={<ProtectedRoute><ImportItems /></ProtectedRoute>} />
+          <Route path="business-setup" element={<ProtectedRoute><BusinessSetup /></ProtectedRoute>} />
+          <Route path="export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
+        </Route>
+
         {/* Reports Route */}
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute>
-              <Reports />
-            </ProtectedRoute>
-          }
-        />
-        
+        <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
+
         {/* 404 Route */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

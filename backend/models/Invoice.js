@@ -24,7 +24,7 @@ const invoiceSchema = new mongoose.Schema(
   {
     invoiceNo: {
       type: String,
-      unique: true,
+      required: true,
     },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -54,16 +54,20 @@ const invoiceSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["cash", "upi", "card", "due"],
+      enum: ["cash", "upi", "card", "due", "split"],
       default: "cash",
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   { timestamps: true }
 );
+
+// Create compound unique index: invoiceNo must be unique per user
+invoiceSchema.index({ invoiceNo: 1, createdBy: 1 }, { unique: true });
 
 const Invoice = mongoose.model("Invoice", invoiceSchema);
 export default Invoice;

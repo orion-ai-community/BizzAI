@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Invoice from "../models/Invoice.js";
 import Item from "../models/Item.js";
 import Customer from "../models/Customer.js";
@@ -24,44 +25,84 @@ export const createInvoice = async (req, res) => {
 
     // IMPORTANT: Walk-in customers cannot take due
     if (!customerId && paidAmount < totalAmount) {
-      return res.status(400).json({ 
-        message: "Walk-in customers must pay full amount. Please add customer details to allow credit." 
+      return res.status(400).json({
+        message: "Walk-in customers must pay full amount. Please add customer details to allow credit."
       });
     }
 
     // Verify all items belong to current user
     for (const it of items) {
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(it.item)) {
+        return res.status(400).json({ message: `Invalid item ID format: ${it.item}` });
+      }
+
       const item = await Item.findOne({ _id: it.item, addedBy: req.user._id });
       if (!item) {
-        return res.status(400).json({ 
-          message: `Item not found or unauthorized: ${it.item}` 
+        return res.status(400).json({
+          message: `Item not found or unauthorized: ${it.item}`
         });
       }
-      
+
       // Check stock availability
       if (item.stockQty < it.quantity) {
-        return res.status(400).json({ 
-          message: `Insufficient stock for ${item.name}. Available: ${item.stockQty}` 
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.name}. Available: ${item.stockQty}`
         });
       }
     }
 
     // Verify customer belongs to current user if provided
     if (customerId) {
-      const customer = await Customer.findOne({ 
-        _id: customerId, 
-        owner: req.user._id 
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(customerId)) {
+        return res.status(400).json({ message: "Invalid customer ID format" });
+      }
+
+      const customer = await Customer.findOne({
+        _id: customerId,
+        owner: req.user._id
       });
       if (!customer) {
-        return res.status(400).json({ 
-          message: "Customer not found or unauthorized" 
+        return res.status(400).json({
+          message: "Customer not found or unauthorized"
         });
       }
     }
 
-    // Create invoice number (ex: INV-00001) - unique per user
-    const count = await Invoice.countDocuments({ createdBy: req.user._id });
-    const invoiceNo = `INV-${String(count + 1).padStart(5, "0")}`;
+    // Handle overpayment and change return
+    const changeOwed = Math.max(0, paidAmount - totalAmount);
+    const changeReturned = parseFloat(req.body.changeReturned) || 0;
+    const changeNotReturned = Math.max(0, changeOwed - changeReturned);
+
+    // Cap paidAmount at totalAmount (don't record overpayment)
+    const actualPaidAmount = Math.min(paidAmount, totalAmount);
+
+    // Determine payment status
+    let paymentStatus;
+    if (actualPaidAmount >= totalAmount) {
+      paymentStatus = "paid";
+    } else if (actualPaidAmount > 0) {
+      paymentStatus = "partial";
+    } else {
+      paymentStatus = "unpaid";
+    }
+
+    // Generate unique invoice number - find most recent invoice and increment
+    const lastInvoice = await Invoice.findOne({ createdBy: req.user._id })
+      .sort({ createdAt: -1 })
+      .select('invoiceNo');
+
+    let invoiceNumber = 1;
+    if (lastInvoice && lastInvoice.invoiceNo) {
+      // Extract number from format INV-00001
+      const match = lastInvoice.invoiceNo.match(/INV-(\d+)/);
+      if (match) {
+        invoiceNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    const invoiceNo = `INV-${String(invoiceNumber).padStart(5, "0")}`;
 
     // Save invoice
     const invoice = await Invoice.create({
@@ -71,10 +112,9 @@ export const createInvoice = async (req, res) => {
       subtotal,
       discount,
       totalAmount,
-      paidAmount,
+      paidAmount: actualPaidAmount,
       paymentMethod,
-      paymentStatus:
-        paidAmount >= totalAmount ? "paid" : paidAmount > 0 ? "partial" : "unpaid",
+      paymentStatus,
       createdBy: req.user._id,
     });
 
@@ -84,8 +124,8 @@ export const createInvoice = async (req, res) => {
     }
 
     // Handle customer dues if unpaid
-    if (customerId && paidAmount < totalAmount) {
-      const dueAmount = totalAmount - paidAmount;
+    if (customerId && actualPaidAmount < totalAmount) {
+      const dueAmount = totalAmount - actualPaidAmount;
       await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
 
       await Transaction.create({
@@ -97,13 +137,27 @@ export const createInvoice = async (req, res) => {
       });
     }
 
+    // Handle change not returned - create NEGATIVE due (customer credit)
+    if (customerId && changeNotReturned > 0) {
+      // Decrease customer dues by changeNotReturned (customer has credit)
+      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: -changeNotReturned } });
+
+      await Transaction.create({
+        type: "due",
+        customer: customerId,
+        invoice: invoice._id,
+        amount: -changeNotReturned,
+        description: `Credit due to customer - change not returned for invoice ${invoiceNo}`,
+      });
+    }
+
     // Record payment transaction
-    if (paidAmount > 0) {
+    if (actualPaidAmount > 0) {
       await Transaction.create({
         type: "payment",
         customer: customerId,
         invoice: invoice._id,
-        amount: paidAmount,
+        amount: actualPaidAmount,
         paymentMethod,
         description: `Payment received for invoice ${invoiceNo}`,
       });
@@ -152,15 +206,20 @@ export const getAllInvoices = async (req, res) => {
  */
 export const getInvoiceById = async (req, res) => {
   try {
-    const invoice = await Invoice.findOne({ 
-      _id: req.params.id, 
-      createdBy: req.user._id 
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid invoice ID format" });
+    }
+
+    const invoice = await Invoice.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id
     }).populate("customer");
-    
+
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found or unauthorized" });
     }
-    
+
     res.status(200).json(invoice);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
@@ -173,11 +232,16 @@ export const getInvoiceById = async (req, res) => {
  */
 export const deleteInvoice = async (req, res) => {
   try {
-    const invoice = await Invoice.findOne({ 
-      _id: req.params.id, 
-      createdBy: req.user._id 
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid invoice ID format" });
+    }
+
+    const invoice = await Invoice.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id
     });
-    
+
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found or unauthorized" });
     }

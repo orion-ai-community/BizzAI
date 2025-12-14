@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getInvoiceById, reset } from '../redux/slices/posSlice';
+import { getInvoiceById, reset, clearInvoice } from '../redux/slices/posSlice';
 import Layout from '../components/Layout';
 
 const InvoiceDetail = () => {
@@ -92,7 +92,11 @@ const InvoiceDetail = () => {
                 <span>Print Invoice</span>
               </button>
               <button
-                onClick={() => navigate('/pos')}
+                onClick={() => {
+                  dispatch(clearInvoice());
+                  dispatch(reset());
+                  navigate('/pos');
+                }}
                 className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

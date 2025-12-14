@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Customer from "../models/Customer.js";
 import Transaction from "../models/Transaction.js";
 import { info, error } from "../utils/logger.js";
@@ -59,6 +60,11 @@ export const addCustomer = async (req, res) => {
  */
 export const updateCustomer = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid customer ID format" });
+    }
+
     // First check if customer belongs to this owner
     const customer = await Customer.findOne({ 
       _id: req.params.id, 
@@ -130,6 +136,11 @@ export const getAllCustomers = async (req, res) => {
  */
 export const getCustomerById = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid customer ID format" });
+    }
+
     // Only get customer if it belongs to current user
     const customer = await Customer.findOne({ 
       _id: req.params.id, 
@@ -153,6 +164,11 @@ export const getCustomerById = async (req, res) => {
  */
 export const deleteCustomer = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid customer ID format" });
+    }
+
     // First check if customer belongs to this owner
     const customer = await Customer.findOne({ 
       _id: req.params.id, 
@@ -178,6 +194,11 @@ export const deleteCustomer = async (req, res) => {
  */
 export const getCustomerTransactions = async (req, res) => {
   try {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid customer ID format" });
+    }
+
     // First check if customer belongs to this owner
     const customer = await Customer.findOne({ 
       _id: req.params.id, 

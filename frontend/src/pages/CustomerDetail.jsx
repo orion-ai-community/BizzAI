@@ -124,7 +124,7 @@ const CustomerDetail = () => {
             </svg>
             Back to Customers
           </button>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Customer Details
@@ -162,7 +162,7 @@ const CustomerDetail = () => {
 
         {/* Customer Info Card */}
         <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
-          <div className="flex items-center space-x-6 mb-6">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-3xl font-bold text-white">
                 {customer.name.charAt(0).toUpperCase()}

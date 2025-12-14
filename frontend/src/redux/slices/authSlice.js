@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'https://billing-software-mern-one.vercel.app/api/auth';
+const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/auth";
 
 // Get user from localStorage
 const user = JSON.parse(localStorage.getItem('user'));

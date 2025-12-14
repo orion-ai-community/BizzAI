@@ -25,6 +25,7 @@ const POS = () => {
         discount: 0,
         paymentMethod: 'cash',
         paidAmount: '',
+        changeReturned: '',
       }
     ];
   });
@@ -48,13 +49,13 @@ const POS = () => {
     { method: 'cash', amount: '' },
   ]);
   const [barcodeInput, setBarcodeInput] = useState('');
-  
+
   // Hold orders state - Load from localStorage
   const [holdOrders, setHoldOrders] = useState(() => {
     const saved = localStorage.getItem('posHoldOrders');
     return saved ? JSON.parse(saved) : [];
   });
-  
+
   // New customer form
   const [newCustomer, setNewCustomer] = useState({
     name: '',
@@ -73,7 +74,7 @@ const POS = () => {
       // Remove completed tab and navigate
       const completedTab = activeTab;
       const newTabs = tabs.filter(tab => tab.id !== activeTabId);
-      
+
       if (newTabs.length === 0) {
         // If no tabs left, create a fresh tab
         const freshTab = {
@@ -84,6 +85,7 @@ const POS = () => {
           discount: 0,
           paymentMethod: 'cash',
           paidAmount: '',
+          changeReturned: '',
         };
         setTabs([freshTab]);
         setActiveTabId(nextTabId);
@@ -92,7 +94,7 @@ const POS = () => {
         setTabs(newTabs);
         setActiveTabId(newTabs[0].id);
       }
-      
+
       // Navigate to invoice detail
       navigate(`/pos/invoice/${invoice._id}`);
       dispatch(clearInvoice());
@@ -156,17 +158,17 @@ const POS = () => {
 
   const closeTab = (tabId) => {
     if (tabs.length === 1) return; // Don't close last tab
-    
+
     const newTabs = tabs.filter(tab => tab.id !== tabId);
     setTabs(newTabs);
-    
+
     if (activeTabId === tabId) {
       setActiveTabId(newTabs[0].id);
     }
   };
 
   const updateTabData = (updates) => {
-    setTabs(tabs.map(tab => 
+    setTabs(tabs.map(tab =>
       tab.id === activeTabId ? { ...tab, ...updates } : tab
     ));
   };
@@ -174,13 +176,13 @@ const POS = () => {
   // Cart management
   const addToCart = (item) => {
     const existingItem = activeTab.cart.find((cartItem) => cartItem.item === item._id);
-    
+
     if (existingItem) {
       if (existingItem.quantity >= item.stockQty) {
         alert(`Only ${item.stockQty} units available in stock!`);
         return;
       }
-      
+
       updateTabData({
         cart: activeTab.cart.map((cartItem) =>
           cartItem.item === item._id
@@ -193,7 +195,7 @@ const POS = () => {
         alert('This item is out of stock!');
         return;
       }
-      
+
       updateTabData({
         cart: [...activeTab.cart, {
           item: item._id,
@@ -246,7 +248,7 @@ const POS = () => {
   const handleAddCustomer = async (e) => {
     e.preventDefault();
     const result = await dispatch(addCustomer(newCustomer));
-    
+
     // Only refresh customer list if successful
     if (result.type.includes('fulfilled')) {
       await dispatch(getAllCustomers());
@@ -269,16 +271,16 @@ const POS = () => {
       alert('Cart is empty!');
       return;
     }
-    
+
     const holdOrder = {
       id: Date.now(),
       timestamp: new Date().toISOString(),
       ...activeTab,
       customerName: activeTab.customer?.name || 'Walk-in',
     };
-    
+
     setHoldOrders([...holdOrders, holdOrder]);
-    
+
     // Clear current tab
     updateTabData({
       customer: null,
@@ -287,7 +289,7 @@ const POS = () => {
       paymentMethod: 'cash',
       paidAmount: '',
     });
-    
+
     alert('Order parked successfully!');
   };
 
@@ -302,11 +304,11 @@ const POS = () => {
       paymentMethod: holdOrder.paymentMethod,
       paidAmount: holdOrder.paidAmount,
     };
-    
+
     setTabs([...tabs, newTab]);
     setActiveTabId(nextTabId);
     setNextTabId(nextTabId + 1);
-    
+
     // Remove from hold orders
     setHoldOrders(holdOrders.filter(order => order.id !== holdOrder.id));
     setShowHoldOrders(false);
@@ -339,7 +341,7 @@ const POS = () => {
 
   const applySplitPayment = () => {
     const total = calculateSplitTotal();
-    updateTabData({ 
+    updateTabData({
       paidAmount: total.toString(),
       paymentMethod: 'split'
     });
@@ -352,7 +354,7 @@ const POS = () => {
       alert('Cart is empty!');
       return;
     }
-    
+
     const printWindow = window.open('', '', 'width=300,height=600');
     const receipt = `
       <!DOCTYPE html>
@@ -442,6 +444,7 @@ const POS = () => {
       discount: parseFloat(activeTab.discount) || 0,
       paidAmount: paid,
       paymentMethod: activeTab.paymentMethod,
+      changeReturned: parseFloat(activeTab.changeReturned) || 0,
     };
 
     dispatch(createInvoice(invoiceData));
@@ -501,11 +504,10 @@ const POS = () => {
             {tabs.map((tab) => (
               <div
                 key={tab.id}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition ${
-                  activeTabId === tab.id
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition ${activeTabId === tab.id
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
               >
                 <button
                   onClick={() => setActiveTabId(tab.id)}
@@ -513,9 +515,8 @@ const POS = () => {
                 >
                   <span className="font-medium">{tab.name}</span>
                   {tab.cart.length > 0 && (
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${
-                      activeTabId === tab.id ? 'bg-white text-indigo-600' : 'bg-indigo-100 text-indigo-600'
-                    }`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${activeTabId === tab.id ? 'bg-white text-indigo-600' : 'bg-indigo-100 text-indigo-600'
+                      }`}>
                       {tab.cart.length}
                     </span>
                   )}
@@ -526,9 +527,8 @@ const POS = () => {
                       e.stopPropagation();
                       closeTab(tab.id);
                     }}
-                    className={`ml-2 hover:bg-opacity-20 rounded p-1 ${
-                      activeTabId === tab.id ? 'hover:bg-white' : 'hover:bg-gray-300'
-                    }`}
+                    className={`ml-2 hover:bg-opacity-20 rounded p-1 ${activeTabId === tab.id ? 'hover:bg-white' : 'hover:bg-gray-300'
+                      }`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -562,7 +562,7 @@ const POS = () => {
                   + Add New Customer
                 </button>
               </div>
-              
+
               {activeTab.customer ? (
                 <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
                   <div>
@@ -625,11 +625,10 @@ const POS = () => {
                     key={item._id}
                     onClick={() => addToCart(item)}
                     disabled={item.stockQty === 0}
-                    className={`p-4 border-2 rounded-lg text-left transition ${
-                      item.stockQty === 0
-                        ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-50'
-                        : 'border-gray-200 hover:border-indigo-500 hover:shadow-md'
-                    }`}
+                    className={`p-4 border-2 rounded-lg text-left transition ${item.stockQty === 0
+                      ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-50'
+                      : 'border-gray-200 hover:border-indigo-500 hover:shadow-md'
+                      }`}
                   >
                     <div className="font-medium text-gray-900 mb-1 truncate">{item.name}</div>
                     <div className="text-lg font-bold text-indigo-600">₹{item.sellingPrice}</div>
@@ -756,6 +755,54 @@ const POS = () => {
                       ₹{Math.abs(balance).toFixed(2)}
                     </span>
                   </div>
+
+                  {/* Change Returned Input - only show if customer paid MORE than total */}
+                  {balance > 0 && (
+                    <div className="mt-3 pt-3 border-t border-green-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Change Returned:
+                      </label>
+                      <input
+                        type="number"
+                        value={activeTab.changeReturned}
+                        onChange={(e) => updateTabData({ changeReturned: e.target.value })}
+                        min="0"
+                        max={balance}
+                        step="0.01"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="Enter change returned to customer"
+                      />
+
+                      {/* Remaining Change/Credit */}
+                      {activeTab.changeReturned && parseFloat(activeTab.changeReturned) < balance && (
+                        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                          <div className="flex justify-between items-center text-sm">
+                            <span className="text-yellow-800 font-medium">
+                              {activeTab.customer ? 'Credit Due to Customer:' : 'Remaining Change (unpaid):'}
+                            </span>
+                            <span className="font-bold text-yellow-900">
+                              ₹{(balance - parseFloat(activeTab.changeReturned || 0)).toFixed(2)}
+                            </span>
+                          </div>
+                          {activeTab.customer && (
+                            <p className="text-xs text-yellow-700 mt-1">
+                              💡 This will be added as credit to customer's account
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Full Change Returned Confirmation */}
+                      {activeTab.changeReturned && parseFloat(activeTab.changeReturned) === balance && (
+                        <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded flex items-center text-sm text-green-800">
+                          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span className="font-medium">Full change returned ✓</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -887,7 +934,7 @@ const POS = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Select Customer</h3>
-              
+
               {/* Customer Search */}
               <div className="mb-4">
                 <input
@@ -899,7 +946,7 @@ const POS = () => {
                   autoFocus
                 />
               </div>
-              
+
               <div className="space-y-2">
                 {filteredCustomers.length === 0 ? (
                   <p className="text-center text-gray-500 py-4">No customers found</p>
@@ -939,7 +986,7 @@ const POS = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 Parked Orders ({holdOrders.length})
               </h3>
-              
+
               {holdOrders.length === 0 ? (
                 <p className="text-center text-gray-500 py-8">No parked orders</p>
               ) : (
@@ -978,7 +1025,7 @@ const POS = () => {
                   ))}
                 </div>
               )}
-              
+
               <button
                 onClick={() => setShowHoldOrders(false)}
                 className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
@@ -1000,7 +1047,7 @@ const POS = () => {
                   <span className="font-bold text-indigo-600">₹{total.toFixed(2)}</span>
                 </div>
               </div>
-              
+
               <div className="space-y-3 mb-4">
                 {splitPayments.map((payment, index) => (
                   <div key={index} className="flex space-x-2">
@@ -1031,14 +1078,14 @@ const POS = () => {
                   </div>
                 ))}
               </div>
-              
+
               <button
                 onClick={addSplitPayment}
                 className="w-full mb-4 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50"
               >
                 + Add Payment Method
               </button>
-              
+
               <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-600">Total Paid:</span>
@@ -1053,7 +1100,7 @@ const POS = () => {
                   </span>
                 </div>
               </div>
-              
+
               <div className="flex space-x-2">
                 <button
                   onClick={() => {

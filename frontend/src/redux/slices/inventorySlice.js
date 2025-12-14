@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'https://billing-software-mern-one.vercel.app/api/inventory';
+const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/inventory";
 
 // Get token from state
 const getConfig = (token) => ({
