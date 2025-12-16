@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
-import Modal from '../../components/Modal';
+import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const SalesInvoice = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         invoiceNo: 'INV-' + Date.now(),
         invoiceDate: new Date().toISOString().split('T')[0],
@@ -329,13 +331,11 @@ const SalesInvoice = () => {
             </div>
 
             {/* Customer Modal */}
-            <Modal
+            <CustomerSelectionModal
                 isOpen={showCustomerModal}
                 onClose={() => setShowCustomerModal(false)}
-                title="Select Customer"
-            >
-                <p className="text-gray-600">Customer selection interface would go here...</p>
-            </Modal>
+                onSelect={(customer) => setFormData({ ...formData, customer })}
+            />
         </Layout>
     );
 };
