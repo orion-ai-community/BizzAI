@@ -1,341 +1,282 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { getAllSalesInvoices, deleteSalesInvoice, reset } from '../../redux/slices/salesInvoiceSlice';
 import Layout from '../../components/Layout';
-import PageHeader from '../../components/PageHeader';
-import FormInput from '../../components/FormInput';
-import Modal from '../../components/Modal';
 
 const SalesInvoice = () => {
-    const [formData, setFormData] = useState({
-        invoiceNo: 'INV-' + Date.now(),
-        invoiceDate: new Date().toISOString().split('T')[0],
-        dueDate: '',
-        customer: null,
-        items: [{ name: '', quantity: 1, rate: 0, tax: 18, amount: 0 }],
-        discount: 0,
-        shippingCharges: 0,
-        notes: '',
-        termsAndConditions: ''
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { invoices, isLoading, isError, message } = useSelector((state) => state.salesInvoice);
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+    useEffect(() => {
+        dispatch(getAllSalesInvoices());
+        return () => {
+            dispatch(reset());
+        };
+    }, [dispatch]);
+
+    const handleDelete = async (id) => {
+        await dispatch(deleteSalesInvoice(id));
+        setDeleteConfirm(null);
+        dispatch(getAllSalesInvoices());
+    };
+
+    const filteredInvoices = invoices.filter((invoice) => {
+        const matchesSearch =
+            invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (invoice.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || invoice.paymentStatus === statusFilter;
+        return matchesSearch && matchesStatus;
     });
 
-    const [showCustomerModal, setShowCustomerModal] = useState(false);
-
-    const addItem = () => {
-        setFormData({
-            ...formData,
-            items: [...formData.items, { name: '', quantity: 1, rate: 0, tax: 18, amount: 0 }]
-        });
-    };
-
-    const removeItem = (index) => {
-        setFormData({
-            ...formData,
-            items: formData.items.filter((_, i) => i !== index)
-        });
-    };
-
-    const updateItem = (index, field, value) => {
-        const newItems = [...formData.items];
-        newItems[index][field] = value;
-
-        if (field === 'quantity' || field === 'rate') {
-            newItems[index].amount = newItems[index].quantity * newItems[index].rate;
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'paid':
+                return 'bg-green-100 text-green-800';
+            case 'partial':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'unpaid':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
         }
-
-        setFormData({ ...formData, items: newItems });
     };
 
-    const calculateSubtotal = () => {
-        return formData.items.reduce((sum, item) => sum + item.amount, 0);
-    };
-
-    const calculateTax = () => {
-        return formData.items.reduce((sum, item) => {
-            return sum + (item.amount * item.tax / 100);
-        }, 0);
-    };
-
-    const calculateTotal = () => {
-        return calculateSubtotal() + calculateTax() - formData.discount + formData.shippingCharges;
-    };
-
-    const handleSave = () => {
-        console.log('Saving invoice:', formData);
-        alert('Invoice saved successfully!');
-    };
+    const totalSales = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
+    const totalPaid = invoices.reduce((sum, inv) => sum + inv.paidAmount, 0);
+    const totalDue = totalSales - totalPaid;
 
     return (
         <Layout>
-            <PageHeader
-                title="Sales Invoice"
-                description="Create and manage sales invoices"
-                actions={[
-                    <button
-                        key="save"
-                        onClick={handleSave}
-                        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-                    >
-                        Save Invoice
-                    </button>,
-                    <button
-                        key="print"
-                        className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-                    >
-                        Print
-                    </button>
-                ]}
-            />
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Sales Invoices</h1>
+                    <p className="text-gray-600">View and manage all sales invoices</p>
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Form */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Invoice Details */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Invoice Details</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormInput
-                                label="Invoice Number"
-                                name="invoiceNo"
-                                value={formData.invoiceNo}
-                                onChange={(e) => setFormData({ ...formData, invoiceNo: e.target.value })}
-                                required
-                            />
-                            <FormInput
-                                label="Invoice Date"
-                                name="invoiceDate"
-                                type="date"
-                                value={formData.invoiceDate}
-                                onChange={(e) => setFormData({ ...formData, invoiceDate: e.target.value })}
-                                required
-                            />
-                            <FormInput
-                                label="Due Date"
-                                name="dueDate"
-                                type="date"
-                                value={formData.dueDate}
-                                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                            />
-                        </div>
+                {/* Error Message */}
+                {isError && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-600 text-sm">{message}</p>
                     </div>
+                )}
 
-                    {/* Customer Selection */}
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                     <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
-                            <button
-                                onClick={() => setShowCustomerModal(true)}
-                                className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                            >
-                                + Add Customer
-                            </button>
-                        </div>
-                        {formData.customer ? (
-                            <div className="p-4 bg-indigo-50 rounded-lg">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{formData.customer.name}</p>
-                                        <p className="text-sm text-gray-600">{formData.customer.phone}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setFormData({ ...formData, customer: null })}
-                                        className="text-red-600 hover:text-red-700"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-500 text-sm font-medium">Total Invoices</p>
+                                <p className="text-3xl font-bold text-gray-900 mt-2">{invoices.length}</p>
                             </div>
-                        ) : (
-                            <button
-                                onClick={() => setShowCustomerModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition"
-                            >
-                                Click to select customer
-                            </button>
-                        )}
+                            <div className="p-3 bg-blue-100 rounded-lg">
+                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Items Table */}
                     <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Items</h2>
-                            <button
-                                onClick={addItem}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                            >
-                                + Add Item
-                            </button>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-500 text-sm font-medium">Total Sales</p>
+                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalSales.toFixed(0)}</p>
+                            </div>
+                            <div className="p-3 bg-green-100 rounded-lg">
+                                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
                         </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-500 text-sm font-medium">Amount Collected</p>
+                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalPaid.toFixed(0)}</p>
+                            </div>
+                            <div className="p-3 bg-purple-100 rounded-lg">
+                                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-500 text-sm font-medium">Outstanding Dues</p>
+                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalDue.toFixed(0)}</p>
+                            </div>
+                            <div className="p-3 bg-red-100 rounded-lg">
+                                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filters */}
+                <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                        <div className="w-full sm:w-96">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search by invoice number or customer..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                />
+                                <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                                <option value="all">All Status</option>
+                                <option value="paid">Paid</option>
+                                <option value="partial">Partial</option>
+                                <option value="unpaid">Unpaid</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Invoices Table */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    {isLoading ? (
+                        <div className="flex justify-center items-center py-12">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                        </div>
+                    ) : filteredInvoices.length === 0 ? (
+                        <div className="text-center py-12">
+                            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p className="text-gray-500 text-lg">No sales invoices found</p>
+                        </div>
+                    ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tax %</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                                        <th className="px-4 py-3"></th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice No</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
+                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    {formData.items.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="text"
-                                                    value={item.name}
-                                                    onChange={(e) => updateItem(index, 'name', e.target.value)}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-                                                    placeholder="Item name"
-                                                />
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredInvoices.map((invoice) => (
+                                        <tr key={invoice._id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-indigo-600">{invoice.invoiceNo}</div>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="number"
-                                                    value={item.quantity}
-                                                    onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                                    className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-                                                    min="1"
-                                                />
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {new Date(invoice.createdAt).toLocaleDateString()}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                    {new Date(invoice.createdAt).toLocaleTimeString()}
+                                                </div>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="number"
-                                                    value={item.rate}
-                                                    onChange={(e) => updateItem(index, 'rate', parseFloat(e.target.value) || 0)}
-                                                    className="w-24 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-                                                    min="0"
-                                                    step="0.01"
-                                                />
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <select
-                                                    value={item.tax}
-                                                    onChange={(e) => updateItem(index, 'tax', parseFloat(e.target.value))}
-                                                    className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-                                                >
-                                                    <option value="0">0%</option>
-                                                    <option value="5">5%</option>
-                                                    <option value="12">12%</option>
-                                                    <option value="18">18%</option>
-                                                    <option value="28">28%</option>
-                                                </select>
-                                            </td>
-                                            <td className="px-4 py-3 font-medium">₹{item.amount.toFixed(2)}</td>
-                                            <td className="px-4 py-3">
-                                                {formData.items.length > 1 && (
-                                                    <button
-                                                        onClick={() => removeItem(index)}
-                                                        className="text-red-600 hover:text-red-800"
-                                                    >
-                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-900">
+                                                    {invoice.customer?.name || 'Walk-in'}
+                                                </div>
+                                                {invoice.customer?.phone && (
+                                                    <div className="text-xs text-gray-500">{invoice.customer.phone}</div>
                                                 )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{invoice.items.length} items</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    ₹{invoice.totalAmount.toFixed(2)}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">₹{invoice.paidAmount.toFixed(2)}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(invoice.paymentStatus)}`}>
+                                                    {invoice.paymentStatus}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="text-sm text-gray-900 capitalize">{invoice.paymentMethod}</span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button
+                                                    onClick={() => navigate(`/sales/invoice/${invoice._id}`)}
+                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                >
+                                                    View
+                                                </button>
+                                                <button
+                                                    onClick={() => setDeleteConfirm(invoice._id)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-
-                    {/* Additional Details */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Additional Details</h2>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                                <textarea
-                                    value={formData.notes}
-                                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                    rows="3"
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    placeholder="Add any notes for the customer..."
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Terms & Conditions</label>
-                                <textarea
-                                    value={formData.termsAndConditions}
-                                    onChange={(e) => setFormData({ ...formData, termsAndConditions: e.target.value })}
-                                    rows="3"
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    placeholder="Add terms and conditions..."
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
 
-                {/* Summary Sidebar */}
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Summary</h2>
-
-                        <div className="space-y-3 mb-4">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Subtotal:</span>
-                                <span className="font-medium">₹{calculateSubtotal().toFixed(2)}</span>
+                {/* Delete Confirmation Modal */}
+                {deleteConfirm && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Confirm Delete</h3>
+                            <p className="text-gray-600 mb-6">
+                                Are you sure you want to delete this invoice? This action cannot be undone.
+                            </p>
+                            <div className="flex space-x-4">
+                                <button
+                                    onClick={() => setDeleteConfirm(null)}
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(deleteConfirm)}
+                                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                >
+                                    Delete
+                                </button>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax:</span>
-                                <span className="font-medium">₹{calculateTax().toFixed(2)}</span>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1">Discount:</label>
-                                <input
-                                    type="number"
-                                    value={formData.discount}
-                                    onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    min="0"
-                                    step="0.01"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1">Shipping:</label>
-                                <input
-                                    type="number"
-                                    value={formData.shippingCharges}
-                                    onChange={(e) => setFormData({ ...formData, shippingCharges: parseFloat(e.target.value) || 0 })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    min="0"
-                                    step="0.01"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="border-t pt-4">
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-bold text-gray-900">Total:</span>
-                                <span className="text-2xl font-bold text-indigo-600">₹{calculateTotal().toFixed(2)}</span>
-                            </div>
-                        </div>
-
-                        <div className="mt-6 space-y-3">
-                            <button
-                                onClick={handleSave}
-                                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
-                            >
-                                Save Invoice
-                            </button>
-                            <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                                Save as Draft
-                            </button>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
-
-            {/* Customer Modal */}
-            <Modal
-                isOpen={showCustomerModal}
-                onClose={() => setShowCustomerModal(false)}
-                title="Select Customer"
-            >
-                <p className="text-gray-600">Customer selection interface would go here...</p>
-            </Modal>
         </Layout>
     );
 };
