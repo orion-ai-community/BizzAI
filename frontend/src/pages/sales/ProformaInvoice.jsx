@@ -73,12 +73,7 @@ const ProformaInvoice = () => {
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-bold text-gray-900">Customer</h2>
-                            <button
-                                onClick={() => setShowCustomerModal(true)}
-                                className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                            >
-                                + Add Customer
-                            </button>
+                            {/* Add Customer button removed */}
                         </div>
                         {formData.customer ? (
                             <div className="p-4 bg-indigo-50 rounded-lg">

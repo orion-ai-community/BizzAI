@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
+import SupplierSelectionModal from '../../components/SupplierSelectionModal';
 
 const Purchase = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const Purchase = () => {
         shippingCharges: 0,
         notes: ''
     });
+    const [showSupplierModal, setShowSupplierModal] = useState(false);
 
     const addItem = () => setFormData({ ...formData, items: [...formData.items, { name: '', quantity: 1, rate: 0, tax: 18, amount: 0 }] });
     const updateItem = (index, field, value) => {
@@ -45,9 +47,32 @@ const Purchase = () => {
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <h2 className="text-lg font-bold text-gray-900 mb-4">Supplier</h2>
-                        <button className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600">
-                            Click to select supplier
-                        </button>
+                        {formData.supplier ? (
+                            <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{formData.supplier.businessName}</p>
+                                        <p className="text-sm text-gray-600">{formData.supplier.contactPersonName}</p>
+                                        <p className="text-sm text-gray-600">{formData.supplier.contactNo}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setFormData({ ...formData, supplier: null })}
+                                        className="text-red-600 hover:text-red-800"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowSupplierModal(true)}
+                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600"
+                            >
+                                Click to select supplier
+                            </button>
+                        )}
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -129,6 +154,12 @@ const Purchase = () => {
                     </div>
                 </div>
             </div>
+
+            <SupplierSelectionModal
+                isOpen={showSupplierModal}
+                onClose={() => setShowSupplierModal(false)}
+                onSelectSupplier={(supplier) => setFormData({ ...formData, supplier })}
+            />
         </Layout>
     );
 };
