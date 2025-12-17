@@ -7,6 +7,10 @@ import Customers from './pages/Customers';
 import AddCustomer from './pages/AddCustomer';
 import EditCustomer from './pages/EditCustomer';
 import CustomerDetail from './pages/CustomerDetail';
+import Suppliers from './pages/Suppliers';
+import AddSupplier from './pages/AddSupplier';
+import EditSupplier from './pages/EditSupplier';
+import SupplierDetail from './pages/SupplierDetail';
 import Inventory from './pages/Inventory';
 import AddItem from './pages/AddItem';
 import EditItem from './pages/EditItem';
@@ -148,6 +152,42 @@ function App() {
             element={
               <ProtectedRoute>
                 <CustomerDetail />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        {/* Supplier Routes */}
+        <Route path="/suppliers">
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <Suppliers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="add"
+            element={
+              <ProtectedRoute>
+                <AddSupplier />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path=":id/edit"
+            element={
+              <ProtectedRoute>
+                <EditSupplier />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path=":id"
+            element={
+              <ProtectedRoute>
+                <SupplierDetail />
               </ProtectedRoute>
             }
           />

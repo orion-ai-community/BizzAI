@@ -1,13 +1,23 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllSalesInvoices, deleteSalesInvoice, reset } from '../../redux/slices/salesInvoiceSlice';
 import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
+import FormInput from '../../components/FormInput';
+import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const SalesInvoice = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const { invoices, isLoading, isError, message } = useSelector((state) => state.salesInvoice);
+    const [formData, setFormData] = useState({
+        invoiceNo: 'INV-' + Date.now(),
+        invoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: '',
+        customer: null,
+        items: [{ name: '', quantity: 1, rate: 0, tax: 18, amount: 0 }],
+        discount: 0,
+        shippingCharges: 0,
+        notes: '',
+        termsAndConditions: ''
+    });
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -84,16 +94,9 @@ const SalesInvoice = () => {
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium">Total Sales</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalSales.toFixed(0)}</p>
-                            </div>
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
+                            {/* Add Customer button removed */}
                         </div>
                     </div>
 
@@ -277,6 +280,13 @@ const SalesInvoice = () => {
                     </div>
                 )}
             </div>
+
+            {/* Customer Modal */}
+            <CustomerSelectionModal
+                isOpen={showCustomerModal}
+                onClose={() => setShowCustomerModal(false)}
+                onSelect={(customer) => setFormData({ ...formData, customer })}
+            />
         </Layout>
     );
 };

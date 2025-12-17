@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
 import DataTable from '../../components/DataTable';
+import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const PaymentIn = () => {
+    const navigate = useNavigate();
+    const [showCustomerModal, setShowCustomerModal] = useState(false);
     const [formData, setFormData] = useState({
         receiptNo: 'RCP-' + Date.now(),
         receiptDate: new Date().toISOString().split('T')[0],
@@ -75,15 +79,19 @@ const PaymentIn = () => {
                     </div>
 
                     {/* Customer Selection */}
+                    {/* Customer Selection */}
                     <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Customer</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
+                            {/* Add Customer button removed */}
+                        </div>
                         {formData.customer ? (
                             <div className="p-4 bg-indigo-50 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="font-medium text-gray-900">{formData.customer.name}</p>
                                         <p className="text-sm text-gray-600">{formData.customer.phone}</p>
-                                        <p className="text-sm text-orange-600 font-medium mt-1">Outstanding: ₹{formData.customer.outstanding}</p>
+                                        <p className="text-sm text-orange-600 font-medium mt-1">Outstanding: ₹{formData.customer.outstanding || 0}</p>
                                     </div>
                                     <button
                                         onClick={() => setFormData({ ...formData, customer: null })}
@@ -94,8 +102,12 @@ const PaymentIn = () => {
                                 </div>
                             </div>
                         ) : (
-                            <button className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600">
-                                Click to select customer
+                            <button
+                                onClick={() => setShowCustomerModal(true)}
+                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
+                            >
+                                <span className="font-medium">Click to select customer</span>
+                                <span className="text-sm text-gray-400">Search by name, phone or email</span>
                             </button>
                         )}
                     </div>
@@ -109,8 +121,8 @@ const PaymentIn = () => {
                                     key={method.value}
                                     onClick={() => setFormData({ ...formData, paymentMethod: method.value })}
                                     className={`p-4 border-2 rounded-lg transition ${formData.paymentMethod === method.value
-                                            ? 'border-indigo-600 bg-indigo-50'
-                                            : 'border-gray-200 hover:border-indigo-300'
+                                        ? 'border-indigo-600 bg-indigo-50'
+                                        : 'border-gray-200 hover:border-indigo-300'
                                         }`}
                                 >
                                     <div className="text-3xl mb-2">{method.icon}</div>
@@ -230,6 +242,11 @@ const PaymentIn = () => {
                     </div>
                 </div>
             </div>
+            <CustomerSelectionModal
+                isOpen={showCustomerModal}
+                onClose={() => setShowCustomerModal(false)}
+                onSelect={(customer) => setFormData({ ...formData, customer })}
+            />
         </Layout>
     );
 };

@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
+import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const Estimate = () => {
+    const navigate = useNavigate();
+    const [showCustomerModal, setShowCustomerModal] = useState(false);
     const [formData, setFormData] = useState({
         estimateNo: 'EST-' + Date.now(),
         estimateDate: new Date().toISOString().split('T')[0],
@@ -65,10 +69,34 @@ const Estimate = () => {
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Customer</h2>
-                        <button className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600">
-                            Click to select customer
-                        </button>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
+                        </div>
+                        {formData.customer ? (
+                            <div className="p-4 bg-indigo-50 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{formData.customer.name}</p>
+                                        <p className="text-sm text-gray-600">{formData.customer.phone}</p>
+                                        <p className="text-sm text-gray-600">{formData.customer.email}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setFormData({ ...formData, customer: null })}
+                                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowCustomerModal(true)}
+                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
+                            >
+                                <span className="font-medium">Click to select customer</span>
+                                <span className="text-sm text-gray-400">Search by name, phone or email</span>
+                            </button>
+                        )}
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -155,7 +183,13 @@ const Estimate = () => {
                     </div>
                 </div>
             </div>
-        </Layout>
+
+            <CustomerSelectionModal
+                isOpen={showCustomerModal}
+                onClose={() => setShowCustomerModal(false)}
+                onSelect={(customer) => setFormData({ ...formData, customer })}
+            />
+        </Layout >
     );
 };
 
