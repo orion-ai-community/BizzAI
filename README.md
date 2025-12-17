@@ -5,12 +5,14 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 ## ✨ Features
 
 ### 🔐 Authentication & Authorization
+
 - Secure user registration and login with JWT authentication
 - Role-based access control (Owner, Admin)
 - Protected routes and API endpoints
 - Password encryption with bcrypt
 
 ### 📦 Inventory Management
+
 - Add, edit, and delete inventory items
 - Track stock quantities in real-time
 - Low stock alerts and notifications
@@ -20,6 +22,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 - Profit margin calculations
 
 ### 👥 Customer Management
+
 - Comprehensive customer database
 - Customer profile with contact details
 - Transaction history tracking
@@ -28,6 +31,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 - Search and filter capabilities
 
 ### 💰 Point of Sale (POS)
+
 - Intuitive, fast checkout interface
 - Barcode/SKU scanning support
 - Multiple payment methods (Cash, UPI, Card, Credit)
@@ -37,6 +41,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 - Print-ready invoice format
 
 ### 📊 Reports & Analytics
+
 - Sales reports with date range filtering
 - Revenue and profit tracking
 - Top-selling products analysis
@@ -45,6 +50,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 - Export capabilities
 
 ### 📄 Invoice Management
+
 - Automatic invoice number generation
 - Detailed invoice view
 - Payment status tracking (Paid, Unpaid, Partial)
@@ -55,6 +61,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 19** - UI library
 - **Vite** - Build tool and dev server
 - **Redux Toolkit** - State management
@@ -64,6 +71,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 - **Axios** - HTTP client
 
 ### Backend
+
 - **Node.js** - Runtime environment
 - **Express.js v5** - Web framework
 - **MongoDB** - NoSQL database
@@ -150,6 +158,7 @@ BizzAI/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **Node.js** (v18 or higher)
 - **MongoDB** (v6 or higher) - Local or Atlas
 - **npm** or **yarn**
@@ -157,49 +166,30 @@ BizzAI/
 ### Installation
 
 #### 1. Clone the repository
+
 ```bash
 git clone https://github.com/orion-ai-community/BizzAI.git
 cd BizzAI
 ```
 
 #### 2. Backend Setup
+
 ```bash
 cd backend
-
 # Install dependencies
 npm install
-
 # Create .env file
-touch .env
-```
-
-Add the following environment variables to `.env`:
-```env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# Database
-MONGODB_URI=mongodb://localhost:27017/bizzai
-# Or use MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/bizzai
-
-# JWT Secret
-JWT_SECRET=your_super_secret_jwt_key_here_change_in_production
-
-# Email Configuration (for invoice emails)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
+cp .env.example .env
 ```
 
 #### 3. Frontend Setup
+
 ```bash
 cd ../frontend
-
 # Install dependencies
 npm install
+# Create .env file
+cp .env.example .env
 ```
 
 ### Running the Application
@@ -207,28 +197,34 @@ npm install
 #### Development Mode
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd backend
 npm run dev
 ```
+
 Backend will run on `http://localhost:5000`
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd frontend
 npm run dev
 ```
+
 Frontend will run on `http://localhost:5173`
 
 #### Production Build
 
 **Backend:**
+
 ```bash
 cd backend
 npm start
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm run build
@@ -238,49 +234,55 @@ npm run preview
 ## 📡 API Endpoints
 
 ### Authentication
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/register` | Register new user | No |
-| POST | `/api/auth/login` | Login user | No |
-| GET | `/api/auth/profile` | Get user profile | Yes |
+
+| Method | Endpoint             | Description       | Auth Required |
+| ------ | -------------------- | ----------------- | ------------- |
+| POST   | `/api/auth/register` | Register new user | No            |
+| POST   | `/api/auth/login`    | Login user        | No            |
+| GET    | `/api/auth/profile`  | Get user profile  | Yes           |
 
 ### Inventory
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/inventory` | Add new item | Yes |
-| GET | `/api/inventory` | Get all items | Yes |
-| GET | `/api/inventory/low-stock` | Get low stock items | Yes |
-| GET | `/api/inventory/:id` | Get single item | Yes |
-| PUT | `/api/inventory/:id` | Update item | Yes |
-| DELETE | `/api/inventory/:id` | Delete item | Yes |
+
+| Method | Endpoint                   | Description         | Auth Required |
+| ------ | -------------------------- | ------------------- | ------------- |
+| POST   | `/api/inventory`           | Add new item        | Yes           |
+| GET    | `/api/inventory`           | Get all items       | Yes           |
+| GET    | `/api/inventory/low-stock` | Get low stock items | Yes           |
+| GET    | `/api/inventory/:id`       | Get single item     | Yes           |
+| PUT    | `/api/inventory/:id`       | Update item         | Yes           |
+| DELETE | `/api/inventory/:id`       | Delete item         | Yes           |
 
 ### Customers
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/customers` | Add new customer | Yes |
-| GET | `/api/customers` | Get all customers | Yes |
-| GET | `/api/customers/:id` | Get customer details | Yes |
-| PUT | `/api/customers/:id` | Update customer | Yes |
-| DELETE | `/api/customers/:id` | Delete customer | Yes |
-| GET | `/api/customers/:id/transactions` | Get customer transactions | Yes |
+
+| Method | Endpoint                          | Description               | Auth Required |
+| ------ | --------------------------------- | ------------------------- | ------------- |
+| POST   | `/api/customers`                  | Add new customer          | Yes           |
+| GET    | `/api/customers`                  | Get all customers         | Yes           |
+| GET    | `/api/customers/:id`              | Get customer details      | Yes           |
+| PUT    | `/api/customers/:id`              | Update customer           | Yes           |
+| DELETE | `/api/customers/:id`              | Delete customer           | Yes           |
+| GET    | `/api/customers/:id/transactions` | Get customer transactions | Yes           |
 
 ### POS / Invoices
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/pos/invoice` | Create new invoice | Yes |
-| GET | `/api/pos/invoices` | Get all invoices | Yes |
-| GET | `/api/pos/invoice/:id` | Get invoice details | Yes |
-| DELETE | `/api/pos/invoice/:id` | Delete invoice | Yes |
+
+| Method | Endpoint               | Description         | Auth Required |
+| ------ | ---------------------- | ------------------- | ------------- |
+| POST   | `/api/pos/invoice`     | Create new invoice  | Yes           |
+| GET    | `/api/pos/invoices`    | Get all invoices    | Yes           |
+| GET    | `/api/pos/invoice/:id` | Get invoice details | Yes           |
+| DELETE | `/api/pos/invoice/:id` | Delete invoice      | Yes           |
 
 ### Reports
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/reports/sales` | Get sales reports | Yes |
-| GET | `/api/reports/revenue` | Get revenue analytics | Yes |
+
+| Method | Endpoint               | Description           | Auth Required |
+| ------ | ---------------------- | --------------------- | ------------- |
+| GET    | `/api/reports/sales`   | Get sales reports     | Yes           |
+| GET    | `/api/reports/revenue` | Get revenue analytics | Yes           |
 
 ## 🎨 Key Features Explained
 
 ### Dashboard
+
 - Real-time business metrics
 - Sales overview with charts
 - Low stock alerts
@@ -288,6 +290,7 @@ npm run preview
 - Quick action buttons
 
 ### POS System
+
 - Fast product search and selection
 - Cart management with quantity adjustments
 - Multiple payment method support
@@ -296,6 +299,7 @@ npm run preview
 - Customer selection for credit tracking
 
 ### Inventory Management
+
 - Bulk import/export capabilities
 - Category-wise organization
 - Stock level monitoring
@@ -303,6 +307,7 @@ npm run preview
 - Search and filter options
 
 ### Customer Management
+
 - Complete customer profiles
 - Purchase history
 - Outstanding dues tracking

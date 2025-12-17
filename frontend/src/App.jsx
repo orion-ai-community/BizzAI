@@ -21,6 +21,7 @@ import Reports from './pages/Reports';
 
 // Sales
 import SalesInvoice from './pages/sales/SalesInvoice';
+import SalesInvoiceDetail from './pages/sales/SalesInvoiceDetail';
 import Estimate from './pages/sales/Estimate';
 import ProformaInvoice from './pages/sales/ProformaInvoice';
 import PaymentIn from './pages/sales/PaymentIn';
@@ -251,6 +252,7 @@ function App() {
         {/* Sales Routes */}
         <Route path="/sales">
           <Route path="invoice" element={<ProtectedRoute><SalesInvoice /></ProtectedRoute>} />
+          <Route path="invoice/:id" element={<ProtectedRoute><SalesInvoiceDetail /></ProtectedRoute>} />
           <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
           <Route path="proforma" element={<ProtectedRoute><ProformaInvoice /></ProtectedRoute>} />
           <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />

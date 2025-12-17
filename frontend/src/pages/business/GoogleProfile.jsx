@@ -10,11 +10,11 @@ const GoogleProfile = () => {
     const [showPhotoUpload, setShowPhotoUpload] = useState(false);
 
     const [profileData, setProfileData] = useState({
-        businessName: 'BillEase Billing Solutions',
+        businessName: 'BizzAI Billing Solutions',
         address: '123 Business Street, Mumbai, Maharashtra 400001',
         phone: '+91 98765 43210',
-        email: 'contact@billease.com',
-        website: 'www.billease.com',
+        email: 'contact@bizzai.com',
+        website: 'www.bizzai.com',
         category: 'Software Company',
         description: 'Complete billing and inventory management solution for businesses',
         verified: true
