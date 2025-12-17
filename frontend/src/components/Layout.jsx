@@ -64,7 +64,7 @@ const Layout = ({ children }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="text-base font-semibold text-gray-900">BillEase</span>
+          <span className="text-base font-semibold text-gray-900">BizzAI</span>
           <div className="w-10" aria-hidden="true" />
         </header>
 

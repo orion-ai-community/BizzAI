@@ -246,7 +246,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">BillEase</h1>
+                  <h1 className="text-lg font-bold">BizzAI</h1>
                   <p className="text-xs text-indigo-200">Billing System</p>
                 </div>
               </div>
