@@ -118,3 +118,5 @@ Desktop.ini
 *.bak
 *.tmp
 *.temp
+
+backend/invoices/*.pdf
