@@ -33,10 +33,21 @@ const POS = () => {
     const savedActiveTab = localStorage.getItem('posActiveTab');
     return savedActiveTab ? parseInt(savedActiveTab) : 1;
   });
-  const [nextTabId, setNextTabId] = useState(() => {
-    const savedNextId = localStorage.getItem('posNextTabId');
-    return savedNextId ? parseInt(savedNextId) : 2;
-  });
+
+  // Helper function to get the next available tab number (fills gaps)
+  const getNextTabNumber = (currentTabs) => {
+    const usedNumbers = currentTabs.map(tab => {
+      const match = tab.name.match(/^Tab (\d+)$/);
+      return match ? parseInt(match[1]) : 0;
+    }).filter(n => n > 0);
+    
+    // Find the smallest available number starting from 1
+    let nextNum = 1;
+    while (usedNumbers.includes(nextNum)) {
+      nextNum++;
+    }
+    return nextNum;
+  };
 
   // UI state
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,6 +56,7 @@ const POS = () => {
   const [showCustomerSelect, setShowCustomerSelect] = useState(false);
   const [showHoldOrders, setShowHoldOrders] = useState(false);
   const [showSplitPayment, setShowSplitPayment] = useState(false);
+  const [draggedTabId, setDraggedTabId] = useState(null);
   const [splitPayments, setSplitPayments] = useState([
     { method: 'cash', amount: '' },
   ]);
@@ -78,7 +90,7 @@ const POS = () => {
       if (newTabs.length === 0) {
         // If no tabs left, create a fresh tab
         const freshTab = {
-          id: nextTabId,
+          id: Date.now(),
           name: 'Tab 1',
           customer: null,
           cart: [],
@@ -88,8 +100,7 @@ const POS = () => {
           changeReturned: '',
         };
         setTabs([freshTab]);
-        setActiveTabId(nextTabId);
-        setNextTabId(nextTabId + 1);
+        setActiveTabId(freshTab.id);
       } else {
         setTabs(newTabs);
         setActiveTabId(newTabs[0].id);
@@ -106,8 +117,7 @@ const POS = () => {
   useEffect(() => {
     localStorage.setItem('posTabs', JSON.stringify(tabs));
     localStorage.setItem('posActiveTab', activeTabId.toString());
-    localStorage.setItem('posNextTabId', nextTabId.toString());
-  }, [tabs, activeTabId, nextTabId]);
+  }, [tabs, activeTabId]);
 
   // Save hold orders to localStorage
   useEffect(() => {
@@ -142,9 +152,11 @@ const POS = () => {
 
   // Tab management functions
   const addNewTab = () => {
+    const nextTabNum = getNextTabNumber(tabs);
+    const newTabId = Date.now(); // Use timestamp for unique ID
     const newTab = {
-      id: nextTabId,
-      name: `Tab ${nextTabId}`,
+      id: newTabId,
+      name: `Tab ${nextTabNum}`,
       customer: null,
       cart: [],
       discount: 0,
@@ -152,8 +164,7 @@ const POS = () => {
       paidAmount: '',
     };
     setTabs([...tabs, newTab]);
-    setActiveTabId(nextTabId);
-    setNextTabId(nextTabId + 1);
+    setActiveTabId(newTabId);
   };
 
   const closeTab = (tabId) => {
@@ -165,6 +176,31 @@ const POS = () => {
     if (activeTabId === tabId) {
       setActiveTabId(newTabs[0].id);
     }
+  };
+
+  // Drag and drop handlers for tab reordering
+  const handleDragStart = (e, tabId) => {
+    setDraggedTabId(tabId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e, tabId) => {
+    e.preventDefault();
+    if (draggedTabId === null || draggedTabId === tabId) return;
+
+    const draggedIndex = tabs.findIndex(tab => tab.id === draggedTabId);
+    const targetIndex = tabs.findIndex(tab => tab.id === tabId);
+
+    if (draggedIndex === targetIndex) return;
+
+    const newTabs = [...tabs];
+    const [draggedTab] = newTabs.splice(draggedIndex, 1);
+    newTabs.splice(targetIndex, 0, draggedTab);
+    setTabs(newTabs);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedTabId(null);
   };
 
   const updateTabData = (updates) => {
@@ -504,10 +540,14 @@ const POS = () => {
             {tabs.map((tab) => (
               <div
                 key={tab.id}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition ${activeTabId === tab.id
+                draggable
+                onDragStart={(e) => handleDragStart(e, tab.id)}
+                onDragOver={(e) => handleDragOver(e, tab.id)}
+                onDragEnd={handleDragEnd}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-grab transition select-none ${activeTabId === tab.id
                   ? 'bg-indigo-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                  } ${draggedTabId === tab.id ? 'opacity-50' : ''}`}
               >
                 <button
                   onClick={() => setActiveTabId(tab.id)}
@@ -527,7 +567,9 @@ const POS = () => {
                       e.stopPropagation();
                       closeTab(tab.id);
                     }}
-                    className={`ml-2 hover:bg-opacity-20 rounded p-1 ${activeTabId === tab.id ? 'hover:bg-white' : 'hover:bg-gray-300'
+                    className={`ml-1 rounded-full p-0.5 transition-colors ${activeTabId === tab.id 
+                      ? 'hover:bg-indigo-500 text-white/70 hover:text-white' 
+                      : 'hover:bg-gray-300 text-gray-500 hover:text-gray-700'
                       }`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
