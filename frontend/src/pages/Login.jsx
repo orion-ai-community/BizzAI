@@ -20,16 +20,14 @@ const Login = () => {
   );
 
   useEffect(() => {
-    if (isError) {
-      // Error is shown in the UI
-    }
-
+    // Only navigate on success, don't reset immediately
     if (isSuccess || user) {
       navigate('/dashboard');
     }
 
-    dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+    // Cleanup: reset only on unmount
+    return () => dispatch(reset());
+  }, [user, isSuccess, navigate, dispatch]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -194,8 +192,16 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
+          {/* Links */}
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-gray-600 text-sm">
+              <Link
+                to="/forgot-password"
+                className="text-indigo-600 font-medium hover:text-indigo-700 transition"
+              >
+                Forgot Password?
+              </Link>
+            </p>
             <p className="text-gray-600 text-sm">
               Don't have an account?{' '}
               <Link
