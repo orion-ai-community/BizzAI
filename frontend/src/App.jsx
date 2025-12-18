@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import {ToastContainer} from "react-toastify"
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import AddCustomer from './pages/AddCustomer';
@@ -111,6 +113,23 @@ function App() {
           element={
             <PublicRoute>
               <Register />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPassword />
             </PublicRoute>
           }
         />
