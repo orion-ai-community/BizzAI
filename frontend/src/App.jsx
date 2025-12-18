@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import {ToastContainer} from "react-toastify"
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -89,6 +90,8 @@ const PublicRoute = ({ children }) => {
 function App() {
   console.log(import.meta.env.VITE_BACKEND_URL);
   return (
+    <>
+    <ToastContainer/>
     <Router>
       <Routes>
         {/* Default Route */}
@@ -311,6 +314,7 @@ function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
+    </>
   );
 }
 
