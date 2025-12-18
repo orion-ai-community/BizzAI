@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, reset } from '../redux/slices/authSlice';
+import {toast} from "react-toastify"
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +23,7 @@ const Login = () => {
   useEffect(() => {
     if (isError) {
       // Error is shown in the UI
+      toast.error(message);
     }
 
     if (isSuccess || user) {
