@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllSalesInvoices, deleteSalesInvoice, reset } from '../../redux/slices/salesInvoiceSlice';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
@@ -7,6 +9,9 @@ import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const SalesInvoice = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { invoices, isLoading, isError, message } = useSelector((state) => state.salesInvoice);
+
     const [formData, setFormData] = useState({
         invoiceNo: 'INV-' + Date.now(),
         invoiceDate: new Date().toISOString().split('T')[0],
@@ -22,6 +27,8 @@ const SalesInvoice = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [showCustomerModal, setShowCustomerModal] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
 
     useEffect(() => {
         dispatch(getAllSalesInvoices());
@@ -41,7 +48,8 @@ const SalesInvoice = () => {
             invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
             (invoice.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || invoice.paymentStatus === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesCustomer = !selectedCustomer || invoice.customer?._id === selectedCustomer._id;
+        return matchesSearch && matchesStatus && matchesCustomer;
     });
 
     const getStatusColor = (status) => {
@@ -95,9 +103,35 @@ const SalesInvoice = () => {
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
-                            {/* Add Customer button removed */}
+                            <h2 className="text-lg font-bold text-gray-900">Customer Filter</h2>
                         </div>
+                        {selectedCustomer ? (
+                            <div className="p-4 bg-indigo-50 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{selectedCustomer.name}</p>
+                                        <p className="text-sm text-gray-600">{selectedCustomer.phone}</p>
+                                        {selectedCustomer.email && (
+                                            <p className="text-sm text-gray-600">{selectedCustomer.email}</p>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => setSelectedCustomer(null)}
+                                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                                    >
+                                        Clear Filter
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowCustomerModal(true)}
+                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
+                            >
+                                <span className="font-medium">Click to filter by customer</span>
+                                <span className="text-sm text-gray-400">Show invoices for specific customer</span>
+                            </button>
+                        )}
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -285,7 +319,10 @@ const SalesInvoice = () => {
             <CustomerSelectionModal
                 isOpen={showCustomerModal}
                 onClose={() => setShowCustomerModal(false)}
-                onSelect={(customer) => setFormData({ ...formData, customer })}
+                onSelect={(customer) => {
+                    setSelectedCustomer(customer);
+                    setShowCustomerModal(false);
+                }}
             />
         </Layout>
     );

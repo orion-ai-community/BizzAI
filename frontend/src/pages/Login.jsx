@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, reset } from '../redux/slices/authSlice';
+import {toast} from "react-toastify"
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -20,7 +21,6 @@ const Login = () => {
   );
 
   useEffect(() => {
-    // Only navigate on success, don't reset immediately
     if (isSuccess || user) {
       navigate('/dashboard');
     }

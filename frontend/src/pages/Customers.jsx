@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { getAllCustomers, deleteCustomer, reset } from '../redux/slices/customerSlice';
-import Layout from '../components/Layout';
-import Modal from '../components/Modal';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  getAllCustomers,
+  deleteCustomer,
+  reset,
+} from "../redux/slices/customerSlice";
+import Layout from "../components/Layout";
+import Modal from "../components/Modal";
 
 const Customers = () => {
   const navigate = useNavigate();
@@ -12,14 +16,13 @@ const Customers = () => {
     (state) => state.customers
   );
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   useEffect(() => {
     dispatch(getAllCustomers());
     return () => {
-      if (window.location.pathname === "/customers")
-        dispatch(reset());
+      if (window.location.pathname === "/customers") dispatch(reset());
     };
   }, [dispatch]);
 
@@ -31,17 +34,17 @@ const Customers = () => {
 
   // FIX: Prevent default behavior and use proper navigation
   const handleAddCustomer = (e) => {
-
     e.preventDefault();
     // e.stopPropagation();
-    navigate('/customers/add');
+    navigate("/customers/add");
   };
 
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm) ||
-      (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (customer.email &&
+        customer.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -118,7 +121,9 @@ const Customers = () => {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">Total Customers</p>
+                <p className="text-gray-500 text-sm font-medium">
+                  Total Customers
+                </p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">
                   {customers.length}
                 </p>
@@ -146,7 +151,10 @@ const Customers = () => {
               <div>
                 <p className="text-gray-500 text-sm font-medium">Total Dues</p>
                 <p className="text-3xl font-bold text-gray-900 mt-2">
-                  ₹{customers.reduce((sum, c) => sum + (c.dues || 0), 0).toFixed(2)}
+                  ₹
+                  {customers
+                    .reduce((sum, c) => sum + (c.dues || 0), 0)
+                    .toFixed(2)}
                 </p>
               </div>
               <div className="p-3 bg-red-100 rounded-lg">
@@ -264,22 +272,31 @@ const Customers = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">{customer.phone}</div>
+                        <div className="text-sm text-gray-900">
+                          {customer.phone}
+                        </div>
                         <div className="text-sm text-gray-500">
-                          {customer.email || 'No email'}
+                          {customer.email || "No email"}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {customer.address || 'No address'}
+                          {customer.address || "No address"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {customer.dues > 0 ? (
+                          // Customer owes shop (Debt) -> Red
                           <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                             ₹{customer.dues.toFixed(2)}
                           </span>
+                        ) : customer.dues < 0 ? (
+                          // Shop owes customer (Return) -> Yellow/Orange
+                          <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            ₹{Math.abs(customer.dues).toFixed(2)} (Return)
+                          </span>
                         ) : (
+                          // No Dues -> Green
                           <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                             No Dues
                           </span>
@@ -326,7 +343,8 @@ const Customers = () => {
         >
           <div className="space-y-4">
             <p className="text-gray-600">
-              Are you sure you want to delete this customer? This action cannot be undone.
+              Are you sure you want to delete this customer? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button

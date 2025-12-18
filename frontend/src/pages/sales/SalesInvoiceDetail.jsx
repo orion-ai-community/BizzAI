@@ -39,7 +39,7 @@ const SalesInvoiceDetail = () => {
                         <p className="text-red-600">{message}</p>
                     </div>
                     <button
-                        onClick={() => navigate('/sales/invoices')}
+                        onClick={() => navigate('/sales/invoice')}
                         className="mt-4 text-indigo-600 hover:text-indigo-700"
                     >
                         Back to Sales Invoices
@@ -68,7 +68,7 @@ const SalesInvoiceDetail = () => {
                 {/* Header - Hidden on print */}
                 <div className="mb-8 print:hidden">
                     <button
-                        onClick={() => navigate('/sales/invoices')}
+                        onClick={() => navigate('/sales/invoice')}
                         className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
                     >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ const SalesInvoiceDetail = () => {
                                 onClick={() => {
                                     dispatch(clearSalesInvoice());
                                     dispatch(reset());
-                                    navigate('/sales/invoices');
+                                    navigate('/sales/invoice');
                                 }}
                                 className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                             >

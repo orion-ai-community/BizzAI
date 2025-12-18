@@ -57,6 +57,14 @@ const invoiceSchema = new mongoose.Schema(
       enum: ["cash", "upi", "card", "due", "split"],
       default: "cash",
     },
+    returnedAmount: {
+      type: Number,
+      default: 0,
+    },
+    hasReturns: {
+      type: Boolean,
+      default: false,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

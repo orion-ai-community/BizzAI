@@ -1,21 +1,41 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Layout from '../components/Layout';
+import { getAllExpenses } from '../redux/slices/expenseSlice';
+import { getAllBills } from '../redux/slices/billSlice';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const { expenses } = useSelector((state) => state.expense);
+  const { bills } = useSelector((state) => state.bill);
 
   useEffect(() => {
     if (!user) {
       navigate('/login');
+    } else {
+      dispatch(getAllExpenses());
+      dispatch(getAllBills());
     }
-  }, [user, navigate]);
+  }, [user, navigate, dispatch]);
 
   if (!user) {
     return null;
   }
+
+  // Calculate expense metrics
+  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const thisMonthExpenses = expenses.filter(exp => {
+    const expenseDate = new Date(exp.date);
+    const now = new Date();
+    return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear();
+  }).reduce((sum, exp) => sum + exp.amount, 0);
+
+  // Calculate bill metrics
+  const totalBillsAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
+  const totalOutstanding = bills.filter(bill => bill.status === 'unpaid').reduce((sum, bill) => sum + bill.amount, 0);
 
   return (
     <Layout>
@@ -122,7 +142,7 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
           {/* Total Invoices */}
           <div className="bg-white rounded-xl shadow p-6">
             <div className="flex items-center justify-between mb-4">
@@ -169,6 +189,98 @@ const Dashboard = () => {
             <p className="text-3xl font-bold text-gray-900 mt-2">₹0.00</p>
           </div>
 
+          {/* Total Expenses */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <svg
+                  className="w-8 h-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-gray-500 text-sm font-medium">Total Expenses</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalExpenses.toFixed(0)}</p>
+          </div>
+
+          {/* This Month Expenses */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <svg
+                  className="w-8 h-8 text-orange-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-gray-500 text-sm font-medium">This Month Expenses</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">₹{thisMonthExpenses.toFixed(0)}</p>
+          </div>
+
+          {/* Total Bills Amount */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-teal-100 rounded-lg">
+                <svg
+                  className="w-8 h-8 text-teal-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-gray-500 text-sm font-medium">Total Bills Amount</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalBillsAmount.toFixed(0)}</p>
+          </div>
+
+          {/* Outstanding Bills */}
+          <div className="bg-white rounded-xl shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-pink-100 rounded-lg">
+                <svg
+                  className="w-8 h-8 text-pink-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-gray-500 text-sm font-medium">Outstanding Bills</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalOutstanding.toFixed(0)}</p>
+          </div>
+
           {/* Pending Payments */}
           <div className="bg-white rounded-xl shadow p-6">
             <div className="flex items-center justify-between mb-4">
@@ -194,6 +306,8 @@ const Dashboard = () => {
             <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
           </div>
         </div>
+
+
 
         {/* Coming Soon Section */}
         <div className="bg-white rounded-2xl shadow-lg p-12 text-center">

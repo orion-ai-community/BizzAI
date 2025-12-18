@@ -4,7 +4,7 @@ const transactionSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["sale", "due", "payment", "purchase", "refund"],
+      enum: ["sale", "due", "payment", "purchase", "refund", "return"],
       required: true,
     },
     customer: {
@@ -14,6 +14,10 @@ const transactionSchema = new mongoose.Schema(
     invoice: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Invoice",
+    },
+    return: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Return",
     },
     amount: {
       type: Number,

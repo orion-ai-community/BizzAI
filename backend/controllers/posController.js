@@ -214,13 +214,23 @@ export const getInvoiceById = async (req, res) => {
     const invoice = await Invoice.findOne({
       _id: req.params.id,
       createdBy: req.user._id
-    }).populate("customer");
+    })
+      .populate("customer")
+      .populate("items.item", "name sku");
 
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found or unauthorized" });
     }
 
-    res.status(200).json(invoice);
+    // Transform items to include name property at root level for frontend compatibility
+    const transformedInvoice = invoice.toObject();
+    transformedInvoice.items = transformedInvoice.items.map(item => ({
+      ...item,
+      name: item.item?.name || 'Item',
+      sku: item.item?.sku || ''
+    }));
+
+    res.status(200).json(transformedInvoice);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
