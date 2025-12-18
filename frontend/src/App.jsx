@@ -27,7 +27,8 @@ import ProformaInvoice from './pages/sales/ProformaInvoice';
 import PaymentIn from './pages/sales/PaymentIn';
 import SalesOrder from './pages/sales/SalesOrder';
 import DeliveryChallan from './pages/sales/DeliveryChallan';
-import SalesReturn from './pages/sales/SalesReturn';
+import Return from './pages/sales/Return';
+import ReturnedItems from './pages/sales/ReturnedItems';
 
 // Purchase
 import Purchase from './pages/purchase/Purchase';
@@ -258,7 +259,8 @@ function App() {
           <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
           <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
           <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
-          <Route path="return" element={<ProtectedRoute><SalesReturn /></ProtectedRoute>} />
+          <Route path="return" element={<ProtectedRoute><Return /></ProtectedRoute>} />
+          <Route path="returned-items" element={<ProtectedRoute><ReturnedItems /></ProtectedRoute>} />
         </Route>
 
         {/* Purchase Routes */}

@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllSalesInvoices, deleteSalesInvoice, reset } from '../../redux/slices/salesInvoiceSlice';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
@@ -7,6 +9,9 @@ import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const SalesInvoice = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { invoices, isLoading, isError, message } = useSelector((state) => state.salesInvoice);
+
     const [formData, setFormData] = useState({
         invoiceNo: 'INV-' + Date.now(),
         invoiceDate: new Date().toISOString().split('T')[0],
@@ -22,6 +27,7 @@ const SalesInvoice = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [showCustomerModal, setShowCustomerModal] = useState(false);
 
     useEffect(() => {
         dispatch(getAllSalesInvoices());
