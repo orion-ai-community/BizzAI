@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Layout from '../components/Layout';
@@ -11,6 +11,7 @@ const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const { expenses } = useSelector((state) => state.expense);
   const { bills } = useSelector((state) => state.bill);
+  const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -18,6 +19,8 @@ const Dashboard = () => {
     } else {
       dispatch(getAllExpenses());
       dispatch(getAllBills());
+      // Trigger fade-in animation
+      setTimeout(() => setFadeIn(true), 50);
     }
   }, [user, navigate, dispatch]);
 
@@ -39,36 +42,37 @@ const Dashboard = () => {
 
   return (
     <Layout>
+      <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 mb-8 text-white">
-          <h2 className="text-3xl font-bold mb-2">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 mb-6 text-white shadow-lg">
+          <h2 className="text-2xl font-bold mb-1">
             Welcome back, {user.name}! 👋
           </h2>
-          <p className="text-indigo-100">
+          <p className="text-sm text-indigo-50">
             Here's your account overview and business insights
           </p>
         </div>
 
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-3xl font-bold text-white">
+        <div className="bg-white rounded-xl shadow-md p-5 mb-6 border border-gray-100">
+          <div className="flex items-center space-x-4 pb-4 border-b border-gray-200">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+              <span className="text-2xl font-bold text-white">
                 {user.name.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">{user.name}</h3>
-              <p className="text-gray-500">{user.email}</p>
+              <h3 className="text-xl font-bold text-gray-900">{user.name}</h3>
+              <p className="text-sm text-gray-500">{user.email}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4">
             {/* Email */}
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/50">
+              <div className="p-2 bg-blue-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -81,19 +85,19 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Email</p>
-                <p className="text-gray-900 font-medium">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Shop Name</p>
+                <p className="text-gray-900 font-semibold text-sm truncate">
                   {user.shopName || 'Not provided'}
                 </p>
               </div>
             </div>
 
             {/* Phone */}
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100/50 border border-purple-200/50">
+              <div className="p-2 bg-purple-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-6 h-6 text-purple-600"
+                  className="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -106,19 +110,19 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Phone</p>
-                <p className="text-gray-900 font-medium">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide">Phone</p>
+                <p className="text-gray-900 font-semibold text-sm truncate">
                   {user.phone || 'Not provided'}
                 </p>
               </div>
             </div>
 
             {/* Role */}
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
+            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-yellow-50 to-yellow-100/50 border border-yellow-200/50">
+              <div className="p-2 bg-yellow-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-6 h-6 text-yellow-600"
+                  className="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -131,9 +135,9 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Role</p>
-                <p className="text-gray-900 font-medium capitalize">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-yellow-700 uppercase tracking-wide">Role</p>
+                <p className="text-gray-900 font-semibold text-sm capitalize truncate">
                   {user.role || 'Owner'}
                 </p>
               </div>
@@ -142,13 +146,13 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {/* Total Invoices */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-blue-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -162,16 +166,16 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Total Invoices</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Total Invoices</p>
+            <p className="text-3xl font-bold text-gray-900">0</p>
           </div>
 
           {/* Total Revenue */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-green-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -185,16 +189,16 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Total Revenue</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">₹0.00</p>
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Total Revenue</p>
+            <p className="text-3xl font-bold text-gray-900">₹0.00</p>
           </div>
 
           {/* Total Expenses */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-red-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-red-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -208,16 +212,16 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Total Expenses</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalExpenses.toFixed(0)}</p>
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Total Expenses</p>
+            <p className="text-3xl font-bold text-gray-900">₹{totalExpenses.toFixed(0)}</p>
           </div>
 
           {/* This Month Expenses */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-orange-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -231,16 +235,16 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">This Month Expenses</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">₹{thisMonthExpenses.toFixed(0)}</p>
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">This Month Expenses</p>
+            <p className="text-3xl font-bold text-gray-900">₹{thisMonthExpenses.toFixed(0)}</p>
           </div>
 
           {/* Total Bills Amount */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-teal-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-teal-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -254,16 +258,16 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Total Bills Amount</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalBillsAmount.toFixed(0)}</p>
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Total Bills Amount</p>
+            <p className="text-3xl font-bold text-gray-900">₹{totalBillsAmount.toFixed(0)}</p>
           </div>
 
           {/* Outstanding Bills */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-pink-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-pink-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -277,16 +281,16 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">Outstanding Bills</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalOutstanding.toFixed(0)}</p>
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">Outstanding Bills</p>
+            <p className="text-3xl font-bold text-gray-900">₹{totalOutstanding.toFixed(0)}</p>
           </div>
 
           {/* Pending Payments */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-yellow-100 rounded-lg">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2.5 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg shadow-sm">
                 <svg
-                  className="w-8 h-8 text-yellow-600"
+                  className="w-6 h-6 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -300,21 +304,19 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-medium">
+            <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-1.5">
               Pending Payments
             </p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+            <p className="text-3xl font-bold text-gray-900">0</p>
           </div>
         </div>
 
-
-
         {/* Coming Soon Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+        <div className="bg-gradient-to-br from-white to-indigo-50 rounded-xl shadow-md p-8 text-center border border-indigo-100">
           <div className="max-w-md mx-auto">
-            <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <svg
-                className="w-10 h-10 text-indigo-600"
+                className="w-8 h-8 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -322,22 +324,22 @@ const Dashboard = () => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   d="M13 10V3L4 14h7v7l9-11h-7z"
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
               More Features Coming Soon!
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm">
               We're working on adding invoices, customers, products, and
               reports to make your billing experience seamless.
             </p>
           </div>
         </div>
-      </Layout>
-    
+      </div>
+    </Layout>
   );
 };
 
