@@ -25,7 +25,7 @@ const InvoiceDetail = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
         </div>
       </Layout>
     );
@@ -35,12 +35,12 @@ const InvoiceDetail = () => {
     return (
       <Layout>
         <div className="max-w-4xl mx-auto">
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600">{message}</p>
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-600 dark:text-red-400">{message}</p>
           </div>
           <button
             onClick={() => navigate('/pos/invoices')}
-            className="mt-4 text-indigo-600 hover:text-indigo-700"
+            className="mt-4 text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))]"
           >
             Back to Invoices
           </button>
@@ -69,7 +69,7 @@ const InvoiceDetail = () => {
         <div className="mb-8 print:hidden">
           <button
             onClick={() => navigate('/pos/invoices')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-900 dark:hover:text-[rgb(var(--color-text))] mb-4"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -78,13 +78,13 @@ const InvoiceDetail = () => {
           </button>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoice Details</h1>
-              <p className="text-gray-600">View and print invoice</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Invoice Details</h1>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">View and print invoice</p>
             </div>
             <div className="flex space-x-2">
               <button
                 onClick={handlePrint}
-                className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -109,9 +109,9 @@ const InvoiceDetail = () => {
         </div>
 
         {/* Invoice Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8 print:shadow-none">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-8 print:shadow-none">
           {/* Invoice Header */}
-          <div className="border-b pb-6 mb-6">
+          <div className="border-b dark:border-[rgb(var(--color-border))] pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-3xl font-bold text-indigo-600 mb-2">INVOICE</h2>
@@ -238,18 +238,18 @@ const InvoiceDetail = () => {
         </div>
 
         {/* Additional Info - Hidden on print */}
-        <div className="mt-6 bg-blue-50 rounded-lg p-4 print:hidden">
+        <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border dark:border-blue-800 rounded-lg p-4 print:hidden">
           <div className="flex items-start">
             <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="flex-1">
-              <h4 className="text-blue-900 font-medium mb-1">Invoice Information</h4>
-              <p className="text-blue-800 text-sm">
+              <h4 className="text-blue-900 dark:text-blue-400 font-medium mb-1">Invoice Information</h4>
+              <p className="text-blue-800 dark:text-blue-300 text-sm">
                 Created on {new Date(invoice.createdAt).toLocaleString('en-IN')}
               </p>
               {invoice.customer && (
-                <p className="text-blue-800 text-sm mt-1">
+                <p className="text-blue-800 dark:text-blue-300 text-sm mt-1">
                   Customer: {invoice.customer.name} ({invoice.customer.phone})
                 </p>
               )}

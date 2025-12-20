@@ -32,9 +32,9 @@ const DataTable = ({
 
     if (isLoading) {
         return (
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg overflow-hidden border dark:border-[rgb(var(--color-border))]">
                 <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
                 </div>
             </div>
         );
@@ -42,28 +42,28 @@ const DataTable = ({
 
     if (data.length === 0) {
         return (
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg overflow-hidden border dark:border-[rgb(var(--color-border))]">
                 <div className="text-center py-12">
-                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-16 h-16 text-gray-400 dark:text-[rgb(var(--color-text-muted))] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
-                    <p className="text-gray-500 text-lg">{emptyMessage}</p>
+                    <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-lg">{emptyMessage}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg overflow-hidden border dark:border-[rgb(var(--color-border))]">
             <div className="overflow-x-auto">
                 <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                         <tr>
                             {columns.map((column) => (
                                 <th
                                     key={column.key}
                                     onClick={() => column.sortable && handleSort(column.key)}
-                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ${column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
+                                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-[rgb(var(--color-input))]' : ''
                                         }`}
                                 >
                                     <div className="flex items-center space-x-1">
@@ -83,12 +83,12 @@ const DataTable = ({
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                         {sortedData.map((row, rowIndex) => (
                             <tr
                                 key={rowIndex}
                                 onClick={() => onRowClick && onRowClick(row)}
-                                className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                                className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]' : ''} text-gray-900 dark:text-[rgb(var(--color-text))]`}
                             >
                                 {columns.map((column) => (
                                     <td key={column.key} className="px-6 py-4 whitespace-nowrap">

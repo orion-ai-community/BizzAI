@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import {ToastContainer} from "react-toastify"
+import { ToastContainer } from "react-toastify"
+import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -93,260 +94,258 @@ const PublicRoute = ({ children }) => {
 function App() {
   console.log(import.meta.env.VITE_BACKEND_URL);
   return (
-    <>
-    <ToastContainer/>
-    <Router>
-      <Routes>
-        {/* Default Route */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+    <ThemeProvider>
+      <ToastContainer />
+      <Router>
+        <Routes>
+          {/* Default Route */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Public Routes */}
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <Register />
-            </PublicRoute>
-          }
-        />
-
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/reset-password"
-          element={
-            <PublicRoute>
-              <ResetPassword />
-            </PublicRoute>
-          }
-        />
-
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/profile-settings"
-          element={
-            <ProtectedRoute>
-              <ProfileSettings />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Customer Routes - Use nested routes for better organization */}
-        <Route path="/customers">
+          {/* Public Routes */}
           <Route
-            index
+            path="/login"
             element={
-              <ProtectedRoute>
-                <Customers />
-              </ProtectedRoute>
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
             }
           />
           <Route
-            path="add"
+            path="/register"
             element={
-              <ProtectedRoute>
-                <AddCustomer />
-              </ProtectedRoute>
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
             }
           />
-          <Route
-            path="edit/:id"
-            element={
-              <ProtectedRoute>
-                <EditCustomer />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path=":id"
-            element={
-              <ProtectedRoute>
-                <CustomerDetail />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
 
-        {/* Supplier Routes */}
-        <Route path="/suppliers">
           <Route
-            index
+            path="/forgot-password"
             element={
-              <ProtectedRoute>
-                <Suppliers />
-              </ProtectedRoute>
+              <PublicRoute>
+                <ForgotPassword />
+              </PublicRoute>
             }
           />
           <Route
-            path="add"
+            path="/reset-password"
             element={
-              <ProtectedRoute>
-                <AddSupplier />
-              </ProtectedRoute>
+              <PublicRoute>
+                <ResetPassword />
+              </PublicRoute>
             }
           />
+
+          {/* Protected Routes */}
           <Route
-            path=":id/edit"
+            path="/dashboard"
             element={
               <ProtectedRoute>
-                <EditSupplier />
+                <Dashboard />
               </ProtectedRoute>
             }
           />
+
           <Route
-            path=":id"
+            path="/profile-settings"
             element={
               <ProtectedRoute>
-                <SupplierDetail />
+                <ProfileSettings />
               </ProtectedRoute>
             }
           />
-        </Route>
 
-        {/* Inventory Routes */}
-        <Route path="/inventory">
-          <Route
-            index
-            element={
-              <ProtectedRoute>
-                <Inventory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="add"
-            element={
-              <ProtectedRoute>
-                <AddItem />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="edit/:id"
-            element={
-              <ProtectedRoute>
-                <EditItem />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
+          {/* Customer Routes - Use nested routes for better organization */}
+          <Route path="/customers">
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Customers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="add"
+              element={
+                <ProtectedRoute>
+                  <AddCustomer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditCustomer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path=":id"
+              element={
+                <ProtectedRoute>
+                  <CustomerDetail />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-        {/* POS Routes */}
-        <Route path="/pos">
-          <Route
-            index
-            element={
-              <ProtectedRoute>
-                <POS />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="invoices"
-            element={
-              <ProtectedRoute>
-                <Invoices />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="invoice/:id"
-            element={
-              <ProtectedRoute>
-                <InvoiceDetail />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
+          {/* Supplier Routes */}
+          <Route path="/suppliers">
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Suppliers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="add"
+              element={
+                <ProtectedRoute>
+                  <AddSupplier />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path=":id/edit"
+              element={
+                <ProtectedRoute>
+                  <EditSupplier />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path=":id"
+              element={
+                <ProtectedRoute>
+                  <SupplierDetail />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-        {/* Sales Routes */}
-        <Route path="/sales">
-          <Route path="invoice" element={<ProtectedRoute><SalesInvoice /></ProtectedRoute>} />
-          <Route path="invoice/:id" element={<ProtectedRoute><SalesInvoiceDetail /></ProtectedRoute>} />
-          <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
-          <Route path="proforma" element={<ProtectedRoute><ProformaInvoice /></ProtectedRoute>} />
-          <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
-          <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
-          <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
-          <Route path="return" element={<ProtectedRoute><Return /></ProtectedRoute>} />
-          <Route path="returned-items" element={<ProtectedRoute><ReturnedItems /></ProtectedRoute>} />
-        </Route>
+          {/* Inventory Routes */}
+          <Route path="/inventory">
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Inventory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="add"
+              element={
+                <ProtectedRoute>
+                  <AddItem />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="edit/:id"
+              element={
+                <ProtectedRoute>
+                  <EditItem />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-        {/* Purchase Routes */}
-        <Route path="/purchase">
-          <Route path="entry" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
-          <Route path="bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
-          <Route path="payment-out" element={<ProtectedRoute><PaymentOut /></ProtectedRoute>} />
-          <Route path="expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
-          <Route path="order" element={<ProtectedRoute><PurchaseOrder /></ProtectedRoute>} />
-          <Route path="return" element={<ProtectedRoute><PurchaseReturn /></ProtectedRoute>} />
-        </Route>
+          {/* POS Routes */}
+          <Route path="/pos">
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <POS />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="invoices"
+              element={
+                <ProtectedRoute>
+                  <Invoices />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="invoice/:id"
+              element={
+                <ProtectedRoute>
+                  <InvoiceDetail />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
 
-        {/* Cash & Bank Routes */}
-        <Route path="/cashbank">
-          <Route path="bank-accounts" element={<ProtectedRoute><BankAccounts /></ProtectedRoute>} />
-          <Route path="cash-in-hand" element={<ProtectedRoute><CashInHand /></ProtectedRoute>} />
-          <Route path="cheques" element={<ProtectedRoute><Cheques /></ProtectedRoute>} />
-          <Route path="loan-accounts" element={<ProtectedRoute><LoanAccounts /></ProtectedRoute>} />
-        </Route>
+          {/* Sales Routes */}
+          <Route path="/sales">
+            <Route path="invoice" element={<ProtectedRoute><SalesInvoice /></ProtectedRoute>} />
+            <Route path="invoice/:id" element={<ProtectedRoute><SalesInvoiceDetail /></ProtectedRoute>} />
+            <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
+            <Route path="proforma" element={<ProtectedRoute><ProformaInvoice /></ProtectedRoute>} />
+            <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
+            <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
+            <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
+            <Route path="return" element={<ProtectedRoute><Return /></ProtectedRoute>} />
+            <Route path="returned-items" element={<ProtectedRoute><ReturnedItems /></ProtectedRoute>} />
+          </Route>
 
-        {/* Business Growth Routes */}
-        <Route path="/business">
-          <Route path="online-shop" element={<ProtectedRoute><OnlineShop /></ProtectedRoute>} />
-          <Route path="google-profile" element={<ProtectedRoute><GoogleProfile /></ProtectedRoute>} />
-          <Route path="marketing-tools" element={<ProtectedRoute><MarketingTools /></ProtectedRoute>} />
-          <Route path="whatsapp-marketing" element={<ProtectedRoute><WhatsAppMarketing /></ProtectedRoute>} />
-        </Route>
+          {/* Purchase Routes */}
+          <Route path="/purchase">
+            <Route path="entry" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
+            <Route path="bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
+            <Route path="payment-out" element={<ProtectedRoute><PaymentOut /></ProtectedRoute>} />
+            <Route path="expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
+            <Route path="order" element={<ProtectedRoute><PurchaseOrder /></ProtectedRoute>} />
+            <Route path="return" element={<ProtectedRoute><PurchaseReturn /></ProtectedRoute>} />
+          </Route>
 
-        {/* Sync & Backup Routes */}
-        <Route path="/sync">
-          <Route path="share" element={<ProtectedRoute><SyncShare /></ProtectedRoute>} />
-          <Route path="backup" element={<ProtectedRoute><Backup /></ProtectedRoute>} />
-          <Route path="restore" element={<ProtectedRoute><Restore /></ProtectedRoute>} />
-        </Route>
+          {/* Cash & Bank Routes */}
+          <Route path="/cashbank">
+            <Route path="bank-accounts" element={<ProtectedRoute><BankAccounts /></ProtectedRoute>} />
+            <Route path="cash-in-hand" element={<ProtectedRoute><CashInHand /></ProtectedRoute>} />
+            <Route path="cheques" element={<ProtectedRoute><Cheques /></ProtectedRoute>} />
+            <Route path="loan-accounts" element={<ProtectedRoute><LoanAccounts /></ProtectedRoute>} />
+          </Route>
 
-        {/* Utilities Routes */}
-        <Route path="/utilities">
-          <Route path="barcode" element={<ProtectedRoute><BarcodeGenerator /></ProtectedRoute>} />
-          <Route path="import-items" element={<ProtectedRoute><ImportItems /></ProtectedRoute>} />
-          <Route path="business-setup" element={<ProtectedRoute><BusinessSetup /></ProtectedRoute>} />
-          <Route path="export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
-        </Route>
+          {/* Business Growth Routes */}
+          <Route path="/business">
+            <Route path="online-shop" element={<ProtectedRoute><OnlineShop /></ProtectedRoute>} />
+            <Route path="google-profile" element={<ProtectedRoute><GoogleProfile /></ProtectedRoute>} />
+            <Route path="marketing-tools" element={<ProtectedRoute><MarketingTools /></ProtectedRoute>} />
+            <Route path="whatsapp-marketing" element={<ProtectedRoute><WhatsAppMarketing /></ProtectedRoute>} />
+          </Route>
 
-        {/* Reports Route */}
-        <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
+          {/* Sync & Backup Routes */}
+          <Route path="/sync">
+            <Route path="share" element={<ProtectedRoute><SyncShare /></ProtectedRoute>} />
+            <Route path="backup" element={<ProtectedRoute><Backup /></ProtectedRoute>} />
+            <Route path="restore" element={<ProtectedRoute><Restore /></ProtectedRoute>} />
+          </Route>
 
-        {/* 404 Route */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </Router>
-    </>
+          {/* Utilities Routes */}
+          <Route path="/utilities">
+            <Route path="barcode" element={<ProtectedRoute><BarcodeGenerator /></ProtectedRoute>} />
+            <Route path="import-items" element={<ProtectedRoute><ImportItems /></ProtectedRoute>} />
+            <Route path="business-setup" element={<ProtectedRoute><BusinessSetup /></ProtectedRoute>} />
+            <Route path="export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
+          </Route>
+
+          {/* Reports Route */}
+          <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
+
+          {/* 404 Route */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
 export default App;
-
-

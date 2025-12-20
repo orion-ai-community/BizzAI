@@ -3,3 +3,93 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+
+  /* Light Theme (Default) */
+  :root {
+    /* Backgrounds */
+    --color-bg: 249 250 251;
+    /* gray-50 */
+    --color-card: 255 255 255;
+    /* white */
+    --color-input: 255 255 255;
+    /* white */
+    --color-sidebar: 255 255 255;
+    /* white */
+    --color-table-row: 255 255 255;
+    /* white */
+    --color-table-header: 249 250 251;
+    /* gray-50 */
+
+    /* Text */
+    --color-text: 17 24 39;
+    /* gray-900 */
+    --color-text-secondary: 107 114 128;
+    /* gray-600 */
+    --color-text-muted: 156 163 175;
+    /* gray-500 */
+    --color-placeholder: 156 163 175;
+    /* gray-400 */
+
+    /* Borders */
+    --color-border: 229 231 235;
+    /* gray-200 */
+    --color-border-light: 243 244 246;
+    /* gray-100 */
+
+    /* Primary Accent (Indigo for Light) */
+    --color-primary: 79 70 229;
+    /* indigo-600 */
+    --color-primary-hover: 67 56 202;
+    /* indigo-700 */
+  }
+
+  /* Dark Theme */
+  .dark {
+    /* Backgrounds */
+    --color-bg: 11 15 20;
+    /* #0B0F14 */
+    --color-card: 17 24 39;
+    /* #111827 */
+    --color-input: 2 6 23;
+    /* #020617 */
+    --color-sidebar: 15 23 42;
+    /* #0F172A */
+    --color-table-row: 17 24 39;
+    /* #111827 */
+    --color-table-header: 2 6 23;
+    /* #020617 */
+
+    /* Text - BRIGHT and READABLE */
+    --color-text: 229 231 235;
+    /* #E5E7EB - bright primary text */
+    --color-text-secondary: 156 163 175;
+    /* #9CA3AF - secondary text */
+    --color-text-muted: 107 114 128;
+    /* #6B7280 - muted/placeholder */
+    --color-placeholder: 107 114 128;
+    /* #6B7280 */
+
+    /* Borders */
+    --color-border: 31 41 51;
+    /* #1F2933 */
+    --color-border-light: 31 41 51;
+    /* #1F2933 */
+
+    /* Primary Accent (Orange for Dark) */
+    --color-primary: 245 158 11;
+    /* #F59E0B */
+    --color-primary-hover: 217 119 6;
+    /* #D97706 */
+  }
+
+  /* Apply color scheme to html element */
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+}
