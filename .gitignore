@@ -120,3 +120,4 @@ Desktop.ini
 *.temp
 
 backend/invoices/*.pdf
+backend/invoices/
