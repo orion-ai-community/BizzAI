@@ -62,6 +62,8 @@ const POS = () => {
   ]);
   const [barcodeInput, setBarcodeInput] = useState('');
   const [showUnpaidConfirm, setShowUnpaidConfirm] = useState(false);
+  const [showOverpaymentConfirm, setShowOverpaymentConfirm] = useState(false);
+  const [showWalkinChangeConfirm, setShowWalkinChangeConfirm] = useState(false);
 
   // Hold orders state - Load from localStorage
   const [holdOrders, setHoldOrders] = useState(() => {
@@ -470,13 +472,35 @@ const POS = () => {
       return;
     }
 
+    // Enforce full change return for walk-in customers on overpayment
+    if (!activeTab.customer && paid > total) {
+      const changeRequired = paid - total;
+      const changeReturned = parseFloat(activeTab.changeReturned) || 0;
+      if (changeReturned < changeRequired) {
+        setShowWalkinChangeConfirm(true);
+        return;
+      }
+    }
+
     // Show confirmation popup for unpaid invoices (only for registered customers)
     if (activeTab.customer && paid < total) {
       setShowUnpaidConfirm(true);
       return;
     }
 
-    // Proceed with checkout for fully paid invoices
+    // Check for overpayment without full change returned (only for saved customers)
+    if (activeTab.customer && paid > total) {
+      const changeRequired = paid - total;
+      const changeReturned = parseFloat(activeTab.changeReturned) || 0;
+
+      // If not all change is returned, show confirmation
+      if (changeReturned < changeRequired) {
+        setShowOverpaymentConfirm(true);
+        return;
+      }
+    }
+
+    // Proceed with checkout for fully paid invoices or after confirmation
     proceedWithCheckout();
   };
 
@@ -1236,6 +1260,140 @@ const POS = () => {
                   className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
                 >
                   Confirm & Create Invoice
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Overpayment Confirmation Modal - for saved customers */}
+        {showOverpaymentConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Partial Change Confirmation</h3>
+              </div>
+
+              <div className="mb-4">
+                <p className="text-gray-700 mb-3">
+                  The customer overpaid but you are not returning the full change:
+                </p>
+                <div className="bg-blue-50 p-4 rounded-lg space-y-2 border border-blue-200">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Customer:</span>
+                    <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Amount Paid:</span>
+                    <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Change Required:</span>
+                    <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between">
+                    <span className="text-gray-600">Change Returned:</span>
+                    <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
+                    <span className="font-medium text-yellow-800">Remaining Credit:</span>
+                    <span className="font-bold text-yellow-900">₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800 font-medium mb-1">💡 What happens next:</p>
+                <p className="text-sm text-green-700">
+                  The remaining amount of ₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)} will be saved as credit to the customer's account. They can use this for future purchases.
+                </p>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-6">
+                This is to prevent accidental loss of change and maintain accurate accounting records.
+              </p>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowOverpaymentConfirm(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowOverpaymentConfirm(false);
+                    proceedWithCheckout();
+                  }}
+                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                >
+                  Proceed
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Walk-in Overpayment Modal (must return full change) */}
+        {showWalkinChangeConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Return Full Change (Walk-in)</h3>
+              </div>
+
+              <div className="mb-4">
+                <p className="text-gray-700 mb-3">
+                  Walk-in customers must receive the full change. Please return all change before continuing:
+                </p>
+                <div className="bg-yellow-50 p-4 rounded-lg space-y-2 border border-yellow-200">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Amount Paid:</span>
+                    <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Change Required:</span>
+                    <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between">
+                    <span className="text-gray-600">Change Returned:</span>
+                    <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
+                    <span className="font-medium text-yellow-800">Remaining Change to Return:</span>
+                    <span className="font-bold text-yellow-900">₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-6">
+                You can adjust the paid amount or return full change to proceed.
+              </p>
+
+              <div className="flex">
+                <button
+                  onClick={() => setShowWalkinChangeConfirm(false)}
+                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                >
+                  Got it
                 </button>
               </div>
             </div>
