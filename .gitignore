@@ -121,3 +121,9 @@ Desktop.ini
 
 backend/invoices/*.pdf
 backend/invoices/
+
+# Generated files
+backend/invoices/
+*.log
+*.tmp
+*.pdf
