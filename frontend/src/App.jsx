@@ -28,6 +28,8 @@ import Reports from './pages/Reports';
 import SalesInvoice from './pages/sales/SalesInvoice';
 import SalesInvoiceDetail from './pages/sales/SalesInvoiceDetail';
 import Estimate from './pages/sales/Estimate';
+import EstimateList from './pages/sales/EstimateList';
+import EstimateDetail from './pages/sales/EstimateDetail';
 import ProformaInvoice from './pages/sales/ProformaInvoice';
 import PaymentIn from './pages/sales/PaymentIn';
 import SalesOrder from './pages/sales/SalesOrder';
@@ -288,6 +290,8 @@ function App() {
             <Route path="invoice" element={<ProtectedRoute><SalesInvoice /></ProtectedRoute>} />
             <Route path="invoice/:id" element={<ProtectedRoute><SalesInvoiceDetail /></ProtectedRoute>} />
             <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
+            <Route path="estimates" element={<ProtectedRoute><EstimateList /></ProtectedRoute>} />
+            <Route path="estimate/:id" element={<ProtectedRoute><EstimateDetail /></ProtectedRoute>} />
             <Route path="proforma" element={<ProtectedRoute><ProformaInvoice /></ProtectedRoute>} />
             <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
             <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
