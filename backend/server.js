@@ -5,7 +5,7 @@ import morgan from "morgan";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
-// import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import posRoutes from "./routes/posRoutes.js";
 import salesInvoiceRoutes from "./routes/salesInvoiceRoutes.js";
@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/pos", posRoutes);
 app.use("/api/sales-invoice", salesInvoiceRoutes);

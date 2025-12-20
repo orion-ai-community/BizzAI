@@ -387,7 +387,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
         <div className="p-3 border-t border-indigo-500">
           {isEffectivelyExpanded ? (
             <>
-              <div className="flex items-center space-x-2 mb-2">
+              <div className="flex items-center space-x-2 mb-3">
                 <div className="w-8 h-8 bg-indigo-400 rounded-full flex items-center justify-center">
                   <span className="text-sm font-bold">
                     {user?.name?.charAt(0).toUpperCase()}
