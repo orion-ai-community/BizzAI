@@ -49,13 +49,13 @@ const Inventory = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Inventory Management</h1>
-          <p className="text-gray-600">Manage your products and stock levels</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Inventory Management</h1>
+          <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Manage your products and stock levels</p>
         </div>
 
         {/* Alerts */}
         {alerts && alerts.length > 0 && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
             <div className="flex items-start">
               <svg
                 className="w-5 h-5 text-yellow-600 mt-0.5 mr-3"
@@ -71,10 +71,10 @@ const Inventory = () => {
                 />
               </svg>
               <div className="flex-1">
-                <h3 className="text-yellow-800 font-medium mb-2">Stock Alerts</h3>
+                <h3 className="text-yellow-800 dark:text-yellow-400 font-medium mb-2">Stock Alerts</h3>
                 <ul className="space-y-1">
                   {alerts.map((alert, idx) => (
-                    <li key={idx} className="text-yellow-700 text-sm">
+                    <li key={idx} className="text-yellow-700 dark:text-yellow-300 text-sm">
                       • {alert.message}
                     </li>
                   ))}
@@ -86,22 +86,22 @@ const Inventory = () => {
 
         {/* Error Message */}
         {isError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{message}</p>
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-600 dark:text-red-400 text-sm">{message}</p>
           </div>
         )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">Total Items</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{items.length}</p>
+                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Total Items</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">{items.length}</p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-lg">
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 <svg
-                  className="w-8 h-8 text-blue-600"
+                  className="w-8 h-8 text-blue-600 dark:text-blue-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -117,17 +117,17 @@ const Inventory = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">Inventory Value</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Inventory Value</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
                   ₹{inventoryValue.toFixed(0)}
                 </p>
               </div>
-              <div className="p-3 bg-green-100 rounded-lg">
+              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
                 <svg
-                  className="w-8 h-8 text-green-600"
+                  className="w-8 h-8 text-green-600 dark:text-green-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -143,17 +143,17 @@ const Inventory = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">Expected Revenue</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Expected Revenue</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
                   ₹{expectedRevenue.toFixed(0)}
                 </p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-lg">
+              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <svg
-                  className="w-8 h-8 text-purple-600"
+                  className="w-8 h-8 text-purple-600 dark:text-purple-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -169,15 +169,15 @@ const Inventory = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm font-medium">Low Stock Items</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{lowStockItems.length}</p>
+                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Low Stock Items</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">{lowStockItems.length}</p>
               </div>
-              <div className="p-3 bg-red-100 rounded-lg">
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
                 <svg
-                  className="w-8 h-8 text-red-600"
+                  className="w-8 h-8 text-red-600 dark:text-red-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -195,7 +195,7 @@ const Inventory = () => {
         </div>
 
         {/* Actions Bar */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 mb-6">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0 gap-4">
             {/* Search */}
             <div className="w-full lg:w-96">
@@ -205,10 +205,10 @@ const Inventory = () => {
                   placeholder="Search by name or SKU..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                 />
                 <svg
-                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+                  className="absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -228,7 +228,7 @@ const Inventory = () => {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -245,7 +245,7 @@ const Inventory = () => {
                   e.stopPropagation();
                   navigate('/inventory/add');
                 }}
-                className="flex items-center space-x-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition whitespace-nowrap"
+                className="flex items-center space-x-2 px-6 py-2 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] transition whitespace-nowrap"
               >
                 <svg
                   className="w-5 h-5"
@@ -267,15 +267,15 @@ const Inventory = () => {
         </div>
 
         {/* Items Table */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="text-center py-12">
               <svg
-                className="w-16 h-16 text-gray-400 mx-auto mb-4"
+                className="w-16 h-16 text-gray-400 dark:text-[rgb(var(--color-text-muted))] mx-auto mb-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -287,11 +287,11 @@ const Inventory = () => {
                   d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
                 />
               </svg>
-              <p className="text-gray-500 text-lg">No items found</p>
+              <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-lg">No items found</p>
               <button
                 type="button"
                 onClick={() => navigate('/inventory/add')}
-                className="mt-4 text-indigo-600 hover:text-indigo-700 font-medium"
+                className="mt-4 text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))] font-medium"
               >
                 Add your first item
               </button>
@@ -299,7 +299,7 @@ const Inventory = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Item
@@ -324,13 +324,13 @@ const Inventory = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                   {filteredItems.map((item) => {
                     const profitMargin = ((item.sellingPrice - item.costPrice) / item.costPrice * 100).toFixed(1);
                     const isLowStock = item.stockQty <= item.lowStockLimit;
-                    
+
                     return (
-                      <tr key={item._id} className="hover:bg-gray-50">
+                      <tr key={item._id} className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]">
                         <td className="px-6 py-4">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{item.name}</div>
@@ -376,7 +376,7 @@ const Inventory = () => {
                               e.stopPropagation();
                               navigate(`/inventory/edit/${item._id}`);
                             }}
-                            className="text-indigo-600 hover:text-indigo-900 mr-4"
+                            className="text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-900 dark:hover:text-[rgb(var(--color-primary-hover))] mr-4"
                           >
                             Edit
                           </button>
@@ -387,7 +387,7 @@ const Inventory = () => {
                               e.stopPropagation();
                               setDeleteConfirm(item._id);
                             }}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500"
                           >
                             Delete
                           </button>
@@ -404,16 +404,16 @@ const Inventory = () => {
         {/* Delete Confirmation Modal */}
         {deleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Confirm Delete</h3>
-              <p className="text-gray-600 mb-6">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-6 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4">Confirm Delete</h3>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-6">
                 Are you sure you want to delete this item? This action cannot be undone.
               </p>
               <div className="flex space-x-4">
                 <button
                   type="button"
                   onClick={() => setDeleteConfirm(null)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
                 >
                   Cancel
                 </button>

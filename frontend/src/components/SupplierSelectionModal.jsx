@@ -49,7 +49,7 @@ const SupplierSelectionModal = ({ isOpen, onClose, onSelectSupplier }) => {
               placeholder="Search by business name, contact person, or contact number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))]"
             />
           </div>
           <button
@@ -57,7 +57,7 @@ const SupplierSelectionModal = ({ isOpen, onClose, onSelectSupplier }) => {
               onClose();
               navigate('/suppliers/add');
             }}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 whitespace-nowrap"
+            className="px-4 py-2 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] whitespace-nowrap"
           >
             + Add New Supplier
           </button>
@@ -67,11 +67,11 @@ const SupplierSelectionModal = ({ isOpen, onClose, onSelectSupplier }) => {
         <div className="max-h-96 overflow-y-auto">
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
             </div>
           ) : filteredSuppliers.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">
+              <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
                 {searchTerm ? 'No suppliers found matching your search' : 'No suppliers found'}
               </p>
             </div>
@@ -81,16 +81,16 @@ const SupplierSelectionModal = ({ isOpen, onClose, onSelectSupplier }) => {
                 <div
                   key={supplier._id}
                   onClick={() => handleSelect(supplier)}
-                  className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 cursor-pointer transition flex justify-between items-center group shadow-sm"
+                  className="p-4 bg-gray-50 dark:bg-[rgb(var(--color-input))] border border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg hover:bg-indigo-50 dark:hover:bg-[rgb(var(--color-card))] hover:border-indigo-300 dark:hover:border-[rgb(var(--color-primary))] cursor-pointer transition flex justify-between items-center group shadow-sm"
                 >
                   <div>
-                    <p className="font-medium text-gray-900 group-hover:text-indigo-700">{supplier.businessName}</p>
-                    <div className="text-sm text-gray-500 space-x-4">
+                    <p className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))] group-hover:text-indigo-700 dark:group-hover:text-[rgb(var(--color-primary))]">{supplier.businessName}</p>
+                    <div className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-secondary))] space-x-4">
                       <span>{supplier.contactPersonName}</span>
                       <span>{supplier.contactNo}</span>
                     </div>
                   </div>
-                  <div className="text-indigo-600 opacity-0 group-hover:opacity-100 font-medium text-sm">
+                  <div className="text-indigo-600 dark:text-[rgb(var(--color-primary))] opacity-0 group-hover:opacity-100 font-medium text-sm">
                     Select
                   </div>
                 </div>
