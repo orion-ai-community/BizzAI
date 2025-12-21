@@ -73,6 +73,14 @@ export const createInvoice = async (req, res) => {
     // Handle overpayment and change return
     const changeOwed = Math.max(0, paidAmount - totalAmount);
     const changeReturned = parseFloat(req.body.changeReturned) || 0;
+
+    // CRITICAL VALIDATION: Prevent Change Returned from exceeding Change Owed
+    if (changeReturned > changeOwed) {
+      return res.status(400).json({
+        message: "You are returning more amount than required. Please correct the change returned."
+      });
+    }
+
     const changeNotReturned = Math.max(0, changeOwed - changeReturned);
 
     // Cap paidAmount at totalAmount (don't record overpayment)

@@ -466,6 +466,17 @@ const POS = () => {
       return;
     }
 
+    // CRITICAL VALIDATION: Prevent Change Returned from exceeding Change to Return
+    if (paid > total) {
+      const changeRequired = paid - total;
+      const changeReturned = parseFloat(activeTab.changeReturned) || 0;
+
+      if (changeReturned > changeRequired) {
+        alert('You are returning more amount than required. Please correct the change returned.');
+        return;
+      }
+    }
+
     // Check if walk-in customer is trying to take due
     if (!activeTab.customer && paid < total) {
       alert('Walk-in customers must pay full amount. Please add customer details to allow credit.');
