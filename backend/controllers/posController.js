@@ -13,7 +13,7 @@ import { info, error } from "../utils/logger.js";
  */
 export const createInvoice = async (req, res) => {
   try {
-    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod } = req.body;
+    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditUsed = 0 } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
@@ -22,6 +22,13 @@ export const createInvoice = async (req, res) => {
     let subtotal = 0;
     for (const it of items) subtotal += it.quantity * it.price;
     const totalAmount = subtotal - discount;
+
+    // Validate credit usage
+    if (creditUsed > 0 && !customerId) {
+      return res.status(400).json({
+        message: "Walk-in customers cannot use credit. Please select a customer."
+      });
+    }
 
     // IMPORTANT: Walk-in customers cannot take due
     if (!customerId && paidAmount < totalAmount) {
@@ -68,6 +75,23 @@ export const createInvoice = async (req, res) => {
           message: "Customer not found or unauthorized"
         });
       }
+
+      // Validate credit usage
+      if (creditUsed > 0) {
+        const availableCredit = customer.dues < 0 ? Math.abs(customer.dues) : 0;
+
+        if (creditUsed > availableCredit) {
+          return res.status(400).json({
+            message: `Cannot use ₹${creditUsed} credit. Available credit: ₹${availableCredit.toFixed(2)}`
+          });
+        }
+
+        if (creditUsed > totalAmount) {
+          return res.status(400).json({
+            message: `Credit used (₹${creditUsed}) cannot exceed total amount (₹${totalAmount})`
+          });
+        }
+      }
     }
 
     // Handle overpayment and change return
@@ -86,11 +110,12 @@ export const createInvoice = async (req, res) => {
     // Cap paidAmount at totalAmount (don't record overpayment)
     const actualPaidAmount = Math.min(paidAmount, totalAmount);
 
-    // Determine payment status
+    // Determine payment status (including credit)
+    const totalPaid = actualPaidAmount + (creditUsed || 0);
     let paymentStatus;
-    if (actualPaidAmount >= totalAmount) {
+    if (totalPaid >= totalAmount) {
       paymentStatus = "paid";
-    } else if (actualPaidAmount > 0) {
+    } else if (totalPaid > 0) {
       paymentStatus = "partial";
     } else {
       paymentStatus = "unpaid";
@@ -131,18 +156,34 @@ export const createInvoice = async (req, res) => {
       await Item.findByIdAndUpdate(it.item, { $inc: { stockQty: -it.quantity } });
     }
 
-    // Handle customer dues if unpaid
-    if (customerId && actualPaidAmount < totalAmount) {
-      const dueAmount = totalAmount - actualPaidAmount;
-      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
+    // Deduct used credit from customer (increase dues since credit is negative)
+    if (customerId && creditUsed > 0) {
+      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: creditUsed } });
 
       await Transaction.create({
-        type: "due",
+        type: "payment",
         customer: customerId,
         invoice: invoice._id,
-        amount: dueAmount,
-        description: `Due added for invoice ${invoiceNo}`,
+        amount: creditUsed,
+        paymentMethod: "credit",
+        description: `Credit used for invoice ${invoiceNo}`,
       });
+    }
+
+    // Handle customer dues if unpaid
+    if (customerId && actualPaidAmount < totalAmount) {
+      const dueAmount = totalAmount - actualPaidAmount - (creditUsed || 0);
+      if (dueAmount > 0) {
+        await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
+
+        await Transaction.create({
+          type: "due",
+          customer: customerId,
+          invoice: invoice._id,
+          amount: dueAmount,
+          description: `Due added for invoice ${invoiceNo}`,
+        });
+      }
     }
 
     // Handle change not returned - create NEGATIVE due (customer credit)
