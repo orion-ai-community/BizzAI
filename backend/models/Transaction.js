@@ -4,7 +4,7 @@ const transactionSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["sale", "due", "payment", "purchase", "refund", "return"],
+      enum: ["sale", "due", "payment", "purchase", "refund", "return", "due_adjustment"],
       required: true,
     },
     customer: {
@@ -19,13 +19,17 @@ const transactionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Return",
     },
+    dueAdjustment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DueAdjustment",
+    },
     amount: {
       type: Number,
       required: true,
     },
     paymentMethod: {
       type: String,
-      enum: ["cash", "upi", "card", "due", "split"],
+      enum: ["cash", "upi", "card", "due", "split", "bank", "credit"],
       default: "cash",
     },
     description: {

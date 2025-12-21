@@ -175,12 +175,18 @@ const Customers = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
+          <div
+            onClick={() => navigate("/customers/with-dues")}
+            className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6 cursor-pointer hover:shadow-md dark:hover:shadow-xl transition-shadow"
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">With Dues</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
                   {customers.filter((c) => c.dues > 0).length}
+                </p>
+                <p className="text-xs text-indigo-600 dark:text-[rgb(var(--color-primary))] mt-2">
+                  Click to view details →
                 </p>
               </div>
               <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">

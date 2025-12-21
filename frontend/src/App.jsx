@@ -12,6 +12,8 @@ import Customers from './pages/Customers';
 import AddCustomer from './pages/AddCustomer';
 import EditCustomer from './pages/EditCustomer';
 import CustomerDetail from './pages/CustomerDetail';
+import DueAdjustment from './pages/DueAdjustment';
+import CustomersWithDues from './pages/CustomersWithDues';
 import Suppliers from './pages/Suppliers';
 import AddSupplier from './pages/AddSupplier';
 import EditSupplier from './pages/EditSupplier';
@@ -179,6 +181,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditCustomer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="adjust-due/:id"
+              element={
+                <ProtectedRoute>
+                  <DueAdjustment />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="with-dues"
+              element={
+                <ProtectedRoute>
+                  <CustomersWithDues />
                 </ProtectedRoute>
               }
             />

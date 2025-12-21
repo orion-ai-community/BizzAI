@@ -15,7 +15,7 @@ import expenseRoutes from "./routes/expenseRoutes.js";
 import billRoutes from "./routes/billRoutes.js";
 import returnRoutes from "./routes/returnRoutes.js";
 import estimateRoutes from "./routes/estimateRoutes.js";
-// import dueRoutes from "./routes/dueRoutes.js";
+import dueRoutes from "./routes/dueRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 // import settingsRoutes from "./routes/settingsRoutes.js";
 
@@ -49,7 +49,7 @@ app.use("/api/expenses", expenseRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/estimates", estimateRoutes);
-// app.use("/api/due", dueRoutes);
+app.use("/api/due", dueRoutes);
 app.use("/api/reports", reportRoutes);
 // app.use("/api/settings", settingsRoutes);
 
