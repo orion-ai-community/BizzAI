@@ -26,6 +26,8 @@ const POS = () => {
         paymentMethod: 'cash',
         paidAmount: '',
         changeReturned: '',
+        creditUsed: 0,
+        availableCredit: 0,
       }
     ];
   });
@@ -101,6 +103,8 @@ const POS = () => {
           paymentMethod: 'cash',
           paidAmount: '',
           changeReturned: '',
+          creditUsed: 0,
+          availableCredit: 0,
         };
         setTabs([freshTab]);
         setActiveTabId(freshTab.id);
@@ -165,6 +169,8 @@ const POS = () => {
       discount: 0,
       paymentMethod: 'cash',
       paidAmount: '',
+      creditUsed: 0,
+      availableCredit: 0,
     };
     setTabs([...tabs, newTab]);
     setActiveTabId(newTabId);
@@ -299,7 +305,14 @@ const POS = () => {
   };
 
   const selectCustomer = (customer) => {
-    updateTabData({ customer });
+    // Calculate available credit (negative dues = credit)
+    const creditBalance = customer.dues < 0 ? Math.abs(customer.dues) : 0;
+
+    updateTabData({
+      customer,
+      availableCredit: creditBalance,
+      creditUsed: 0 // Reset credit used when selecting new customer
+    });
     setShowCustomerSelect(false);
     setCustomerSearchTerm('');
   };
@@ -327,6 +340,8 @@ const POS = () => {
       discount: 0,
       paymentMethod: 'cash',
       paidAmount: '',
+      creditUsed: 0,
+      availableCredit: 0,
     });
 
     alert('Order parked successfully!');
@@ -534,6 +549,7 @@ const POS = () => {
       paidAmount: paid,
       paymentMethod: activeTab.paymentMethod,
       changeReturned: parseFloat(activeTab.changeReturned) || 0,
+      creditUsed: parseFloat(activeTab.creditUsed) || 0,
     };
 
     dispatch(createInvoice(invoiceData));
@@ -665,7 +681,7 @@ const POS = () => {
                     <div className="text-sm text-gray-600">{activeTab.customer.phone}</div>
                   </div>
                   <button
-                    onClick={() => updateTabData({ customer: null })}
+                    onClick={() => updateTabData({ customer: null, availableCredit: 0, creditUsed: 0 })}
                     className="text-red-600 hover:text-red-700"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -680,6 +696,36 @@ const POS = () => {
                 >
                   Walk-in Customer (Click to select)
                 </button>
+              )}
+
+              {/* Credit Balance Display */}
+              {activeTab.customer && activeTab.availableCredit > 0 && (
+                <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium text-green-800">Available Credit</span>
+                    </div>
+                    <span className="text-lg font-bold text-green-600">₹{activeTab.availableCredit.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Pending Dues Display */}
+              {activeTab.customer && activeTab.customer.dues > 0 && (
+                <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <span className="text-sm font-medium text-red-800">Pending Dues</span>
+                    </div>
+                    <span className="text-lg font-bold text-red-600">₹{activeTab.customer.dues.toFixed(2)}</span>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -794,6 +840,32 @@ const POS = () => {
                 />
               </div>
 
+              {/* Credit Usage */}
+              {activeTab.customer && activeTab.availableCredit > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Use Credit (₹) - Available: ₹{activeTab.availableCredit.toFixed(2)}
+                  </label>
+                  <input
+                    type="number"
+                    value={activeTab.creditUsed}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value) || 0;
+                      const maxCredit = Math.min(activeTab.availableCredit, total);
+                      updateTabData({ creditUsed: Math.min(Math.max(0, value), maxCredit) });
+                    }}
+                    min="0"
+                    max={Math.min(activeTab.availableCredit, total)}
+                    step="0.01"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="0.00"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Max: ₹{Math.min(activeTab.availableCredit, total).toFixed(2)}
+                  </p>
+                </div>
+              )}
+
               {/* Totals */}
               <div className="border-t border-gray-200 pt-4 mb-4 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -802,615 +874,627 @@ const POS = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Discount:</span>
-                  <span className="font-medium text-red-600">-₹{activeTab.discount.toFixed(2)}</span>
+                  <span className="font-medium">-₹{activeTab.discount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t pt-2">
-                  <span>Total:</span>
-                  <span className="text-indigo-600">₹{total.toFixed(2)}</span>
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                <select
-                  value={activeTab.paymentMethod}
-                  onChange={(e) => updateTabData({ paymentMethod: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="cash">Cash</option>
-                  <option value="upi">UPI</option>
-                  <option value="card">Card</option>
-                  {activeTab.customer && <option value="due">Credit/Due</option>}
-                </select>
-              </div>
-
-              {/* Paid Amount */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount Paid (₹)</label>
-                <input
-                  type="number"
-                  value={activeTab.paidAmount}
-                  onChange={(e) => updateTabData({ paidAmount: e.target.value })}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
-
-              {/* Balance */}
-              {activeTab.paidAmount && (
-                <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">
-                      {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
-                    </span>
-                    <span className={`text-xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      ₹{Math.abs(balance).toFixed(2)}
-                    </span>
+                {activeTab.creditUsed > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Credit Applied:</span>
+                    <span className="font-medium">-₹{activeTab.creditUsed.toFixed(2)}</span>
                   </div>
-
-                  {/* Change Returned Input - only show if customer paid MORE than total */}
-                  {balance > 0 && (
-                    <div className="mt-3 pt-3 border-t border-green-200">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Change Returned:
-                      </label>
-                      <input
-                        type="number"
-                        value={activeTab.changeReturned}
-                        onChange={(e) => updateTabData({ changeReturned: e.target.value })}
-                        min="0"
-                        max={balance}
-                        step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Enter change returned to customer"
-                      />
-
-                      {/* Remaining Change/Credit */}
-                      {activeTab.changeReturned && parseFloat(activeTab.changeReturned) < balance && (
-                        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                          <div className="flex justify-between items-center text-sm">
-                            <span className="text-yellow-800 font-medium">
-                              {activeTab.customer ? 'Credit Due to Customer:' : 'Remaining Change (unpaid):'}
-                            </span>
-                            <span className="font-bold text-yellow-900">
-                              ₹{(balance - parseFloat(activeTab.changeReturned || 0)).toFixed(2)}
-                            </span>
-                          </div>
-                          {activeTab.customer && (
-                            <p className="text-xs text-yellow-700 mt-1">
-                              💡 This will be added as credit to customer's account
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Full Change Returned Confirmation */}
-                      {activeTab.changeReturned && parseFloat(activeTab.changeReturned) === balance && (
-                        <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded flex items-center text-sm text-green-800">
-                          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          <span className="font-medium">Full change returned ✓</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                )}
+                <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                  <span>Total:</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
-              )}
-
-              {/* Walk-in Customer Warning */}
-              {!activeTab.customer && paid < total && (
-                <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-xs text-yellow-800">
-                    ⚠️ Walk-in customers must pay full amount. Add customer for credit.
-                  </p>
-                </div>
-              )}
-
-              {/* Checkout Button */}
-              <button
-                onClick={handleCheckout}
-                disabled={activeTab.cart.length === 0 || isLoading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                {isLoading ? 'Processing...' : 'Complete Sale'}
-              </button>
-
-              {/* Additional Actions */}
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                <button
-                  onClick={holdCurrentOrder}
-                  disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-yellow-600 text-yellow-600 rounded-lg hover:bg-yellow-50 disabled:opacity-50 text-sm"
-                >
-                  Hold
-                </button>
-                <button
-                  onClick={() => setShowSplitPayment(true)}
-                  disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 disabled:opacity-50 text-sm"
-                >
-                  Split Pay
-                </button>
-                <button
-                  onClick={printReceipt}
-                  disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-gray-600 text-gray-600 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm"
-                >
-                  Print
-                </button>
-              </div>
-
-              {/* Clear Cart */}
-              {activeTab.cart.length > 0 && (
-                <button
-                  onClick={() => updateTabData({ cart: [] })}
-                  className="w-full mt-2 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  Clear Cart
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Add Customer Modal */}
-        {showAddCustomer && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Customer</h3>
-              <form onSubmit={handleAddCustomer} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                  <input
-                    type="text"
-                    value={newCustomer.name}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
-                  <input
-                    type="tel"
-                    value={newCustomer.phone}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={newCustomer.email}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                  <textarea
-                    value={newCustomer.address}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
-                    rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                <div className="flex space-x-4 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAddCustomer(false);
-                      setNewCustomer({ name: '', phone: '', email: '', address: '' });
-                    }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                  >
-                    Add Customer
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Customer Select Modal */}
-        {showCustomerSelect && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Select Customer</h3>
-
-              {/* Customer Search */}
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Search by name or phone..."
-                  value={customerSearchTerm}
-                  onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                  autoFocus
-                />
-              </div>
-
-              <div className="space-y-2">
-                {filteredCustomers.length === 0 ? (
-                  <p className="text-center text-gray-500 py-4">No customers found</p>
-                ) : (
-                  filteredCustomers.map((customer) => (
-                    <button
-                      key={customer._id}
-                      onClick={() => selectCustomer(customer)}
-                      className="w-full p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 text-left transition"
-                    >
-                      <div className="font-medium text-gray-900">{customer.name}</div>
-                      <div className="text-sm text-gray-600">{customer.phone}</div>
-                      {customer.dues > 0 && (
-                        <div className="text-sm text-red-600 mt-1">Outstanding: ₹{customer.dues.toFixed(2)}</div>
-                      )}
-                    </button>
-                  ))
+                {activeTab.creditUsed > 0 && (
+                  <div className="flex justify-between text-lg font-bold text-indigo-600">
+                    <span>Amount to Pay:</span>
+                    <span>₹{(total - activeTab.creditUsed).toFixed(2)}</span>
+                  </div>
                 )}
               </div>
-              <button
-                onClick={() => {
-                  setShowCustomerSelect(false);
-                  setCustomerSearchTerm('');
-                }}
-                className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
             </div>
-          </div>
-        )}
 
-        {/* Hold Orders Modal */}
-        {showHoldOrders && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Parked Orders ({holdOrders.length})
-              </h3>
-
-              {holdOrders.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No parked orders</p>
-              ) : (
-                <div className="space-y-3">
-                  {holdOrders.map((order) => (
-                    <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="font-medium text-gray-900">{order.customerName}</div>
-                          <div className="text-sm text-gray-500">
-                            {new Date(order.timestamp).toLocaleString()}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm text-gray-600">{order.cart.length} items</div>
-                          <div className="font-bold text-indigo-600">
-                            ₹{(order.cart.reduce((sum, item) => sum + item.total, 0) - order.discount).toFixed(2)}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2 mt-3">
-                        <button
-                          onClick={() => retrieveHoldOrder(order)}
-                          className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                        >
-                          Retrieve
-                        </button>
-                        <button
-                          onClick={() => deleteHoldOrder(order.id)}
-                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <button
-                onClick={() => setShowHoldOrders(false)}
-                className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            {/* Payment Method */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+              <select
+                value={activeTab.paymentMethod}
+                onChange={(e) => updateTabData({ paymentMethod: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
-                Close
-              </button>
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+                <option value="card">Card</option>
+                {activeTab.customer && <option value="due">Credit/Due</option>}
+              </select>
             </div>
-          </div>
-        )}
 
-        {/* Split Payment Modal */}
-        {showSplitPayment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Split Payment</h3>
-              <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total Amount:</span>
-                  <span className="font-bold text-indigo-600">₹{total.toFixed(2)}</span>
+            {/* Paid Amount */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Amount Paid (₹)</label>
+              <input
+                type="number"
+                value={activeTab.paidAmount}
+                onChange={(e) => updateTabData({ paidAmount: e.target.value })}
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="0.00"
+              />
+            </div>
+
+            {/* Balance */}
+            {activeTab.paidAmount && (
+              <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-700">
+                    {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
+                  </span>
+                  <span className={`text-xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ₹{Math.abs(balance).toFixed(2)}
+                  </span>
                 </div>
-              </div>
 
-              <div className="space-y-3 mb-4">
-                {splitPayments.map((payment, index) => (
-                  <div key={index} className="flex space-x-2">
-                    <select
-                      value={payment.method}
-                      onChange={(e) => updateSplitPayment(index, 'method', e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="cash">Cash</option>
-                      <option value="upi">UPI</option>
-                      <option value="card">Card</option>
-                    </select>
+                {/* Change Returned Input - only show if customer paid MORE than total */}
+                {balance > 0 && (
+                  <div className="mt-3 pt-3 border-t border-green-200">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Change Returned:
+                    </label>
                     <input
                       type="number"
-                      value={payment.amount}
-                      onChange={(e) => updateSplitPayment(index, 'amount', e.target.value)}
-                      placeholder="Amount"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      value={activeTab.changeReturned}
+                      onChange={(e) => updateTabData({ changeReturned: e.target.value })}
+                      min="0"
+                      max={balance}
+                      step="0.01"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Enter change returned to customer"
                     />
-                    {splitPayments.length > 1 && (
-                      <button
-                        onClick={() => removeSplitPayment(index)}
-                        className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                      >
-                        ×
-                      </button>
+
+                    {/* Remaining Change/Credit */}
+                    {activeTab.changeReturned && parseFloat(activeTab.changeReturned) < balance && (
+                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-yellow-800 font-medium">
+                            {activeTab.customer ? 'Credit Due to Customer:' : 'Remaining Change (unpaid):'}
+                          </span>
+                          <span className="font-bold text-yellow-900">
+                            ₹{(balance - parseFloat(activeTab.changeReturned || 0)).toFixed(2)}
+                          </span>
+                        </div>
+                        {activeTab.customer && (
+                          <p className="text-xs text-yellow-700 mt-1">
+                            💡 This will be added as credit to customer's account
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Full Change Returned Confirmation */}
+                    {activeTab.changeReturned && parseFloat(activeTab.changeReturned) === balance && (
+                      <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded flex items-center text-sm text-green-800">
+                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="font-medium">Full change returned ✓</span>
+                      </div>
                     )}
                   </div>
-                ))}
+                )}
               </div>
+            )}
 
+            {/* Walk-in Customer Warning */}
+            {!activeTab.customer && paid < total && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-xs text-yellow-800">
+                  ⚠️ Walk-in customers must pay full amount. Add customer for credit.
+                </p>
+              </div>
+            )}
+
+            {/* Checkout Button */}
+            <button
+              onClick={handleCheckout}
+              disabled={activeTab.cart.length === 0 || isLoading}
+              className="w-full py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {isLoading ? 'Processing...' : 'Complete Sale'}
+            </button>
+
+            {/* Additional Actions */}
+            <div className="grid grid-cols-3 gap-2 mt-2">
               <button
-                onClick={addSplitPayment}
-                className="w-full mb-4 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50"
+                onClick={holdCurrentOrder}
+                disabled={activeTab.cart.length === 0}
+                className="py-2 border border-yellow-600 text-yellow-600 rounded-lg hover:bg-yellow-50 disabled:opacity-50 text-sm"
               >
-                + Add Payment Method
+                Hold
               </button>
+              <button
+                onClick={() => setShowSplitPayment(true)}
+                disabled={activeTab.cart.length === 0}
+                className="py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 disabled:opacity-50 text-sm"
+              >
+                Split Pay
+              </button>
+              <button
+                onClick={printReceipt}
+                disabled={activeTab.cart.length === 0}
+                className="py-2 border border-gray-600 text-gray-600 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm"
+              >
+                Print
+              </button>
+            </div>
 
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Total Paid:</span>
-                  <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
-                    ₹{calculateSplitTotal().toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Balance:</span>
-                  <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
-                    ₹{(total - calculateSplitTotal()).toFixed(2)}
-                  </span>
-                </div>
+            {/* Clear Cart */}
+            {activeTab.cart.length > 0 && (
+              <button
+                onClick={() => updateTabData({ cart: [] })}
+                className="w-full mt-2 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Clear Cart
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Add Customer Modal */}
+      {showAddCustomer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Customer</h3>
+            <form onSubmit={handleAddCustomer} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  type="text"
+                  value={newCustomer.name}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
               </div>
-
-              <div className="flex space-x-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                <input
+                  type="tel"
+                  value={newCustomer.phone}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newCustomer.email}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <textarea
+                  value={newCustomer.address}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div className="flex space-x-4 pt-2">
                 <button
+                  type="button"
                   onClick={() => {
-                    setShowSplitPayment(false);
-                    setSplitPayments([{ method: 'cash', amount: '' }]);
+                    setShowAddCustomer(false);
+                    setNewCustomer({ name: '', phone: '', email: '', address: '' });
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={applySplitPayment}
-                  disabled={calculateSplitTotal() !== total}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                 >
-                  Apply
+                  Add Customer
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Customer Select Modal */}
+      {showCustomerSelect && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Select Customer</h3>
+
+            {/* Customer Search */}
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search by name or phone..."
+                value={customerSearchTerm}
+                onChange={(e) => setCustomerSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                autoFocus
+              />
+            </div>
+
+            <div className="space-y-2">
+              {filteredCustomers.length === 0 ? (
+                <p className="text-center text-gray-500 py-4">No customers found</p>
+              ) : (
+                filteredCustomers.map((customer) => (
+                  <button
+                    key={customer._id}
+                    onClick={() => selectCustomer(customer)}
+                    className="w-full p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 text-left transition"
+                  >
+                    <div className="font-medium text-gray-900">{customer.name}</div>
+                    <div className="text-sm text-gray-600">{customer.phone}</div>
+                    {customer.dues > 0 && (
+                      <div className="text-sm text-red-600 mt-1">Outstanding: ₹{customer.dues.toFixed(2)}</div>
+                    )}
+                  </button>
+                ))
+              )}
+            </div>
+            <button
+              onClick={() => {
+                setShowCustomerSelect(false);
+                setCustomerSearchTerm('');
+              }}
+              className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hold Orders Modal */}
+      {showHoldOrders && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Parked Orders ({holdOrders.length})
+            </h3>
+
+            {holdOrders.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">No parked orders</p>
+            ) : (
+              <div className="space-y-3">
+                {holdOrders.map((order) => (
+                  <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="font-medium text-gray-900">{order.customerName}</div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(order.timestamp).toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">{order.cart.length} items</div>
+                        <div className="font-bold text-indigo-600">
+                          ₹{(order.cart.reduce((sum, item) => sum + item.total, 0) - order.discount).toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 mt-3">
+                      <button
+                        onClick={() => retrieveHoldOrder(order)}
+                        className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      >
+                        Retrieve
+                      </button>
+                      <button
+                        onClick={() => deleteHoldOrder(order.id)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowHoldOrders(false)}
+              className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Split Payment Modal */}
+      {showSplitPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Split Payment</h3>
+            <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Total Amount:</span>
+                <span className="font-bold text-indigo-600">₹{total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-4">
+              {splitPayments.map((payment, index) => (
+                <div key={index} className="flex space-x-2">
+                  <select
+                    value={payment.method}
+                    onChange={(e) => updateSplitPayment(index, 'method', e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="upi">UPI</option>
+                    <option value="card">Card</option>
+                  </select>
+                  <input
+                    type="number"
+                    value={payment.amount}
+                    onChange={(e) => updateSplitPayment(index, 'amount', e.target.value)}
+                    placeholder="Amount"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {splitPayments.length > 1 && (
+                    <button
+                      onClick={() => removeSplitPayment(index)}
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={addSplitPayment}
+              className="w-full mb-4 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50"
+            >
+              + Add Payment Method
+            </button>
+
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-600">Total Paid:</span>
+                <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
+                  ₹{calculateSplitTotal().toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Balance:</span>
+                <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
+                  ₹{(total - calculateSplitTotal()).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex space-x-2">
+              <button
+                onClick={() => {
+                  setShowSplitPayment(false);
+                  setSplitPayments([{ method: 'cash', amount: '' }]);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={applySplitPayment}
+                disabled={calculateSplitTotal() !== total}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+              >
+                Apply
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Unpaid Invoice Confirmation Modal */}
-        {showUnpaidConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Unpaid Invoice Confirmation</h3>
+      {/* Unpaid Invoice Confirmation Modal */}
+      {showUnpaidConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
               </div>
+              <h3 className="text-lg font-bold text-gray-900">Unpaid Invoice Confirmation</h3>
+            </div>
 
-              <div className="mb-4">
-                <p className="text-gray-700 mb-3">
-                  This invoice has an outstanding balance. Please confirm before proceeding:
-                </p>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Customer:</span>
-                    <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Paid Amount:</span>
-                    <span className="text-gray-900">₹{paid.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between">
-                    <span className="font-medium text-red-600">Balance Due:</span>
-                    <span className="font-bold text-red-600 text-lg">₹{(total - paid).toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-600 mb-6">
-                The customer will be responsible for paying the outstanding balance of ₹{(total - paid).toFixed(2)}.
+            <div className="mb-4">
+              <p className="text-gray-700 mb-3">
+                This invoice has an outstanding balance. Please confirm before proceeding:
               </p>
-
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowUnpaidConfirm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={proceedWithCheckout}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-                >
-                  Confirm & Create Invoice
-                </button>
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Customer:</span>
+                  <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Total Amount:</span>
+                  <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Paid Amount:</span>
+                  <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-2 flex justify-between">
+                  <span className="font-medium text-red-600">Balance Due:</span>
+                  <span className="font-bold text-red-600 text-lg">₹{(total - paid).toFixed(2)}</span>
+                </div>
               </div>
             </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              The customer will be responsible for paying the outstanding balance of ₹{(total - paid).toFixed(2)}.
+            </p>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowUnpaidConfirm(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={proceedWithCheckout}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+              >
+                Confirm & Create Invoice
+              </button>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Overpayment Confirmation Modal - for saved customers */}
-        {showOverpaymentConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Partial Change Confirmation</h3>
+      {/* Overpayment Confirmation Modal - for saved customers */}
+      {showOverpaymentConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
               </div>
+              <h3 className="text-lg font-bold text-gray-900">Partial Change Confirmation</h3>
+            </div>
 
-              <div className="mb-4">
-                <p className="text-gray-700 mb-3">
-                  The customer overpaid but you are not returning the full change:
-                </p>
-                <div className="bg-blue-50 p-4 rounded-lg space-y-2 border border-blue-200">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Customer:</span>
-                    <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Amount Paid:</span>
-                    <span className="text-gray-900">₹{paid.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Change Required:</span>
-                    <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between">
-                    <span className="text-gray-600">Change Returned:</span>
-                    <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
-                    <span className="font-medium text-yellow-800">Remaining Credit:</span>
-                    <span className="font-bold text-yellow-900">₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800 font-medium mb-1">💡 What happens next:</p>
-                <p className="text-sm text-green-700">
-                  The remaining amount of ₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)} will be saved as credit to the customer's account. They can use this for future purchases.
-                </p>
-              </div>
-
-              <p className="text-xs text-gray-500 mb-6">
-                This is to prevent accidental loss of change and maintain accurate accounting records.
+            <div className="mb-4">
+              <p className="text-gray-700 mb-3">
+                The customer overpaid but you are not returning the full change:
               </p>
-
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowOverpaymentConfirm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowOverpaymentConfirm(false);
-                    proceedWithCheckout();
-                  }}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-                >
-                  Proceed
-                </button>
+              <div className="bg-blue-50 p-4 rounded-lg space-y-2 border border-blue-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Customer:</span>
+                  <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Total Amount:</span>
+                  <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Amount Paid:</span>
+                  <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Change Required:</span>
+                  <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-2 flex justify-between">
+                  <span className="text-gray-600">Change Returned:</span>
+                  <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
+                  <span className="font-medium text-yellow-800">Remaining Credit:</span>
+                  <span className="font-bold text-yellow-900">₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)}</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Walk-in Overpayment Modal (must return full change) */}
-        {showWalkinChangeConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Return Full Change (Walk-in)</h3>
-              </div>
-
-              <div className="mb-4">
-                <p className="text-gray-700 mb-3">
-                  Walk-in customers must receive the full change. Please return all change before continuing:
-                </p>
-                <div className="bg-yellow-50 p-4 rounded-lg space-y-2 border border-yellow-200">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Amount:</span>
-                    <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Amount Paid:</span>
-                    <span className="text-gray-900">₹{paid.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Change Required:</span>
-                    <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
-                  </div>
-                  <div className="border-t pt-2 flex justify-between">
-                    <span className="text-gray-600">Change Returned:</span>
-                    <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
-                    <span className="font-medium text-yellow-800">Remaining Change to Return:</span>
-                    <span className="font-bold text-yellow-900">₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-gray-500 mb-6">
-                You can adjust the paid amount or return full change to proceed.
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800 font-medium mb-1">💡 What happens next:</p>
+              <p className="text-sm text-green-700">
+                The remaining amount of ₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)} will be saved as credit to the customer's account. They can use this for future purchases.
               </p>
+            </div>
 
-              <div className="flex">
-                <button
-                  onClick={() => setShowWalkinChangeConfirm(false)}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-                >
-                  Got it
-                </button>
-              </div>
+            <p className="text-xs text-gray-500 mb-6">
+              This is to prevent accidental loss of change and maintain accurate accounting records.
+            </p>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowOverpaymentConfirm(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowOverpaymentConfirm(false);
+                  proceedWithCheckout();
+                }}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+              >
+                Proceed
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Walk-in Overpayment Modal (must return full change) */}
+      {showWalkinChangeConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Return Full Change (Walk-in)</h3>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-gray-700 mb-3">
+                Walk-in customers must receive the full change. Please return all change before continuing:
+              </p>
+              <div className="bg-yellow-50 p-4 rounded-lg space-y-2 border border-yellow-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Total Amount:</span>
+                  <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Amount Paid:</span>
+                  <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Change Required:</span>
+                  <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-2 flex justify-between">
+                  <span className="text-gray-600">Change Returned:</span>
+                  <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
+                  <span className="font-medium text-yellow-800">Remaining Change to Return:</span>
+                  <span className="font-bold text-yellow-900">₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-500 mb-6">
+              You can adjust the paid amount or return full change to proceed.
+            </p>
+
+            <div className="flex">
+              <button
+                onClick={() => setShowWalkinChangeConfirm(false)}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
