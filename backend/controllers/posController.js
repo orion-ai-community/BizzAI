@@ -13,7 +13,7 @@ import { info, error } from "../utils/logger.js";
  */
 export const createInvoice = async (req, res) => {
   try {
-    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod } = req.body;
+    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditApplied = 0 } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
@@ -22,6 +22,13 @@ export const createInvoice = async (req, res) => {
     let subtotal = 0;
     for (const it of items) subtotal += it.quantity * it.price;
     const totalAmount = subtotal - discount;
+
+    // Validate credit usage
+    if (creditUsed > 0 && !customerId) {
+      return res.status(400).json({
+        message: "Walk-in customers cannot use credit. Please select a customer."
+      });
+    }
 
     // IMPORTANT: Walk-in customers cannot take due
     if (!customerId && paidAmount < totalAmount) {
@@ -53,13 +60,14 @@ export const createInvoice = async (req, res) => {
     }
 
     // Verify customer belongs to current user if provided
+    let customer = null;
     if (customerId) {
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(customerId)) {
         return res.status(400).json({ message: "Invalid customer ID format" });
       }
 
-      const customer = await Customer.findOne({
+      customer = await Customer.findOne({
         _id: customerId,
         owner: req.user._id
       });
@@ -68,21 +76,64 @@ export const createInvoice = async (req, res) => {
           message: "Customer not found or unauthorized"
         });
       }
+
+      // Validate credit application if creditApplied > 0
+      if (creditApplied > 0) {
+        const availableCredit = customer.dues < 0 ? Math.abs(customer.dues) : 0;
+
+        if (availableCredit === 0) {
+          return res.status(400).json({
+            message: "Customer has no available credit"
+          });
+        }
+        if (creditApplied > availableCredit) {
+          return res.status(400).json({
+            message: `Credit applied (₹${creditApplied}) exceeds available credit (₹${availableCredit.toFixed(2)})`
+          });
+        }
+        if (creditApplied > totalAmount) {
+          return res.status(400).json({
+            message: `Credit applied (₹${creditApplied}) cannot exceed total amount (₹${totalAmount})`
+          });
+        }
+      }
+    } else if (creditApplied > 0) {
+      return res.status(400).json({
+        message: "Cannot apply credit for walk-in customers"
+      });
     }
 
     // Handle overpayment and change return
-    const changeOwed = Math.max(0, paidAmount - totalAmount);
+    const effectivePaidAmount = paidAmount + creditUsed; // Credit counts as payment
+    const changeOwed = Math.max(0, effectivePaidAmount - totalAmount);
     const changeReturned = parseFloat(req.body.changeReturned) || 0;
+
+    // CRITICAL VALIDATION: Prevent Change Returned from exceeding Change Owed
+    if (changeReturned > changeOwed) {
+      return res.status(400).json({
+        message: "You are returning more amount than required. Please correct the change returned."
+      });
+    }
+
     const changeNotReturned = Math.max(0, changeOwed - changeReturned);
 
-    // Cap paidAmount at totalAmount (don't record overpayment)
-    const actualPaidAmount = Math.min(paidAmount, totalAmount);
+    // Cap actualPaidAmount at totalAmount (don't record overpayment)
+    const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
-    // Determine payment status
+<<<<<<< HEAD
+    // Determine payment status based on effective payment (cash + credit)
     let paymentStatus;
-    if (actualPaidAmount >= totalAmount) {
+    if (effectivePaidAmount >= totalAmount) {
       paymentStatus = "paid";
-    } else if (actualPaidAmount > 0) {
+    } else if (effectivePaidAmount > 0) {
+=======
+    // Determine payment status (including credit)
+    const totalPaid = actualPaidAmount + (creditUsed || 0);
+    let paymentStatus;
+    if (totalPaid >= totalAmount) {
+      paymentStatus = "paid";
+    } else if (totalPaid > 0) {
+>>>>>>> origin/main
       paymentStatus = "partial";
     } else {
       paymentStatus = "unpaid";
@@ -113,6 +164,7 @@ export const createInvoice = async (req, res) => {
       discount,
       totalAmount,
       paidAmount: actualPaidAmount,
+      creditApplied,
       paymentMethod,
       paymentStatus,
       createdBy: req.user._id,
@@ -123,18 +175,35 @@ export const createInvoice = async (req, res) => {
       await Item.findByIdAndUpdate(it.item, { $inc: { stockQty: -it.quantity } });
     }
 
-    // Handle customer dues if unpaid
-    if (customerId && actualPaidAmount < totalAmount) {
-      const dueAmount = totalAmount - actualPaidAmount;
-      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
+    // Handle customer credit usage
+    if (customerId && creditApplied > 0) {
+      // Increase dues by creditApplied (reduce customer credit)
+      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: creditApplied } });
 
       await Transaction.create({
-        type: "due",
+        type: "payment",
         customer: customerId,
         invoice: invoice._id,
-        amount: dueAmount,
-        description: `Due added for invoice ${invoiceNo}`,
+        amount: creditApplied,
+        paymentMethod: "credit",
+        description: `Customer credit applied to invoice ${invoiceNo}`,
       });
+    }
+
+    // Handle customer dues if unpaid (after credit application)
+    if (customerId && effectivePaidAmount < totalAmount) {
+      const dueAmount = totalAmount - effectivePaidAmount;
+      if (dueAmount > 0) {
+        await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
+
+        await Transaction.create({
+          type: "due",
+          customer: customerId,
+          invoice: invoice._id,
+          amount: dueAmount,
+          description: `Due added for invoice ${invoiceNo}`,
+        });
+      }
     }
 
     // Handle change not returned - create NEGATIVE due (customer credit)

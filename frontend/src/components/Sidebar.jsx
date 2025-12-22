@@ -105,8 +105,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
       ),
       submenu: [
         { name: 'Sales Invoice', path: '/sales/invoice' },
-        { name: 'Estimate', path: '/sales/estimate' },
-        { name: 'Proforma Invoice', path: '/sales/proforma' },
+        { name: 'Estimate / Proforma', path: '/sales/estimate' },
         { name: 'Payment In', path: '/sales/payment-in' },
         { name: 'Sales Order', path: '/sales/order' },
         { name: 'Delivery Challan', path: '/sales/delivery-challan' },

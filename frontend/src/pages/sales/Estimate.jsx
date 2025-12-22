@@ -150,7 +150,7 @@ const Estimate = () => {
                 {/* Header */}
                 <div className="mb-6 flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Create Estimate</h1>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Create Estimate / Proforma</h1>
                         <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Price approximation for customers</p>
                     </div>
                     <button

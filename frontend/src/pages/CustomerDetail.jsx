@@ -304,7 +304,17 @@ const CustomerDetail = () => {
             </div>
 
             {/* Dues */}
-            <div className="flex items-start space-x-3">
+            <div
+              onClick={() => {
+                if (customer.dues > 0) {
+                  navigate(`/customers/adjust-due/${id}`);
+                }
+              }}
+              className={`flex items-start space-x-3 ${customer.dues > 0
+                  ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] p-3 rounded-lg transition-colors"
+                  : ""
+                }`}
+            >
               <div
                 className={`p-2 rounded-lg ${customer.dues > 0
                     ? "bg-red-100"
@@ -333,7 +343,7 @@ const CustomerDetail = () => {
                 </svg>
               </div>
 
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-500">
                   {customer.dues < 0 ? "Pending Return" : "Outstanding Dues"}
                 </p>
@@ -348,6 +358,11 @@ const CustomerDetail = () => {
                   {/* Absolute value used to display returns as positive (e.g. ₹9 instead of ₹-9) */}
                   ₹{Math.abs(customer.dues || 0).toFixed(2)}
                 </p>
+                {customer.dues > 0 && (
+                  <p className="text-xs text-indigo-600 dark:text-[rgb(var(--color-primary))] mt-1">
+                    Click to adjust due →
+                  </p>
+                )}
               </div>
             </div>
           </div>
