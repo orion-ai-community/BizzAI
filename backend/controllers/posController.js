@@ -13,7 +13,7 @@ import { info, error } from "../utils/logger.js";
  */
 export const createInvoice = async (req, res) => {
   try {
-    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditUsed = 0 } = req.body;
+    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditApplied = 0 } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
@@ -60,13 +60,14 @@ export const createInvoice = async (req, res) => {
     }
 
     // Verify customer belongs to current user if provided
+    let customer = null;
     if (customerId) {
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(customerId)) {
         return res.status(400).json({ message: "Invalid customer ID format" });
       }
 
-      const customer = await Customer.findOne({
+      customer = await Customer.findOne({
         _id: customerId,
         owner: req.user._id
       });
@@ -76,26 +77,35 @@ export const createInvoice = async (req, res) => {
         });
       }
 
-      // Validate credit usage
-      if (creditUsed > 0) {
+      // Validate credit application if creditApplied > 0
+      if (creditApplied > 0) {
         const availableCredit = customer.dues < 0 ? Math.abs(customer.dues) : 0;
 
-        if (creditUsed > availableCredit) {
+        if (availableCredit === 0) {
           return res.status(400).json({
-            message: `Cannot use ₹${creditUsed} credit. Available credit: ₹${availableCredit.toFixed(2)}`
+            message: "Customer has no available credit"
           });
         }
-
-        if (creditUsed > totalAmount) {
+        if (creditApplied > availableCredit) {
           return res.status(400).json({
-            message: `Credit used (₹${creditUsed}) cannot exceed total amount (₹${totalAmount})`
+            message: `Credit applied (₹${creditApplied}) exceeds available credit (₹${availableCredit.toFixed(2)})`
+          });
+        }
+        if (creditApplied > totalAmount) {
+          return res.status(400).json({
+            message: `Credit applied (₹${creditApplied}) cannot exceed total amount (₹${totalAmount})`
           });
         }
       }
+    } else if (creditApplied > 0) {
+      return res.status(400).json({
+        message: "Cannot apply credit for walk-in customers"
+      });
     }
 
     // Handle overpayment and change return
-    const changeOwed = Math.max(0, paidAmount - totalAmount);
+    const effectivePaidAmount = paidAmount + creditUsed; // Credit counts as payment
+    const changeOwed = Math.max(0, effectivePaidAmount - totalAmount);
     const changeReturned = parseFloat(req.body.changeReturned) || 0;
 
     // CRITICAL VALIDATION: Prevent Change Returned from exceeding Change Owed
@@ -107,15 +117,23 @@ export const createInvoice = async (req, res) => {
 
     const changeNotReturned = Math.max(0, changeOwed - changeReturned);
 
-    // Cap paidAmount at totalAmount (don't record overpayment)
-    const actualPaidAmount = Math.min(paidAmount, totalAmount);
+    // Cap actualPaidAmount at totalAmount (don't record overpayment)
+    const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
+<<<<<<< HEAD
+    // Determine payment status based on effective payment (cash + credit)
+    let paymentStatus;
+    if (effectivePaidAmount >= totalAmount) {
+      paymentStatus = "paid";
+    } else if (effectivePaidAmount > 0) {
+=======
     // Determine payment status (including credit)
     const totalPaid = actualPaidAmount + (creditUsed || 0);
     let paymentStatus;
     if (totalPaid >= totalAmount) {
       paymentStatus = "paid";
     } else if (totalPaid > 0) {
+>>>>>>> origin/main
       paymentStatus = "partial";
     } else {
       paymentStatus = "unpaid";
@@ -146,6 +164,7 @@ export const createInvoice = async (req, res) => {
       discount,
       totalAmount,
       paidAmount: actualPaidAmount,
+      creditApplied,
       paymentMethod,
       paymentStatus,
       createdBy: req.user._id,
@@ -156,23 +175,24 @@ export const createInvoice = async (req, res) => {
       await Item.findByIdAndUpdate(it.item, { $inc: { stockQty: -it.quantity } });
     }
 
-    // Deduct used credit from customer (increase dues since credit is negative)
-    if (customerId && creditUsed > 0) {
-      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: creditUsed } });
+    // Handle customer credit usage
+    if (customerId && creditApplied > 0) {
+      // Increase dues by creditApplied (reduce customer credit)
+      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: creditApplied } });
 
       await Transaction.create({
         type: "payment",
         customer: customerId,
         invoice: invoice._id,
-        amount: creditUsed,
+        amount: creditApplied,
         paymentMethod: "credit",
-        description: `Credit used for invoice ${invoiceNo}`,
+        description: `Customer credit applied to invoice ${invoiceNo}`,
       });
     }
 
-    // Handle customer dues if unpaid
-    if (customerId && actualPaidAmount < totalAmount) {
-      const dueAmount = totalAmount - actualPaidAmount - (creditUsed || 0);
+    // Handle customer dues if unpaid (after credit application)
+    if (customerId && effectivePaidAmount < totalAmount) {
+      const dueAmount = totalAmount - effectivePaidAmount;
       if (dueAmount > 0) {
         await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
 
