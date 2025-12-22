@@ -27,8 +27,6 @@ const POS = () => {
         paidAmount: '',
         changeReturned: '',
         applyCreditEnabled: false,
-        creditUsed: 0,
-        availableCredit: 0,
       }
     ];
   });
@@ -104,8 +102,7 @@ const POS = () => {
           paymentMethod: 'cash',
           paidAmount: '',
           changeReturned: '',
-          creditUsed: 0,
-          availableCredit: 0,
+          applyCreditEnabled: false,
         };
         setTabs([freshTab]);
         setActiveTabId(freshTab.id);
@@ -170,8 +167,8 @@ const POS = () => {
       discount: 0,
       paymentMethod: 'cash',
       paidAmount: '',
-      creditUsed: 0,
-      availableCredit: 0,
+      changeReturned: '',
+      applyCreditEnabled: false,
     };
     setTabs([...tabs, newTab]);
     setActiveTabId(newTabId);
@@ -327,13 +324,9 @@ const POS = () => {
   };
 
   const selectCustomer = (customer) => {
-    // Calculate available credit (negative dues = credit)
-    const creditBalance = customer.dues < 0 ? Math.abs(customer.dues) : 0;
-
     updateTabData({
       customer,
-      availableCredit: creditBalance,
-      creditUsed: 0 // Reset credit used when selecting new customer
+      applyCreditEnabled: false // Reset credit checkbox when selecting new customer
     });
     setShowCustomerSelect(false);
     setCustomerSearchTerm('');
@@ -362,8 +355,8 @@ const POS = () => {
       discount: 0,
       paymentMethod: 'cash',
       paidAmount: '',
-      creditUsed: 0,
-      availableCredit: 0,
+      changeReturned: '',
+      applyCreditEnabled: false,
     });
 
     alert('Order parked successfully!');
@@ -559,6 +552,7 @@ const POS = () => {
 
     const total = calculateTotal();
     const paid = parseFloat(activeTab.paidAmount) || 0;
+    const creditApplied = getCreditApplied();
 
     const invoiceData = {
       customerId: activeTab.customer?._id || null,
@@ -573,7 +567,6 @@ const POS = () => {
       creditApplied,
       paymentMethod: activeTab.paymentMethod,
       changeReturned: parseFloat(activeTab.changeReturned) || 0,
-      creditUsed: parseFloat(activeTab.creditUsed) || 0,
     };
 
     dispatch(createInvoice(invoiceData));
@@ -716,7 +709,7 @@ const POS = () => {
                       )}
                     </div>
                     <button
-                      onClick={() => updateTabData({ customer: null, applyCreditEnabled: false, availableCredit: 0, creditUsed: 0 })}
+                      onClick={() => updateTabData({ customer: null, applyCreditEnabled: false })}
                       className="text-red-600 hover:text-red-700"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -734,22 +727,7 @@ const POS = () => {
                 </button>
               )}
 
-              {/* Credit Balance Display */}
-              {
-                activeTab.customer && activeTab.availableCredit > 0 && (
-                  <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm font-medium text-green-800">Available Credit</span>
-                      </div>
-                      <span className="text-lg font-bold text-green-600">₹{activeTab.availableCredit.toFixed(2)}</span>
-                    </div>
-                  </div>
-                )
-              }
+
 
               {/* Pending Dues Display */}
               {
@@ -922,12 +900,6 @@ const POS = () => {
                   <span>Total:</span>
                   <span className="text-indigo-600">₹{total.toFixed(2)}</span>
                 </div>
-                {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
-                  <div className="flex justify-between text-lg font-bold text-indigo-600">
-                    <span>Amount to Pay:</span>
-                    <span>₹{(total - getCreditApplied()).toFixed(2)}</span>
-                  </div>
-                )}
               </div>
 
               {/* Payment Method */}
