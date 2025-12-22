@@ -24,7 +24,7 @@ export const createInvoice = async (req, res) => {
     const totalAmount = subtotal - discount;
 
     // Validate credit usage
-    if (creditUsed > 0 && !customerId) {
+    if (creditApplied > 0 && !customerId) {
       return res.status(400).json({
         message: "Walk-in customers cannot use credit. Please select a customer."
       });
@@ -104,7 +104,7 @@ export const createInvoice = async (req, res) => {
     }
 
     // Handle overpayment and change return
-    const effectivePaidAmount = paidAmount + creditUsed; // Credit counts as payment
+    const effectivePaidAmount = paidAmount + creditApplied; // Credit counts as payment
     const changeOwed = Math.max(0, effectivePaidAmount - totalAmount);
     const changeReturned = parseFloat(req.body.changeReturned) || 0;
 
@@ -120,20 +120,11 @@ export const createInvoice = async (req, res) => {
     // Cap actualPaidAmount at totalAmount (don't record overpayment)
     const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
-<<<<<<< HEAD
     // Determine payment status based on effective payment (cash + credit)
     let paymentStatus;
     if (effectivePaidAmount >= totalAmount) {
       paymentStatus = "paid";
     } else if (effectivePaidAmount > 0) {
-=======
-    // Determine payment status (including credit)
-    const totalPaid = actualPaidAmount + (creditUsed || 0);
-    let paymentStatus;
-    if (totalPaid >= totalAmount) {
-      paymentStatus = "paid";
-    } else if (totalPaid > 0) {
->>>>>>> origin/main
       paymentStatus = "partial";
     } else {
       paymentStatus = "unpaid";
