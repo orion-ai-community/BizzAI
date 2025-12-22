@@ -2,6 +2,17 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { register, reset } from "../redux/slices/authSlice";
+import { toast } from "react-toastify";
+
+// Frontend password strength check mirrors backend
+const isStrongPassword = (password) => {
+  if (!password || password.length < 8) return false;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSymbol = /[^A-Za-z0-9]/.test(password);
+  return hasUpper && hasLower && hasNumber && hasSymbol;
+};
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -26,16 +37,14 @@ const Register = () => {
   const [validationError, setValidationError] = useState("");
 
   useEffect(() => {
-    if (isError) {
-      // Error is shown in the UI
-    }
-
     if (isSuccess || user) {
       navigate("/dashboard");
+      dispatch(reset());
     }
 
-    dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+    // Keep error visible; reset only on unmount
+    return () => dispatch(reset());
+  }, [user, isSuccess, navigate, dispatch]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -53,8 +62,10 @@ const Register = () => {
       return;
     }
 
-    if (password.length < 6) {
-      setValidationError("Password must be at least 6 characters");
+    if (!isStrongPassword(password)) {
+      setValidationError(
+        "Password must be 8+ chars with uppercase, lowercase, number, and symbol."
+      );
       return;
     }
 
@@ -209,7 +220,7 @@ const Register = () => {
                     onChange={onChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                    placeholder="Min. 6 characters"
+                    placeholder="Min 8+ characters"
                   />
                   <button
                     type="button"

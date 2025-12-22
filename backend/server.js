@@ -5,13 +5,17 @@ import morgan from "morgan";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
-// import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import posRoutes from "./routes/posRoutes.js";
 import salesInvoiceRoutes from "./routes/salesInvoiceRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
-// import wholesalerRoutes from "./routes/wholesalerRoutes.js";
-// import dueRoutes from "./routes/dueRoutes.js";
+import supplierRoutes from "./routes/supplierRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js";
+import billRoutes from "./routes/billRoutes.js";
+import returnRoutes from "./routes/returnRoutes.js";
+import estimateRoutes from "./routes/estimateRoutes.js";
+import dueRoutes from "./routes/dueRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 // import settingsRoutes from "./routes/settingsRoutes.js";
 
@@ -38,13 +42,17 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/pos", posRoutes);
 app.use("/api/sales-invoice", salesInvoiceRoutes);
 app.use("/api/customers", customerRoutes);
-// app.use("/api/wholesalers", wholesalerRoutes);
-// app.use("/api/due", dueRoutes);
+app.use("/api/suppliers", supplierRoutes);
+app.use("/api/expenses", expenseRoutes);
+app.use("/api/bills", billRoutes);
+app.use("/api/returns", returnRoutes);
+app.use("/api/estimates", estimateRoutes);
+app.use("/api/due", dueRoutes);
 app.use("/api/reports", reportRoutes);
 // app.use("/api/settings", settingsRoutes);
 

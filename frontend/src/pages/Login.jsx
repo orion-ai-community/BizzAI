@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, reset } from '../redux/slices/authSlice';
+import { toast } from "react-toastify"
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -20,16 +21,13 @@ const Login = () => {
   );
 
   useEffect(() => {
-    if (isError) {
-      // Error is shown in the UI
-    }
-
     if (isSuccess || user) {
       navigate('/dashboard');
     }
 
-    dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+    // Cleanup: reset only on unmount
+    return () => dispatch(reset());
+  }, [user, isSuccess, navigate, dispatch]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -44,11 +42,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-[rgb(var(--color-bg))] dark:to-[rgb(var(--color-card))] flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-indigo-600 rounded-2xl mb-4">
+          <div className="inline-block p-3 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] rounded-2xl mb-4">
             <svg
               className="w-12 h-12 text-white"
               fill="none"
@@ -63,15 +61,15 @@ const Login = () => {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to your billing account</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Welcome Back</h1>
+          <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mt-2">Sign in to your billing account</p>
         </div>
 
         {/* Login Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-2xl shadow-xl dark:shadow-2xl p-8 border dark:border-[rgb(var(--color-border))]">
           {isError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600 text-sm">{message}</p>
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-red-600 dark:text-red-400 text-sm">{message}</p>
             </div>
           )}
 
@@ -80,7 +78,7 @@ const Login = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text))] mb-2"
               >
                 Email Address
               </label>
@@ -91,7 +89,7 @@ const Login = () => {
                 value={email}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))]"
                 placeholder="you@example.com"
               />
             </div>
@@ -100,7 +98,7 @@ const Login = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text))] mb-2"
               >
                 Password
               </label>
@@ -112,13 +110,13 @@ const Login = () => {
                   value={password}
                   onChange={onChange}
                   required
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))]"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-700 dark:hover:text-[rgb(var(--color-text))] focus:outline-none"
                 >
                   {showPassword ? (
                     <svg
@@ -163,7 +161,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white py-3 rounded-lg font-medium hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:ring-offset-2 dark:focus:ring-offset-[rgb(var(--color-card))] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -194,13 +192,21 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+          {/* Links */}
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
+              <Link
+                to="/forgot-password"
+                className="text-indigo-600 dark:text-[rgb(var(--color-primary))] font-medium hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))] transition"
+              >
+                Forgot Password?
+              </Link>
+            </p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
               Don't have an account?{' '}
               <Link
                 to="/register"
-                className="text-indigo-600 font-medium hover:text-indigo-700 transition"
+                className="text-indigo-600 dark:text-[rgb(var(--color-primary))] font-medium hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))] transition"
               >
                 Create Account
               </Link>
@@ -209,7 +215,7 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-500 text-sm mt-8">
+        <p className="text-center text-gray-500 dark:text-[rgb(var(--color-text-muted))] text-sm mt-8">
           Secure billing management for your business
         </p>
       </div>

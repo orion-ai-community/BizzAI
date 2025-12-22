@@ -1,5 +1,17 @@
 import User from "../models/User.js";
 import { generateToken } from "../config/jwt.js";
+import crypto from "crypto";
+import { sendEmail } from "../utils/emailService.js";
+
+// Simple password strength check for registration
+const isStrongPassword = (password) => {
+  if (!password || password.length < 8) return false;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSymbol = /[^A-Za-z0-9]/.test(password);
+  return hasUpper && hasLower && hasNumber && hasSymbol;
+};
 
 /**
  * @desc Register new user (Shop Owner)
@@ -12,6 +24,13 @@ export const registerUser = async (req, res) => {
     // Validate inputs
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please fill all required fields" });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({
+        message:
+          "Password too weak. Use at least 8 characters with uppercase, lowercase, number, and symbol.",
+      });
     }
 
     // Check if user already exists
@@ -95,6 +114,91 @@ export const getProfile = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+/**
+ * @desc Request password reset link
+ * @route POST /api/auth/forgot-password
+ */
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Respond success even if user missing to avoid user enumeration
+      return res.status(200).json({ message: "If this email exists, a reset link has been sent" });
+    }
+
+    // Generate token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    // Save to user with 1 hour expiry
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
+    await user.save();
+
+    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+    const mailSent = await sendEmail(
+      email,
+      "Reset your BizzAI password",
+      `You requested a password reset. Click the link below to set a new password (valid for 1 hour):\n\n${resetUrl}\n\nIf you did not request this, please ignore this email.`
+    );
+
+    if (!mailSent) {
+      return res.status(500).json({ message: "Failed to send reset email" });
+    }
+
+    res.status(200).json({ message: "Reset link sent if the email exists" });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+/**
+ * @desc Reset password using token
+ * @route POST /api/auth/reset-password
+ */
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, email, password } = req.body;
+    if (!token || !email || !password) {
+      return res.status(400).json({ message: "Token, email and new password are required" });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({
+        message: "Password too weak. Use at least 8 characters with uppercase, lowercase, number, and symbol.",
+      });
+    }
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      email,
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired reset token" });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful. Please log in." });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };

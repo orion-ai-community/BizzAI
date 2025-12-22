@@ -23,6 +23,13 @@ export const createInvoice = async (req, res) => {
     for (const it of items) subtotal += it.quantity * it.price;
     const totalAmount = subtotal - discount;
 
+    // Validate credit usage
+    if (creditUsed > 0 && !customerId) {
+      return res.status(400).json({
+        message: "Walk-in customers cannot use credit. Please select a customer."
+      });
+    }
+
     // IMPORTANT: Walk-in customers cannot take due
     if (!customerId && paidAmount < totalAmount) {
       return res.status(400).json({
@@ -72,7 +79,8 @@ export const createInvoice = async (req, res) => {
 
       // Validate credit application if creditApplied > 0
       if (creditApplied > 0) {
-        const availableCredit = Math.abs(Math.min(0, customer.dues)); // Credit is negative dues
+        const availableCredit = customer.dues < 0 ? Math.abs(customer.dues) : 0;
+
         if (availableCredit === 0) {
           return res.status(400).json({
             message: "Customer has no available credit"
@@ -80,12 +88,12 @@ export const createInvoice = async (req, res) => {
         }
         if (creditApplied > availableCredit) {
           return res.status(400).json({
-            message: `Credit applied (₹${creditApplied}) exceeds available credit (₹${availableCredit})`
+            message: `Credit applied (₹${creditApplied}) exceeds available credit (₹${availableCredit.toFixed(2)})`
           });
         }
         if (creditApplied > totalAmount) {
           return res.status(400).json({
-            message: `Credit applied (₹${creditApplied}) exceeds invoice total (₹${totalAmount})`
+            message: `Credit applied (₹${creditApplied}) cannot exceed total amount (₹${totalAmount})`
           });
         }
       }
@@ -96,19 +104,36 @@ export const createInvoice = async (req, res) => {
     }
 
     // Handle overpayment and change return
-    const effectivePaidAmount = paidAmount + creditApplied; // Credit counts as payment
+    const effectivePaidAmount = paidAmount + creditUsed; // Credit counts as payment
     const changeOwed = Math.max(0, effectivePaidAmount - totalAmount);
     const changeReturned = parseFloat(req.body.changeReturned) || 0;
+
+    // CRITICAL VALIDATION: Prevent Change Returned from exceeding Change Owed
+    if (changeReturned > changeOwed) {
+      return res.status(400).json({
+        message: "You are returning more amount than required. Please correct the change returned."
+      });
+    }
+
     const changeNotReturned = Math.max(0, changeOwed - changeReturned);
 
     // Cap actualPaidAmount at totalAmount (don't record overpayment)
     const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
+<<<<<<< HEAD
     // Determine payment status based on effective payment (cash + credit)
     let paymentStatus;
     if (effectivePaidAmount >= totalAmount) {
       paymentStatus = "paid";
     } else if (effectivePaidAmount > 0) {
+=======
+    // Determine payment status (including credit)
+    const totalPaid = actualPaidAmount + (creditUsed || 0);
+    let paymentStatus;
+    if (totalPaid >= totalAmount) {
+      paymentStatus = "paid";
+    } else if (totalPaid > 0) {
+>>>>>>> origin/main
       paymentStatus = "partial";
     } else {
       paymentStatus = "unpaid";
@@ -168,15 +193,17 @@ export const createInvoice = async (req, res) => {
     // Handle customer dues if unpaid (after credit application)
     if (customerId && effectivePaidAmount < totalAmount) {
       const dueAmount = totalAmount - effectivePaidAmount;
-      await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
+      if (dueAmount > 0) {
+        await Customer.findByIdAndUpdate(customerId, { $inc: { dues: dueAmount } });
 
-      await Transaction.create({
-        type: "due",
-        customer: customerId,
-        invoice: invoice._id,
-        amount: dueAmount,
-        description: `Due added for invoice ${invoiceNo}`,
-      });
+        await Transaction.create({
+          type: "due",
+          customer: customerId,
+          invoice: invoice._id,
+          amount: dueAmount,
+          description: `Due added for invoice ${invoiceNo}`,
+        });
+      }
     }
 
     // Handle change not returned - create NEGATIVE due (customer credit)
@@ -256,13 +283,23 @@ export const getInvoiceById = async (req, res) => {
     const invoice = await Invoice.findOne({
       _id: req.params.id,
       createdBy: req.user._id
-    }).populate("customer");
+    })
+      .populate("customer")
+      .populate("items.item", "name sku");
 
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found or unauthorized" });
     }
 
-    res.status(200).json(invoice);
+    // Transform items to include name property at root level for frontend compatibility
+    const transformedInvoice = invoice.toObject();
+    transformedInvoice.items = transformedInvoice.items.map(item => ({
+      ...item,
+      name: item.item?.name || 'Item',
+      sku: item.item?.sku || ''
+    }));
+
+    res.status(200).json(transformedInvoice);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }

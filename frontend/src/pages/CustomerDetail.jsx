@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   getCustomerById,
   getCustomerTransactions,
   clearCustomer,
   reset,
-} from '../redux/slices/customerSlice';
-import Layout from '../components/Layout';
+} from "../redux/slices/customerSlice";
+import Layout from "../components/Layout";
 
 const CustomerDetail = () => {
   const { id } = useParams();
@@ -26,47 +26,89 @@ const CustomerDetail = () => {
     };
   }, [dispatch, id]);
 
-  const getTransactionTypeColor = (type) => {
+  const getTransactionTypeColor = (type, amount) => {
     switch (type) {
-      case 'sale':
-        return 'bg-green-100 text-green-800';
-      case 'purchase':
-        return 'bg-blue-100 text-blue-800';
-      case 'payment':
-        return 'bg-purple-100 text-purple-800';
-      case 'due':
-        return 'bg-red-100 text-red-800';
-      case 'refund':
-        return 'bg-yellow-100 text-yellow-800';
+      case "sale":
+        return "bg-green-100 text-green-800";
+      case "purchase":
+        return "bg-blue-100 text-blue-800";
+      case "payment":
+        return "bg-purple-100 text-purple-800";
+      case "due":
+        if (amount > 0) return "bg-red-100 text-red-800";
+        if (amount < 0) return "bg-yellow-100 text-yellow-800";
+        return "bg-red-100 text-red-800";
+      case "refund":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getPaymentMethodIcon = (method) => {
     switch (method) {
-      case 'cash':
+      case "cash":
         return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+            />
           </svg>
         );
-      case 'upi':
+      case "upi":
         return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+            />
           </svg>
         );
-      case 'card':
+      case "card":
         return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+            />
           </svg>
         );
-      case 'due':
+      case "due":
         return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         );
       default:
@@ -78,7 +120,7 @@ const CustomerDetail = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
         </div>
       </Layout>
     );
@@ -90,8 +132,8 @@ const CustomerDetail = () => {
         <div className="text-center py-12">
           <p className="text-gray-500">Customer not found</p>
           <button
-            onClick={() => navigate('/customers')}
-            className="mt-4 text-indigo-600 hover:text-indigo-700"
+            onClick={() => navigate("/customers")}
+            className="mt-4 text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))]"
           >
             Back to Customers
           </button>
@@ -106,8 +148,8 @@ const CustomerDetail = () => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate('/customers')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            onClick={() => navigate("/customers")}
+            className="flex items-center text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-900 dark:hover:text-[rgb(var(--color-text))] mb-4"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -126,14 +168,16 @@ const CustomerDetail = () => {
           </button>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
                 Customer Details
               </h1>
-              <p className="text-gray-600">View customer information and transaction history</p>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
+                View customer information and transaction history
+              </p>
             </div>
             <button
               onClick={() => navigate(`/customers/edit/${id}`)}
-              className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))]"
             >
               <svg
                 className="w-5 h-5"
@@ -155,13 +199,13 @@ const CustomerDetail = () => {
 
         {/* Error Message */}
         {isError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{message}</p>
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-600 dark:text-red-400 text-sm">{message}</p>
           </div>
         )}
 
         {/* Customer Info Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-8 mb-6">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-3xl font-bold text-white">
@@ -169,17 +213,22 @@ const CustomerDetail = () => {
               </span>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{customer.name}</h2>
-              <p className="text-gray-500">Customer since {new Date(customer.createdAt).toLocaleDateString()}</p>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {customer.name}
+              </h2>
+              <p className="text-gray-500">
+                Customer since{" "}
+                {new Date(customer.createdAt).toLocaleDateString()}
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Phone */}
             <div className="flex items-start space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className="w-6 h-6 text-blue-600 dark:text-blue-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -200,9 +249,9 @@ const CustomerDetail = () => {
 
             {/* Email */}
             <div className="flex items-start space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className="w-6 h-6 text-green-600 dark:text-green-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -218,16 +267,16 @@ const CustomerDetail = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500">Email</p>
                 <p className="text-gray-900 font-medium">
-                  {customer.email || 'Not provided'}
+                  {customer.email || "Not provided"}
                 </p>
               </div>
             </div>
 
             {/* Address */}
             <div className="flex items-start space-x-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-purple-600"
+                  className="w-6 h-6 text-purple-600 dark:text-purple-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -249,16 +298,38 @@ const CustomerDetail = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500">Address</p>
                 <p className="text-gray-900 font-medium">
-                  {customer.address || 'Not provided'}
+                  {customer.address || "Not provided"}
                 </p>
               </div>
             </div>
 
             {/* Dues */}
-            <div className="flex items-start space-x-3">
-              <div className={`p-2 rounded-lg ${customer.dues > 0 ? 'bg-red-100' : 'bg-green-100'}`}>
+            <div
+              onClick={() => {
+                if (customer.dues > 0) {
+                  navigate(`/customers/adjust-due/${id}`);
+                }
+              }}
+              className={`flex items-start space-x-3 ${customer.dues > 0
+                  ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] p-3 rounded-lg transition-colors"
+                  : ""
+                }`}
+            >
+              <div
+                className={`p-2 rounded-lg ${customer.dues > 0
+                    ? "bg-red-100"
+                    : customer.dues < 0
+                      ? "bg-yellow-100"
+                      : "bg-green-100"
+                  }`}
+              >
                 <svg
-                  className={`w-6 h-6 ${customer.dues > 0 ? 'text-red-600' : 'text-green-600'}`}
+                  className={`w-6 h-6 ${customer.dues > 0
+                      ? "text-red-600"
+                      : customer.dues < 0
+                        ? "text-yellow-600"
+                        : "text-green-600"
+                    }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -271,28 +342,47 @@ const CustomerDetail = () => {
                   />
                 </svg>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Outstanding Dues</p>
-                <p className={`font-bold text-lg ${customer.dues > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                  ₹{customer.dues?.toFixed(2) || '0.00'}
+
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-500">
+                  {customer.dues < 0 ? "Pending Return" : "Outstanding Dues"}
                 </p>
+                <p
+                  className={`font-bold text-lg ${customer.dues > 0
+                      ? "text-red-600"
+                      : customer.dues < 0
+                        ? "text-yellow-600"
+                        : "text-green-600"
+                    }`}
+                >
+                  {/* Absolute value used to display returns as positive (e.g. ₹9 instead of ₹-9) */}
+                  ₹{Math.abs(customer.dues || 0).toFixed(2)}
+                </p>
+                {customer.dues > 0 && (
+                  <p className="text-xs text-indigo-600 dark:text-[rgb(var(--color-primary))] mt-1">
+                    Click to adjust due →
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Transaction History */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900">Transaction History</h3>
+        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
+            <h3 className="text-lg font-bold text-gray-900">
+              Transaction History
+            </h3>
             <p className="text-sm text-gray-600">
-              {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} found
+              {transactions.length} transaction
+              {transactions.length !== 1 ? "s" : ""} found
             </p>
           </div>
 
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
             </div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-12">
@@ -317,7 +407,7 @@ const CustomerDetail = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Date
@@ -336,23 +426,26 @@ const CustomerDetail = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                   {transactions.map((transaction) => (
-                    <tr key={transaction._id} className="hover:bg-gray-50">
+                    <tr key={transaction._id} className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(transaction.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getTransactionTypeColor(
-                            transaction.type
+                            transaction.type,
+                            transaction.amount?.toFixed(2)
                           )}`}
                         >
-                          {transaction.type}
+                          {transaction.type === "due" && transaction.amount < 0
+                            ? "due (return)"
+                            : transaction.type}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ₹{transaction.amount?.toFixed(2)}
+                        ₹{Math.abs(transaction.amount?.toFixed(2))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
@@ -363,7 +456,7 @@ const CustomerDetail = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {transaction.description || '-'}
+                        {transaction.description || "-"}
                       </td>
                     </tr>
                   ))}

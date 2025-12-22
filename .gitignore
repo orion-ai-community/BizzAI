@@ -118,3 +118,12 @@ Desktop.ini
 *.bak
 *.tmp
 *.temp
+
+backend/invoices/*.pdf
+backend/invoices/
+
+# Generated files
+backend/invoices/
+*.log
+*.tmp
+*.pdf

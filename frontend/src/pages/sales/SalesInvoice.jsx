@@ -1,17 +1,34 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { getAllSalesInvoices, deleteSalesInvoice, reset } from '../../redux/slices/salesInvoiceSlice';
 import Layout from '../../components/Layout';
+import PageHeader from '../../components/PageHeader';
+import FormInput from '../../components/FormInput';
+import CustomerSelectionModal from '../../components/CustomerSelectionModal';
 
 const SalesInvoice = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { invoices, isLoading, isError, message } = useSelector((state) => state.salesInvoice);
 
+    const [formData, setFormData] = useState({
+        invoiceNo: 'INV-' + Date.now(),
+        invoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: '',
+        customer: null,
+        items: [{ name: '', quantity: 1, rate: 0, tax: 18, amount: 0 }],
+        discount: 0,
+        shippingCharges: 0,
+        notes: '',
+        termsAndConditions: ''
+    });
+
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [showCustomerModal, setShowCustomerModal] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
 
     useEffect(() => {
         dispatch(getAllSalesInvoices());
@@ -31,7 +48,8 @@ const SalesInvoice = () => {
             invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
             (invoice.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === 'all' || invoice.paymentStatus === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesCustomer = !selectedCustomer || invoice.customer?._id === selectedCustomer._id;
+        return matchesSearch && matchesStatus && matchesCustomer;
     });
 
     const getStatusColor = (status) => {
@@ -56,69 +74,88 @@ const SalesInvoice = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Sales Invoices</h1>
-                    <p className="text-gray-600">View and manage all sales invoices</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">Sales Invoices</h1>
+                    <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">View and manage all sales invoices</p>
                 </div>
 
                 {/* Error Message */}
                 {isError && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-red-600 text-sm">{message}</p>
+                    <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-red-600 dark:text-red-400 text-sm">{message}</p>
                     </div>
                 )}
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm font-medium">Total Invoices</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">{invoices.length}</p>
+                                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Total Invoices</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">{invoices.length}</p>
                             </div>
-                            <div className="p-3 bg-blue-100 rounded-lg">
-                                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                                <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium">Total Sales</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalSales.toFixed(0)}</p>
-                            </div>
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Customer Filter</h2>
                         </div>
+                        {selectedCustomer ? (
+                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{selectedCustomer.name}</p>
+                                        <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{selectedCustomer.phone}</p>
+                                        {selectedCustomer.email && (
+                                            <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{selectedCustomer.email}</p>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => setSelectedCustomer(null)}
+                                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500 text-sm font-medium"
+                                    >
+                                        Clear Filter
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowCustomerModal(true)}
+                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 dark:border-[rgb(var(--color-border))] rounded-lg text-gray-600 dark:text-[rgb(var(--color-text-secondary))] hover:border-indigo-500 dark:hover:border-[rgb(var(--color-primary))] hover:text-indigo-600 dark:hover:text-[rgb(var(--color-primary))] transition flex flex-col items-center justify-center gap-2"
+                            >
+                                <span className="font-medium">Click to filter by customer</span>
+                                <span className="text-sm text-gray-400 dark:text-[rgb(var(--color-text-muted))]">Show invoices for specific customer</span>
+                            </button>
+                        )}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm font-medium">Amount Collected</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalPaid.toFixed(0)}</p>
+                                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Amount Collected</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">₹{totalPaid.toFixed(0)}</p>
                             </div>
-                            <div className="p-3 bg-purple-100 rounded-lg">
-                                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                                <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm font-medium">Outstanding Dues</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">₹{totalDue.toFixed(0)}</p>
+                                <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-sm font-medium">Outstanding Dues</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">₹{totalDue.toFixed(0)}</p>
                             </div>
-                            <div className="p-3 bg-red-100 rounded-lg">
-                                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
@@ -127,7 +164,7 @@ const SalesInvoice = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-4 mb-6">
                     <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                         <div className="w-full sm:w-96">
                             <div className="relative">
@@ -136,9 +173,9 @@ const SalesInvoice = () => {
                                     placeholder="Search by invoice number or customer..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                                 />
-                                <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-[rgb(var(--color-text-muted))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
@@ -148,7 +185,7 @@ const SalesInvoice = () => {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                             >
                                 <option value="all">All Status</option>
                                 <option value="paid">Paid</option>
@@ -160,22 +197,22 @@ const SalesInvoice = () => {
                 </div>
 
                 {/* Invoices Table */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
                     {isLoading ? (
                         <div className="flex justify-center items-center py-12">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
                         </div>
                     ) : filteredInvoices.length === 0 ? (
                         <div className="text-center py-12">
-                            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-16 h-16 text-gray-400 dark:text-[rgb(var(--color-text-muted))] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <p className="text-gray-500 text-lg">No sales invoices found</p>
+                            <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-lg">No sales invoices found</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                                <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice No</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
@@ -188,7 +225,7 @@ const SalesInvoice = () => {
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                                     {filteredInvoices.map((invoice) => (
                                         <tr key={invoice._id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -254,15 +291,15 @@ const SalesInvoice = () => {
                 {/* Delete Confirmation Modal */}
                 {deleteConfirm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Confirm Delete</h3>
-                            <p className="text-gray-600 mb-6">
+                        <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-6 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4">Confirm Delete</h3>
+                            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-6">
                                 Are you sure you want to delete this invoice? This action cannot be undone.
                             </p>
                             <div className="flex space-x-4">
                                 <button
                                     onClick={() => setDeleteConfirm(null)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
                                 >
                                     Cancel
                                 </button>
@@ -277,6 +314,16 @@ const SalesInvoice = () => {
                     </div>
                 )}
             </div>
+
+            {/* Customer Modal */}
+            <CustomerSelectionModal
+                isOpen={showCustomerModal}
+                onClose={() => setShowCustomerModal(false)}
+                onSelect={(customer) => {
+                    setSelectedCustomer(customer);
+                    setShowCustomerModal(false);
+                }}
+            />
         </Layout>
     );
 };
