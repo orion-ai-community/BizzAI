@@ -4,6 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import Layout from '../components/Layout';
 import { getAllExpenses } from '../redux/slices/expenseSlice';
 import { getAllBills } from '../redux/slices/billSlice';
+import { getDashboardStats } from '../redux/slices/reportsSlice';
+import {
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  AreaChart, Area
+} from 'recharts';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,6 +17,7 @@ const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const { expenses } = useSelector((state) => state.expense);
   const { bills } = useSelector((state) => state.bill);
+  const { dashboardStats } = useSelector((state) => state.reports);
   const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
@@ -19,6 +26,7 @@ const Dashboard = () => {
     } else {
       dispatch(getAllExpenses());
       dispatch(getAllBills());
+      dispatch(getDashboardStats());
       // Trigger fade-in animation
       setTimeout(() => setFadeIn(true), 50);
     }
@@ -358,31 +366,160 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Coming Soon Section */}
-        <div className="bg-gradient-to-br from-white to-indigo-50 dark:from-[rgb(var(--color-card))] dark:to-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-8 text-center border border-indigo-100 dark:border-[rgb(var(--color-border))]">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <svg
-                className="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
+        {/* Analytical Graphs */}
+        {dashboardStats && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Sales Trend */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                Sales Trend (Last 30 Days)
+              </h3>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dashboardStats.dailySales}>
+                    <defs>
+                      <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis
+                      dataKey="_id"
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => value.split('-').slice(1).join('/')}
+                      stroke="#94a3b8"
+                    />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgb(var(--color-card))', border: '1px solid rgb(var(--color-border))', borderRadius: '8px', color: 'rgb(var(--color-text))' }}
+                      itemStyle={{ color: 'rgb(var(--color-primary))' }}
+                    />
+                    <Area type="monotone" dataKey="totalSales" name="Sales" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Revenue vs Expenses */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Revenue vs Expenses (Monthly)
+              </h3>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={dashboardStats.revenueVsExpenses}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      stroke="#94a3b8"
+                    />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                    <Tooltip
+                      cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }}
+                      contentStyle={{ backgroundColor: 'rgb(var(--color-card))', border: '1px solid rgb(var(--color-border))', borderRadius: '8px', color: 'rgb(var(--color-text))' }}
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
+                    <Bar dataKey="revenue" name="Revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="expenses" name="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Payment Methods Distribution
+              </h3>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={dashboardStats.paymentMethods}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="count"
+                      nameKey="_id"
+                    >
+                      {dashboardStats.paymentMethods.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={
+                          entry._id === 'cash' ? '#10b981' :
+                            entry._id === 'upi' ? '#6366f1' :
+                              entry._id === 'card' ? '#f59e0b' :
+                                '#94a3b8'
+                        } />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgb(var(--color-card))', border: '1px solid rgb(var(--color-border))', borderRadius: '8px', color: 'rgb(var(--color-text))' }}
+                    />
+                    <Legend iconType="circle" layout="vertical" align="right" verticalAlign="middle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Top Customer Dues */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Top Receivables
+              </h3>
+              <div className="space-y-4">
+                {dashboardStats.topCustomersWithDues.length > 0 ? (
+                  dashboardStats.topCustomersWithDues.map((customer, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                          {customer.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">{customer.name}</span>
+                      </div>
+                      <span className="font-bold text-red-500">₹{customer.dues.toLocaleString()}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-48 flex items-center justify-center text-gray-400 italic">
+                    No outstanding dues found
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Coming Soon Section - Now as helpful info */}
+        <div className="bg-gradient-to-br from-white to-gray-50 dark:from-[rgb(var(--color-card))] dark:to-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-6 border border-gray-100 dark:border-[rgb(var(--color-border))]">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
-              More Features Coming Soon!
-            </h3>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
-              We're working on adding invoices, customers, products, and
-              reports to make your billing experience seamless.
-            </p>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                Quick Tips
+              </h3>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
+                Graphs update in real-time as you add invoices and expenses. Use reports for detailed analysis.
+              </p>
+            </div>
           </div>
         </div>
       </div>
