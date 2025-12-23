@@ -166,10 +166,10 @@ const Dashboard = () => {
             </div>
 
             {/* Shop Name */}
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/20 border border-green-200/50 dark:border-green-700/50">
+              <div className="p-2 bg-green-600 dark:bg-green-500 rounded-lg shadow-sm">
                 <svg
-                  className="w-6 h-6 text-green-600 dark:text-green-400"
+                  className="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

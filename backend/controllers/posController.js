@@ -224,7 +224,10 @@ export const createInvoice = async (req, res) => {
     }
 
     // Generate invoice PDF + Email it + Log it
-    const populatedInvoice = await Invoice.findById(invoice._id).populate("customer");
+    const populatedInvoice = await Invoice.findById(invoice._id)
+      .populate("customer")
+      .populate("items.item")
+      .populate({ path: "createdBy", select: "shopName name" });
     const pdfPath = await generateInvoicePDF(populatedInvoice);
 
     if (populatedInvoice.customer?.email) {
