@@ -90,6 +90,19 @@ export const createExpense = async (req, res) => {
       );
 
       info(`Bank payment for expense ${expenseNo}: -₹${amount} from account ${bankAccount}`);
+    } else if (paymentMethod === 'cash') {
+      // Record cash expense transaction
+      await CashbankTransaction.create({
+        type: 'out',
+        amount,
+        fromAccount: 'cash',
+        toAccount: 'expense',
+        description: `Cash expense: ${category} - ${description || expenseNo}`,
+        date: new Date(),
+        userId: req.user._id,
+      });
+
+      info(`Cash payment for expense ${expenseNo}: -₹${amount}`);
     }
 
     res.status(201).json(expense);

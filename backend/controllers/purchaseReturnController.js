@@ -73,6 +73,19 @@ export const createPurchaseReturn = async (req, res) => {
                 }
             );
             info(`Bank refund received: +₹${totalAmount} to ${bankAcc.bankName}`);
+        } else if (refundMethod === 'cash') {
+            // Record cash refund transaction
+            await CashbankTransaction.create({
+                type: 'in',
+                amount: totalAmount,
+                toAccount: 'cash',
+                fromAccount: 'purchase_return',
+                description: `Cash refund for purchase return ${returnId}`,
+                date: new Date(),
+                userId: req.user._id,
+            });
+
+            info(`Cash refund received: +₹${totalAmount}`);
         }
 
         // Update Supplier Dues (Debit note reduces what we owe)

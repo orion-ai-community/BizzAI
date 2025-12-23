@@ -353,6 +353,18 @@ export const updateBillPayment = async (req, res) => {
       );
 
       info(`Bank payment for bill ${bill.billNo}: -₹${paidAmount}`);
+    } else if (paymentMethod === 'cash') {
+      // Record cash payment transaction
+      await CashbankTransaction.create({
+        type: 'out',
+        amount: paidAmount,
+        fromAccount: 'cash',
+        toAccount: 'purchase',
+        description: `Cash payment for bill ${bill.billNo}`,
+        userId: req.user._id,
+      });
+
+      info(`Cash payment for bill ${bill.billNo}: -₹${paidAmount}`);
     }
 
     // Update bill

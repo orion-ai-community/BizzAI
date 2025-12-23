@@ -260,6 +260,18 @@ export const createReturn = async (req, res) => {
 
                     info(`Bank refund for return ${returnId}: -₹${totalReturnAmount} from ${bankAcc.bankName}`);
                 }
+            } else if (refundMethod === 'cash') {
+                // Record cash refund transaction
+                await CashbankTransaction.create({
+                    type: 'out',
+                    amount: totalReturnAmount,
+                    fromAccount: 'cash',
+                    toAccount: 'sale_return',
+                    description: `Cash refund for sales return ${returnId}`,
+                    userId: req.user._id,
+                });
+
+                info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
             }
         }
 
