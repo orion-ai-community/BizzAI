@@ -1,15 +1,19 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ToastContainer } from "react-toastify"
+import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import ProfileSettings from './pages/ProfileSettings';
 import Customers from './pages/Customers';
 import AddCustomer from './pages/AddCustomer';
 import EditCustomer from './pages/EditCustomer';
 import CustomerDetail from './pages/CustomerDetail';
+import DueAdjustment from './pages/DueAdjustment';
+import CustomersWithDues from './pages/CustomersWithDues';
 import Suppliers from './pages/Suppliers';
 import AddSupplier from './pages/AddSupplier';
 import EditSupplier from './pages/EditSupplier';
@@ -26,7 +30,8 @@ import Reports from './pages/Reports';
 import SalesInvoice from './pages/sales/SalesInvoice';
 import SalesInvoiceDetail from './pages/sales/SalesInvoiceDetail';
 import Estimate from './pages/sales/Estimate';
-import ProformaInvoice from './pages/sales/ProformaInvoice';
+import EstimateList from './pages/sales/EstimateList';
+import EstimateDetail from './pages/sales/EstimateDetail';
 import PaymentIn from './pages/sales/PaymentIn';
 import SalesOrder from './pages/sales/SalesOrder';
 import DeliveryChallan from './pages/sales/DeliveryChallan';
@@ -96,7 +101,10 @@ const PublicRoute = ({ children }) => {
 function App() {
   console.log(import.meta.env.VITE_BACKEND_URL);
   return (
-    <>
+    <ThemeProvider>
+=======
+    <ThemeProvider>
+>>>>>>> main
       <ToastContainer />
       <Router>
         <Routes>
@@ -148,6 +156,16 @@ function App() {
             }
           />
 
+          <Route
+            path="/profile-settings"
+            element={
+              <ProtectedRoute>
+                <ProfileSettings />
+              </ProtectedRoute>
+            }
+          />
+>>>>>>> main
+
           {/* Customer Routes - Use nested routes for better organization */}
           <Route path="/customers">
             <Route
@@ -175,6 +193,23 @@ function App() {
               }
             />
             <Route
+              path="adjust-due/:id"
+              element={
+                <ProtectedRoute>
+                  <DueAdjustment />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="with-dues"
+              element={
+                <ProtectedRoute>
+                  <CustomersWithDues />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+>>>>>>> main
               path=":id"
               element={
                 <ProtectedRoute>
@@ -281,7 +316,9 @@ function App() {
             <Route path="invoice" element={<ProtectedRoute><SalesInvoice /></ProtectedRoute>} />
             <Route path="invoice/:id" element={<ProtectedRoute><SalesInvoiceDetail /></ProtectedRoute>} />
             <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
-            <Route path="proforma" element={<ProtectedRoute><ProformaInvoice /></ProtectedRoute>} />
+            <Route path="estimates" element={<ProtectedRoute><EstimateList /></ProtectedRoute>} />
+            <Route path="estimate/:id" element={<ProtectedRoute><EstimateDetail /></ProtectedRoute>} />
+>>>>>>> main
             <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
             <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
             <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
@@ -305,13 +342,7 @@ function App() {
             <Route path="cash-in-hand" element={<ProtectedRoute><CashInHand /></ProtectedRoute>} />
             <Route path="cheques" element={<ProtectedRoute><Cheques /></ProtectedRoute>} />
             <Route path="loan-accounts" element={<ProtectedRoute><LoanAccounts /></ProtectedRoute>} />
-            <Route path="ledger/:id" element={<ProtectedRoute><AccountLedger /></ProtectedRoute>} />
-            <Route path="summary" element={<ProtectedRoute><BankSummary /></ProtectedRoute>} />
-            <Route path="position" element={<ProtectedRoute><CashBankPosition /></ProtectedRoute>} />
           </Route>
-
-          {/* Transfers */}
-          <Route path="/transfers" element={<ProtectedRoute><Transfers /></ProtectedRoute>} />
 
           {/* Business Growth Routes */}
           <Route path="/business">
@@ -328,6 +359,7 @@ function App() {
             <Route path="restore" element={<ProtectedRoute><Restore /></ProtectedRoute>} />
           </Route>
 
+>>>>>>> main
           {/* Utilities Routes */}
           <Route path="/utilities">
             <Route path="barcode" element={<ProtectedRoute><BarcodeGenerator /></ProtectedRoute>} />
@@ -343,10 +375,9 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
-    </>
+    </ThemeProvider>
+>>>>>>> main
   );
 }
 
 export default App;
-
-

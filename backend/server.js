@@ -5,7 +5,7 @@ import morgan from "morgan";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
-// import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import posRoutes from "./routes/posRoutes.js";
 import salesInvoiceRoutes from "./routes/salesInvoiceRoutes.js";
@@ -15,7 +15,8 @@ import supplierRoutes from "./routes/supplierRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import billRoutes from "./routes/billRoutes.js";
 import returnRoutes from "./routes/returnRoutes.js";
-// import dueRoutes from "./routes/dueRoutes.js";
+import estimateRoutes from "./routes/estimateRoutes.js";
+import dueRoutes from "./routes/dueRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 // import settingsRoutes from "./routes/settingsRoutes.js";
 import cashbankRoutes from "./routes/cashbankRoutes.js";
@@ -27,7 +28,10 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(morgan("dev"));
 
 // DB Connection
@@ -40,7 +44,7 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/pos", posRoutes);
 app.use("/api/sales-invoice", salesInvoiceRoutes);
@@ -49,8 +53,14 @@ app.use("/api/suppliers", supplierRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/returns", returnRoutes);
+<<<<<<< HEAD
 app.use("/api/purchase-returns", purchaseReturnRoutes);
-// app.use("/api/due", dueRoutes);
+app.use("/api/estimates", estimateRoutes);
+app.use("/api/due", dueRoutes);
+=======
+app.use("/api/estimates", estimateRoutes);
+app.use("/api/due", dueRoutes);
+>>>>>>> main
 app.use("/api/reports", reportRoutes);
 app.use("/api/cashbank", cashbankRoutes);
 // app.use("/api/settings", settingsRoutes);
