@@ -6,10 +6,12 @@ import FormInput from '../../components/FormInput';
 import DataTable from '../../components/DataTable';
 import StatsCard from '../../components/StatsCard';
 import { getAllExpenses, createExpense, deleteExpense, reset } from '../../redux/slices/expenseSlice';
+import { getAccounts } from '../../redux/slices/cashbankSlice';
 
 const Expenses = () => {
     const dispatch = useDispatch();
     const { expenses, isLoading, isError, message } = useSelector(state => state.expense);
+    const { accounts } = useSelector(state => state.cashbank);
 
     const [showAddExpense, setShowAddExpense] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -20,6 +22,7 @@ const Expenses = () => {
         category: '',
         amount: 0,
         paymentMethod: 'cash',
+        bankAccount: '',
         description: '',
         receipt: null
     });
@@ -31,6 +34,7 @@ const Expenses = () => {
 
     useEffect(() => {
         dispatch(getAllExpenses());
+        dispatch(getAccounts());
         return () => {
             dispatch(reset());
         };
@@ -47,10 +51,12 @@ const Expenses = () => {
                 category: '',
                 amount: 0,
                 paymentMethod: 'cash',
+                bankAccount: '',
                 description: '',
                 receipt: null
             });
             dispatch(getAllExpenses()); // Refresh the list
+            dispatch(getAccounts()); // Refresh bank balances
         } catch (error) {
             console.error('Error creating expense:', error);
         }
@@ -143,9 +149,22 @@ const Expenses = () => {
                                     <option value="cheque">Cheque</option>
                                     <option value="bank_transfer">Bank Transfer</option>
                                 </select>
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                             </div>
+                             {formData.paymentMethod === 'bank_transfer' && (
+                                 <div>
+                                     <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
+                                     <select value={formData.bankAccount} onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })} className="w-full px-4 py-2 border rounded-lg" required>
+                                         <option value="">Choose account</option>
+                                         {accounts.map(account => (
+                                             <option key={account._id} value={account._id}>
+                                                 {account.bankName} - {account.accountType} (₹{account.currentBalance})
+                                             </option>
+                                         ))}
+                                     </select>
+                                 </div>
+                             )}
+                             <div className="md:col-span-2">
+                                 <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                                 <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows="2" className="w-full px-4 py-2 border rounded-lg" placeholder="Add description..." />
                             </div>
                         </div>

@@ -221,6 +221,46 @@ export const createReturn = async (req, res) => {
                 paymentMethod: refundMethod,
                 description: `Return processed for invoice ${invoice.invoiceNo} - Return ID: ${returnId}`,
             });
+
+            // Handle Bank Refund (Money OUT)
+            if (refundMethod === 'bank' && req.body.bankAccount) {
+                const BankAccount = (await import("../models/BankAccount.js")).default;
+                const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
+
+                const bankAcc = await BankAccount.findOne({
+                    _id: req.body.bankAccount,
+                    userId: req.user._id
+                });
+
+                if (bankAcc) {
+                    // Create cashbank transaction (money OUT - refund to customer)
+                    const cashbankTxn = await CashbankTransaction.create({
+                        type: 'out',
+                        amount: totalReturnAmount,
+                        fromAccount: req.body.bankAccount,
+                        toAccount: 'sale_return',
+                        description: `Refund for sales return ${returnId}`,
+                        date: new Date(),
+                        userId: req.user._id,
+                    });
+
+                    // Update bank balance (deduct)
+                    await BankAccount.updateOne(
+                        { _id: req.body.bankAccount, userId: req.user._id },
+                        {
+                            $inc: { currentBalance: -totalReturnAmount },
+                            $push: { transactions: cashbankTxn._id }
+                        }
+                    );
+
+                    // Update return record
+                    returnRecord.bankAccount = req.body.bankAccount;
+                    returnRecord.refundProcessed = true;
+                    await returnRecord.save();
+
+                    info(`Bank refund for return ${returnId}: -₹${totalReturnAmount} from ${bankAcc.bankName}`);
+                }
+            }
         }
 
         info(
@@ -347,7 +387,47 @@ export const deleteReturn = async (req, res) => {
             });
         }
 
-        // Delete associated transactions
+        // Handle Bank Refund Reversal
+        if (returnRecord.refundProcessed && returnRecord.bankAccount) {
+            const BankAccount = (await import("../models/BankAccount.js")).default;
+            const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
+
+            const bankAcc = await BankAccount.findOne({
+                _id: returnRecord.bankAccount,
+                userId: req.user._id
+            });
+
+            if (bankAcc) {
+                // Find and delete the associated cashbank transaction
+                // We search by amount, account, and description to find the matching one
+                const cashbankTxn = await CashbankTransaction.findOne({
+                    amount: returnRecord.totalReturnAmount,
+                    fromAccount: returnRecord.bankAccount,
+                    type: 'out',
+                    description: new RegExp(`sales return ${returnRecord.returnId}`),
+                    userId: req.user._id
+                });
+
+                if (cashbankTxn) {
+                    // Update bank balance (add back the money because 'out' is being reversed)
+                    await BankAccount.updateOne(
+                        { _id: returnRecord.bankAccount, userId: req.user._id },
+                        {
+                            $inc: { currentBalance: returnRecord.totalReturnAmount },
+                            $pull: { transactions: cashbankTxn._id }
+                        }
+                    );
+
+                    // Delete the cashbank transaction
+                    await CashbankTransaction.findByIdAndDelete(cashbankTxn._id);
+
+                    info(`Bank refund reversed for return ${returnRecord.returnId}: +₹${returnRecord.totalReturnAmount} to ${bankAcc.bankName}`);
+                }
+            }
+        }
+
+        // Delete associated general transactions
+        const Transaction = (await import("../models/Transaction.js")).default;
         await Transaction.deleteMany({ return: returnRecord._id });
 
         // Delete return record

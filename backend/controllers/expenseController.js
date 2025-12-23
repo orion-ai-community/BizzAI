@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Expense from "../models/Expense.js";
-import { error } from "../utils/logger.js";
+import CashbankTransaction from "../models/CashbankTransaction.js";
+import BankAccount from "../models/BankAccount.js";
+import { info, error } from "../utils/logger.js";
 
 /**
  * @desc Get all expenses (only for current owner)
@@ -23,7 +25,7 @@ export const getAllExpenses = async (req, res) => {
  */
 export const createExpense = async (req, res) => {
   try {
-    const { expenseNo, date, category, amount, paymentMethod, description, receipt } = req.body;
+    const { expenseNo, date, category, amount, paymentMethod, description, receipt, bankAccount } = req.body;
 
     if (!expenseNo || !date || !category || !amount) {
       return res.status(400).json({ message: "Expense number, date, category, and amount are required" });
@@ -39,6 +41,20 @@ export const createExpense = async (req, res) => {
       return res.status(400).json({ message: "Expense number already exists" });
     }
 
+    // Validate bank payment
+    if (paymentMethod === 'bank_transfer' && bankAccount) {
+      const bankAcc = await BankAccount.findOne({ _id: bankAccount, userId: req.user._id });
+      if (!bankAcc) {
+        return res.status(400).json({ message: 'Bank account not found' });
+      }
+
+      if (bankAcc.currentBalance < amount) {
+        return res.status(400).json({
+          message: `Insufficient balance. Available: ₹${bankAcc.currentBalance}`
+        });
+      }
+    }
+
     const expense = await Expense.create({
       expenseNo,
       date,
@@ -47,8 +63,34 @@ export const createExpense = async (req, res) => {
       paymentMethod: paymentMethod || 'cash',
       description,
       receipt,
+      bankAccount: bankAccount || null,
       createdBy: req.user._id
     });
+
+    // Handle bank payment
+    if (paymentMethod === 'bank_transfer' && bankAccount) {
+      // Create cashbank transaction (money OUT)
+      const cashbankTxn = await CashbankTransaction.create({
+        type: 'out',
+        amount,
+        fromAccount: bankAccount,
+        toAccount: 'expense',
+        description: `Expense: ${category} - ${description || expenseNo}`,
+        date: new Date(),
+        userId: req.user._id,
+      });
+
+      // Update bank balance (deduct)
+      await BankAccount.updateOne(
+        { _id: bankAccount, userId: req.user._id },
+        {
+          $inc: { currentBalance: -amount },
+          $push: { transactions: cashbankTxn._id }
+        }
+      );
+
+      info(`Bank payment for expense ${expenseNo}: -₹${amount} from account ${bankAccount}`);
+    }
 
     res.status(201).json(expense);
   } catch (err) {
@@ -118,15 +160,20 @@ export const updateExpense = async (req, res) => {
       }
     }
 
+    // Sanitize bankAccount if provided as empty string
+    if (req.body.bankAccount === "") {
+      req.body.bankAccount = undefined;
+    }
+
     const updatedExpense = await Expense.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      { $set: req.body },
+      { new: true, runValidators: true }
     );
 
     res.status(200).json(updatedExpense);
   } catch (err) {
-    error(`Update expense failed: ${err.message}`);
+    error(`Update expense failed: ${err.stack || err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };

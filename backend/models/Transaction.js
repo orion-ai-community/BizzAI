@@ -25,7 +25,7 @@ const transactionSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["cash", "upi", "card", "due", "split"],
+      enum: ["cash", "upi", "card", "due", "split", "bank_transfer"],
       default: "cash",
     },
     description: {

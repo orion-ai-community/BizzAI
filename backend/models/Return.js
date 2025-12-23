@@ -82,6 +82,14 @@ const returnSchema = new mongoose.Schema(
             enum: ["credit", "cash", "bank", "original_payment"],
             default: "credit",
         },
+        bankAccount: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'BankAccount',
+        },
+        refundProcessed: {
+            type: Boolean,
+            default: false,
+        },
         items: [returnItemSchema],
         subtotal: {
             type: Number,

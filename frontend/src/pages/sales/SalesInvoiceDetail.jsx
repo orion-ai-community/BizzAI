@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getSalesInvoiceById, reset, clearSalesInvoice } from '../../redux/slices/salesInvoiceSlice';
+import { getSalesInvoiceById, reset, clearSalesInvoice, markSalesInvoiceAsPaid } from '../../redux/slices/salesInvoiceSlice';
 import Layout from '../../components/Layout';
+import PaymentModal from '../../components/PaymentModal';
 
 const SalesInvoiceDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { invoice, isLoading, isError, message } = useSelector((state) => state.salesInvoice);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     useEffect(() => {
         dispatch(getSalesInvoiceById(id));
@@ -19,6 +21,21 @@ const SalesInvoiceDetail = () => {
 
     const handlePrint = () => {
         window.print();
+    };
+
+    const handlePayment = async (paymentData) => {
+        const result = await dispatch(markSalesInvoiceAsPaid({
+            id: invoice._id,
+            amount: paymentData.paidAmount,
+            bankAccount: paymentData.bankAccount,
+            paymentMethod: paymentData.paymentMethod
+        }));
+
+        if (result.meta.requestStatus === 'fulfilled') {
+            setShowPaymentModal(false);
+            // Refresh invoice data
+            dispatch(getSalesInvoiceById(id));
+        }
     };
 
     if (isLoading || !invoice) {
@@ -81,30 +98,41 @@ const SalesInvoiceDetail = () => {
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">Sales Invoice Details</h1>
                             <p className="text-gray-600">View and print sales invoice</p>
                         </div>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={handlePrint}
-                                className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                                <span>Print Invoice</span>
-                            </button>
-                            <button
-                                onClick={() => {
-                                    dispatch(clearSalesInvoice());
-                                    dispatch(reset());
-                                    navigate('/sales/invoice');
-                                }}
-                                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span>Done - Return to Sales</span>
-                            </button>
-                        </div>
+                         <div className="flex space-x-2">
+                             {invoice && invoice.paymentStatus !== 'paid' && (
+                                 <button
+                                     onClick={() => setShowPaymentModal(true)}
+                                     className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                 >
+                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                     </svg>
+                                     <span>Record Payment</span>
+                                 </button>
+                             )}
+                             <button
+                                 onClick={handlePrint}
+                                 className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                             >
+                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                 </svg>
+                                 <span>Print Invoice</span>
+                             </button>
+                             <button
+                                 onClick={() => {
+                                     dispatch(clearSalesInvoice());
+                                     dispatch(reset());
+                                     navigate('/sales/invoice');
+                                 }}
+                                 className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                             >
+                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                 </svg>
+                                 <span>Done - Return to Sales</span>
+                             </button>
+                         </div>
                     </div>
                 </div>
 
@@ -279,6 +307,18 @@ const SalesInvoiceDetail = () => {
           }
         }
       `}</style>
+
+            {/* Payment Modal */}
+            {showPaymentModal && (
+                <PaymentModal
+                    isOpen={showPaymentModal}
+                    onClose={() => setShowPaymentModal(false)}
+                    onSubmit={handlePayment}
+                    documentType="Sales Invoice"
+                    totalAmount={invoice.totalAmount}
+                    paidAmount={invoice.paidAmount}
+                />
+            )}
         </Layout>
     );
 };

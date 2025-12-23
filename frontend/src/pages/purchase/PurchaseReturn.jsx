@@ -3,6 +3,9 @@ import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
 import SupplierSelectionModal from '../../components/SupplierSelectionModal';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const PurchaseReturn = () => {
     const [formData, setFormData] = useState({
@@ -13,9 +16,30 @@ const PurchaseReturn = () => {
         items: [{ name: '', quantity: 1, rate: 0, tax: 18, amount: 0, reason: '' }],
         refundMethod: 'credit',
         discount: 0,
-        notes: ''
+        notes: '',
+        bankAccount: ''
     });
     const [showSupplierModal, setShowSupplierModal] = useState(false);
+    const [bankAccounts, setBankAccounts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    useState(() => {
+        const fetchBanks = async () => {
+            try {
+                const userData = JSON.parse(localStorage.getItem('user'));
+                const token = userData?.token;
+                const response = await axios.get(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setBankAccounts(response.data.filter(acc => acc.status === 'active'));
+            } catch (error) {
+                console.error('Error fetching banks:', error);
+            }
+        };
+        fetchBanks();
+    }, []);
 
     const addItem = () => setFormData({ ...formData, items: [...formData.items, { name: '', quantity: 1, rate: 0, tax: 18, amount: 0, reason: '' }] });
     const updateItem = (index, field, value) => {
@@ -29,12 +53,52 @@ const PurchaseReturn = () => {
     const calculateTax = () => formData.items.reduce((sum, item) => sum + (item.amount * item.tax / 100), 0);
     const calculateTotal = () => calculateSubtotal() + calculateTax() - formData.discount;
 
+    const handleSubmit = async () => {
+        if (!formData.supplier) return toast.warning('Please select a supplier');
+        if (formData.items.some(item => !item.name || item.quantity <= 0)) return toast.warning('Please fill all item details');
+        if (formData.refundMethod === 'bank_transfer' && !formData.bankAccount) return toast.warning('Please select a bank account');
+
+        try {
+            setLoading(true);
+            const userData = JSON.parse(localStorage.getItem('user'));
+            const token = userData?.token;
+
+            await axios.post(
+                `${import.meta.env.VITE_BACKEND_URL}/api/purchase-returns`,
+                {
+                    supplierId: formData.supplier._id,
+                    items: formData.items,
+                    refundMethod: formData.refundMethod,
+                    bankAccount: formData.bankAccount,
+                    discount: formData.discount,
+                    notes: formData.notes,
+                    returnDate: formData.debitNoteDate
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            toast.success('Purchase return processed successfully');
+            navigate('/purchase/bills');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to process return');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const returnReasons = ['Damaged Product', 'Wrong Item', 'Quality Issue', 'Expired Product', 'Other'];
 
     return (
         <Layout>
             <PageHeader title="Purchase Return / Debit Note" description="Process returns to suppliers" actions={[
-                <button key="save" className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Debit Note</button>,
+                <button
+                    key="save"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                >
+                    {loading ? 'Saving...' : 'Save Debit Note'}
+                </button>,
                 <button key="print" className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Print</button>
             ]} />
 
@@ -148,6 +212,23 @@ const PurchaseReturn = () => {
                                     ))}
                                 </div>
                             </div>
+                            {formData.refundMethod === 'bank_transfer' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
+                                    <select
+                                        value={formData.bankAccount}
+                                        onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                    >
+                                        <option value="">Choose Bank Account</option>
+                                        {bankAccounts.map(acc => (
+                                            <option key={acc._id} value={acc._id}>
+                                                {acc.bankName} - ****{acc.accountNumber.slice(-4)} (₹{acc.currentBalance.toLocaleString()})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                                 <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Add notes..." />
@@ -180,7 +261,13 @@ const PurchaseReturn = () => {
                             </div>
                         </div>
                         <div className="space-y-3">
-                            <button className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">Save Debit Note</button>
+                            <button
+                                onClick={handleSubmit}
+                                disabled={loading}
+                                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
+                            >
+                                {loading ? 'Saving...' : 'Save Debit Note'}
+                            </button>
                             <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Print Debit Note</button>
                         </div>
                     </div>
