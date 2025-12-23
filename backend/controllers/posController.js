@@ -230,6 +230,18 @@ export const createInvoice = async (req, res) => {
         console.log(`Bank balance updated for ${bankAccount}: new balance ${updatedAcc.currentBalance}`);
 
         info(`Bank payment recorded for invoice ${invoiceNo}: +${actualPaidAmount} to account ${bankAccount}`);
+      } else if (paymentMethod === 'cash') {
+        // Record cash payment transaction
+        await CashbankTransaction.create({
+          type: 'in',
+          amount: actualPaidAmount,
+          fromAccount: 'sale',
+          toAccount: 'cash',
+          description: `Cash payment for invoice ${invoiceNo}`,
+          userId: req.user._id,
+        });
+
+        info(`Cash payment recorded for invoice ${invoiceNo}: +${actualPaidAmount}`);
       }
     }
 
