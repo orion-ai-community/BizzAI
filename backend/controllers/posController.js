@@ -215,7 +215,7 @@ export const createInvoice = async (req, res) => {
           amount: actualPaidAmount,
           fromAccount: 'sale', // Indicates money from sale
           toAccount: bankAccount,
-          description: `Payment for invoice ${invoiceNo}`,
+          description: `POS Payment for invoice ${invoiceNo}`,
           userId: req.user._id,
         });
 
@@ -231,8 +231,7 @@ export const createInvoice = async (req, res) => {
 
         info(`Bank payment recorded for invoice ${invoiceNo}: +${actualPaidAmount} to account ${bankAccount}`);
       } else if (paymentMethod === 'cash') {
-        // Record cash payment transaction
-        await CashbankTransaction.create({
+        console.log('Creating cash transaction for POS:', {
           type: 'in',
           amount: actualPaidAmount,
           fromAccount: 'sale',
@@ -240,6 +239,16 @@ export const createInvoice = async (req, res) => {
           description: `Cash payment for invoice ${invoiceNo}`,
           userId: req.user._id,
         });
+        // Record cash payment transaction
+        const cashTxn = await CashbankTransaction.create({
+          type: 'in',
+          amount: actualPaidAmount,
+          fromAccount: 'sale',
+          toAccount: 'cash',
+          description: `POS Cash Payment for invoice ${invoiceNo}`,
+          userId: req.user._id,
+        });
+        console.log('Cash transaction created:', cashTxn._id);
 
         info(`Cash payment recorded for invoice ${invoiceNo}: +${actualPaidAmount}`);
       }
