@@ -121,11 +121,10 @@ export const createInvoice = async (req, res) => {
     const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
     // Determine payment status based on effective payment (cash + credit)
-    const totalEffectivePayment = actualPaidAmount + creditApplied;
     let paymentStatus;
-    if (totalEffectivePayment >= totalAmount) {
+    if (effectivePaidAmount >= totalAmount) {
       paymentStatus = "paid";
-    } else if (totalEffectivePayment > 0) {
+    } else if (effectivePaidAmount > 0) {
       paymentStatus = "partial";
     } else {
       paymentStatus = "unpaid";
