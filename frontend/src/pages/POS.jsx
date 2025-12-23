@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { getAllItems } from '../redux/slices/inventorySlice';
 import { getAllCustomers, addCustomer, reset as resetCustomer } from '../redux/slices/customerSlice';
 import { createInvoice, reset, clearInvoice } from '../redux/slices/posSlice';
+import { getAccounts } from '../redux/slices/cashbankSlice';
 import Layout from '../components/Layout';
 
 const POS = () => {
@@ -11,6 +13,7 @@ const POS = () => {
   const dispatch = useDispatch();
   const { items } = useSelector((state) => state.inventory);
   const { customers } = useSelector((state) => state.customers);
+  const { accounts } = useSelector((state) => state.cashbank);
   const { invoice, isLoading, isSuccess, isError, message } = useSelector((state) => state.pos);
 
   // Tab system state - Load from localStorage on mount
@@ -24,6 +27,7 @@ const POS = () => {
         cart: [],
         discount: 0,
         paymentMethod: 'cash',
+        bankAccount: '',
         paidAmount: '',
         changeReturned: '',
       }
@@ -80,6 +84,7 @@ const POS = () => {
   useEffect(() => {
     dispatch(getAllItems());
     dispatch(getAllCustomers());
+    dispatch(getAccounts());
   }, [dispatch]);
 
   useEffect(() => {
@@ -97,6 +102,7 @@ const POS = () => {
           cart: [],
           discount: 0,
           paymentMethod: 'cash',
+          bankAccount: '',
           paidAmount: '',
           changeReturned: '',
         };
@@ -106,6 +112,9 @@ const POS = () => {
         setTabs(newTabs);
         setActiveTabId(newTabs[0].id);
       }
+
+      // Refresh bank accounts to update balances
+      dispatch(getAccounts());
 
       // Navigate to invoice detail
       navigate(`/pos/invoice/${invoice._id}`);
@@ -484,22 +493,34 @@ const POS = () => {
   const proceedWithCheckout = () => {
     setShowUnpaidConfirm(false);
 
+    // Validate bank account selection
+    if (activeTab.paymentMethod === 'bank_transfer' && !activeTab.bankAccount) {
+      toast.error('Please select a bank account for bank transfer payment');
+      return;
+    }
+
+    console.log('Active tab:', { paymentMethod: activeTab.paymentMethod, bankAccount: activeTab.bankAccount });
+
     const total = calculateTotal();
     const paid = parseFloat(activeTab.paidAmount) || 0;
 
     const invoiceData = {
       customerId: activeTab.customer?._id || null,
-      items: activeTab.cart.map(({ item, quantity, price, total }) => ({
-        item,
-        quantity,
-        price,
-        total,
+      items: activeTab.cart.map(item => ({
+        item: item.item,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.quantity * item.price,
       })),
       discount: parseFloat(activeTab.discount) || 0,
       paidAmount: paid,
       paymentMethod: activeTab.paymentMethod,
+      bankAccount: activeTab.paymentMethod === 'bank_transfer' ? activeTab.bankAccount : null,
       changeReturned: parseFloat(activeTab.changeReturned) || 0,
     };
+
+    console.log('Sending invoice data:', invoiceData);
 
     dispatch(createInvoice(invoiceData));
   };
@@ -786,9 +807,30 @@ const POS = () => {
                   <option value="cash">Cash</option>
                   <option value="upi">UPI</option>
                   <option value="card">Card</option>
+                  <option value="bank_transfer">Bank Transfer</option>
                   {activeTab.customer && <option value="due">Credit/Due</option>}
                 </select>
               </div>
+
+              {/* Bank Account Selection */}
+              {activeTab.paymentMethod === 'bank_transfer' && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
+                  <select
+                    value={activeTab.bankAccount}
+                    onChange={(e) => updateTabData({ bankAccount: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Choose account</option>
+                    {accounts.map(account => (
+                      <option key={account._id} value={account._id}>
+                        {account.bankName} - {account.accountType} (₹{account.currentBalance})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Paid Amount */}
               <div className="mb-4">

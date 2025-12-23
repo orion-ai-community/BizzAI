@@ -8,6 +8,7 @@ import reportsReducer from './slices/reportsSlice';
 import supplierReducer from './slices/supplierSlice';
 import expenseReducer from './slices/expenseSlice';
 import billReducer from './slices/billSlice';
+import cashbankReducer from './slices/cashbankSlice';
 
 export const store = configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export const store = configureStore({
     suppliers: supplierReducer,
     expense: expenseReducer,
     bill: billReducer,
+    cashbank: cashbankReducer,
   },
 });

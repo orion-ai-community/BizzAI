@@ -3,7 +3,8 @@ import Invoice from "../models/Invoice.js";
 import Item from "../models/Item.js";
 import Customer from "../models/Customer.js";
 import Transaction from "../models/Transaction.js";
-import { generateInvoicePDF } from "../utils/invoiceGenerator.js";
+import CashbankTransaction from "../models/CashbankTransaction.js";
+import BankAccount from "../models/BankAccount.js";
 import { sendEmail } from "../utils/emailService.js";
 import { info, error } from "../utils/logger.js";
 
@@ -13,15 +14,23 @@ import { info, error } from "../utils/logger.js";
  */
 export const createInvoice = async (req, res) => {
   try {
-    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod } = req.body;
+    const { customerId, items, discount = 0, paymentMethod, bankAccount } = req.body;
+    const paidAmount = Number(req.body.paidAmount || 0);
+    console.log('POS invoice request:', { customerId, items, discount, paymentMethod, bankAccount, paidAmount });
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
 
+    console.log('Items validation passed, calculating totals');
+
     // Calculate totals
     let subtotal = 0;
-    for (const it of items) subtotal += it.quantity * it.price;
+    for (const it of items) {
+      console.log('Calculating item:', it);
+      subtotal += it.quantity * it.price;
+    }
     const totalAmount = subtotal - discount;
+    console.log('Totals calculated:', { subtotal, discount, totalAmount });
 
     // IMPORTANT: Walk-in customers cannot take due
     if (!customerId && paidAmount < totalAmount) {
@@ -31,14 +40,18 @@ export const createInvoice = async (req, res) => {
     }
 
     // Verify all items belong to current user
+    console.log('Validating items...');
     for (const it of items) {
+      console.log('Validating item:', it);
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(it.item)) {
+        console.log('Invalid ObjectId:', it.item);
         return res.status(400).json({ message: `Invalid item ID format: ${it.item}` });
       }
 
       const item = await Item.findOne({ _id: it.item, addedBy: req.user._id });
       if (!item) {
+        console.log('Item not found:', it.item);
         return res.status(400).json({
           message: `Item not found or unauthorized: ${it.item}`
         });
@@ -46,16 +59,20 @@ export const createInvoice = async (req, res) => {
 
       // Check stock availability
       if (item.stockQty < it.quantity) {
+        console.log('Insufficient stock for', item.name);
         return res.status(400).json({
           message: `Insufficient stock for ${item.name}. Available: ${item.stockQty}`
         });
       }
     }
+    console.log('All items validated successfully');
 
     // Verify customer belongs to current user if provided
     if (customerId) {
+      console.log('Validating customer:', customerId);
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(customerId)) {
+        console.log('Invalid customer ObjectId');
         return res.status(400).json({ message: "Invalid customer ID format" });
       }
 
@@ -64,10 +81,12 @@ export const createInvoice = async (req, res) => {
         owner: req.user._id
       });
       if (!customer) {
+        console.log('Customer not found');
         return res.status(400).json({
           message: "Customer not found or unauthorized"
         });
       }
+      console.log('Customer validated');
     }
 
     // Handle overpayment and change return
@@ -105,6 +124,20 @@ export const createInvoice = async (req, res) => {
     const invoiceNo = `INV-${String(invoiceNumber).padStart(5, "0")}`;
 
     // Save invoice
+    console.log('Creating invoice with data:', {
+      invoiceNo,
+      customer: customerId || null,
+      items,
+      subtotal,
+      discount,
+      totalAmount,
+      paidAmount: actualPaidAmount,
+      paymentMethod,
+      paymentStatus,
+      bankAccount: paymentMethod === 'bank_transfer' ? bankAccount : undefined,
+      createdBy: req.user._id,
+    });
+
     const invoice = await Invoice.create({
       invoiceNo,
       customer: customerId || null,
@@ -115,8 +148,11 @@ export const createInvoice = async (req, res) => {
       paidAmount: actualPaidAmount,
       paymentMethod,
       paymentStatus,
+      bankAccount: paymentMethod === 'bank_transfer' ? bankAccount : undefined,
       createdBy: req.user._id,
     });
+
+    console.log('Invoice created successfully:', invoice._id);
 
     // Update stock
     for (const it of items) {
@@ -161,25 +197,67 @@ export const createInvoice = async (req, res) => {
         paymentMethod,
         description: `Payment received for invoice ${invoiceNo}`,
       });
+
+      // Handle bank payment
+      if (paymentMethod === 'bank_transfer' && bankAccount) {
+        console.log('Processing bank payment for account:', bankAccount);
+        // Validate bank account exists
+        const bankAcc = await BankAccount.findOne({ _id: bankAccount, userId: req.user._id });
+        if (!bankAcc) {
+          console.log('Bank account not found');
+          return res.status(400).json({ message: 'Selected bank account not found' });
+        }
+        console.log('Bank account validated:', bankAcc.bankName);
+
+        // Create cashbank transaction
+        const cashbankTxn = await CashbankTransaction.create({
+          type: 'in',
+          amount: actualPaidAmount,
+          fromAccount: 'sale', // Indicates money from sale
+          toAccount: bankAccount,
+          description: `POS Payment for invoice ${invoiceNo}`,
+          userId: req.user._id,
+        });
+
+        // Update bank balance
+        await BankAccount.updateOne(
+          { _id: bankAccount, userId: req.user._id },
+          { $inc: { currentBalance: actualPaidAmount }, $push: { transactions: cashbankTxn._id } }
+        );
+
+        // Verify update
+        const updatedAcc = await BankAccount.findById(bankAccount);
+        console.log(`Bank balance updated for ${bankAccount}: new balance ${updatedAcc.currentBalance}`);
+
+        info(`Bank payment recorded for invoice ${invoiceNo}: +${actualPaidAmount} to account ${bankAccount}`);
+      } else if (paymentMethod === 'cash') {
+        console.log('Creating cash transaction for POS:', {
+          type: 'in',
+          amount: actualPaidAmount,
+          fromAccount: 'sale',
+          toAccount: 'cash',
+          description: `Cash payment for invoice ${invoiceNo}`,
+          userId: req.user._id,
+        });
+        // Record cash payment transaction
+        const cashTxn = await CashbankTransaction.create({
+          type: 'in',
+          amount: actualPaidAmount,
+          fromAccount: 'sale',
+          toAccount: 'cash',
+          description: `POS Cash Payment for invoice ${invoiceNo}`,
+          userId: req.user._id,
+        });
+        console.log('Cash transaction created:', cashTxn._id);
+
+        info(`Cash payment recorded for invoice ${invoiceNo}: +${actualPaidAmount}`);
+      }
     }
 
-    // Generate invoice PDF + Email it + Log it
-    const populatedInvoice = await Invoice.findById(invoice._id).populate("customer");
-    const pdfPath = await generateInvoicePDF(populatedInvoice);
-
-    if (populatedInvoice.customer?.email) {
-      await sendEmail(
-        populatedInvoice.customer.email,
-        `Invoice ${invoiceNo}`,
-        `Thank you for your purchase! Attached is your invoice ${invoiceNo}.`,
-        pdfPath
-      );
-    }
-
-    info(`Invoice generated by ${req.user.name}: ${invoiceNo}`);
-
-    res.status(201).json({ message: "Invoice created successfully", invoice: populatedInvoice });
+    res.status(201).json({ message: "Invoice created successfully", invoice });
   } catch (err) {
+    console.error('Create Invoice Error:', err);
+    console.error('Stack trace:', err.stack);
     error(`Invoice creation failed: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });
   }
@@ -260,5 +338,129 @@ export const deleteInvoice = async (req, res) => {
     res.status(200).json({ message: "Invoice deleted" });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+/**
+ * @desc Mark invoice as paid (for unpaid/partial invoices)
+ * @route PUT /api/pos/invoice/:id/payment
+ */
+export const markInvoiceAsPaid = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { paymentMethod, bankAccount } = req.body;
+    const paidAmount = Number(req.body.paidAmount);
+
+    if (isNaN(paidAmount) || paidAmount <= 0) {
+      return res.status(400).json({ message: 'Valid payment amount required' });
+    }
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid invoice ID format" });
+    }
+
+    const invoice = await Invoice.findOne({
+      _id: id,
+      createdBy: req.user._id
+    }).populate('customer');
+
+    if (!invoice) {
+      return res.status(404).json({ message: 'Invoice not found' });
+    }
+
+    const newPaidAmount = invoice.paidAmount + paidAmount;
+
+    if (newPaidAmount > invoice.totalAmount) {
+      return res.status(400).json({
+        message: `Payment exceeds invoice total. Remaining: ₹${invoice.totalAmount - invoice.paidAmount}`
+      });
+    }
+
+    // Determine new payment status
+    let paymentStatus = 'unpaid';
+
+    if (newPaidAmount >= invoice.totalAmount) {
+      paymentStatus = 'paid';
+    } else if (newPaidAmount > 0) {
+      paymentStatus = 'partial';
+    }
+
+    // Handle bank payment
+    if (paymentMethod === 'bank_transfer') {
+      if (!bankAccount) {
+        return res.status(400).json({
+          message: 'Bank account is required for bank transfer'
+        });
+      }
+
+      const bankAcc = await BankAccount.findOne({
+        _id: bankAccount,
+        userId: req.user._id
+      });
+
+      if (!bankAcc) {
+        return res.status(400).json({ message: 'Bank account not found' });
+      }
+
+      // Create cashbank transaction (money IN)
+      const cashbankTxn = await CashbankTransaction.create({
+        type: 'in',
+        amount: paidAmount,
+        fromAccount: 'sale',
+        toAccount: bankAccount,
+        description: `Payment for invoice ${invoice.invoiceNo}`,
+        date: new Date(),
+        userId: req.user._id,
+      });
+
+      // Update bank balance (add)
+      await BankAccount.updateOne(
+        { _id: bankAccount, userId: req.user._id },
+        {
+          $inc: { currentBalance: paidAmount },
+          $push: { transactions: cashbankTxn._id }
+        }
+      );
+
+      info(`Bank payment for invoice ${invoice.invoiceNo}: +₹${paidAmount}`);
+    }
+
+    // Update customer dues if exists
+    if (invoice.customer) {
+      const dueReduction = Math.min(
+        paidAmount,
+        invoice.totalAmount - invoice.paidAmount
+      );
+
+      await Customer.findByIdAndUpdate(
+        invoice.customer._id,
+        { $inc: { dues: -dueReduction } }
+      );
+
+      // Record transaction
+      await Transaction.create({
+        type: 'payment',
+        customer: invoice.customer._id,
+        invoice: invoice._id,
+        amount: paidAmount,
+        paymentMethod,
+        description: `Payment received for invoice ${invoice.invoiceNo}`,
+      });
+    }
+
+    // Update invoice
+    invoice.paidAmount = newPaidAmount;
+    invoice.paymentStatus = paymentStatus;
+    invoice.paymentMethod = paymentMethod;
+    await invoice.save();
+
+    res.status(200).json({
+      message: 'Payment recorded successfully',
+      invoice
+    });
+  } catch (err) {
+    error(`Mark invoice as paid failed: ${err.stack || err.message}`);
+    res.status(500).json({ message: 'Server Error', error: err.message });
   }
 };

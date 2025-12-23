@@ -27,6 +27,24 @@ const billSchema = new mongoose.Schema(
       enum: ['paid', 'unpaid'],
       default: 'unpaid',
     },
+    paymentMethod: {
+      type: String,
+      enum: ['cash', 'upi', 'card', 'bank_transfer', 'cheque'],
+      default: 'cash',
+    },
+    paidAmount: {
+      type: Number,
+      default: 0,
+    },
+    bankAccount: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'BankAccount',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['paid', 'unpaid', 'partial'],
+      default: 'unpaid',
+    },
     description: {
       type: String,
     },

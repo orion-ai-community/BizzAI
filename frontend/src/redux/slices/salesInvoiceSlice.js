@@ -73,6 +73,28 @@ export const deleteSalesInvoice = createAsyncThunk(
     }
 );
 
+// Mark sales invoice as paid
+export const markSalesInvoiceAsPaid = createAsyncThunk(
+    'salesInvoice/markPaid',
+    async ({ id, amount, bankAccount, paymentMethod }, thunkAPI) => {
+        try {
+            const token = thunkAPI.getState().auth.user.token;
+            const response = await axios.put(`${API_URL}/invoice/${id}/mark-paid`, {
+                amount,
+                bankAccount,
+                paymentMethod
+            }, getConfig(token));
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.response && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
 export const salesInvoiceSlice = createSlice({
     name: 'salesInvoice',
     initialState,
@@ -128,6 +150,28 @@ export const salesInvoiceSlice = createSlice({
                 state.invoices = state.invoices.filter((inv) => inv._id !== action.payload);
             })
             .addCase(deleteSalesInvoice.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
+            })
+            // Mark sales invoice as paid
+            .addCase(markSalesInvoiceAsPaid.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(markSalesInvoiceAsPaid.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                // Update the invoice in the list if it exists
+                const index = state.invoices.findIndex(inv => inv._id === action.payload.invoice._id);
+                if (index !== -1) {
+                    state.invoices[index] = action.payload.invoice;
+                }
+                // Update the current invoice if it's the same one
+                if (state.invoice && state.invoice._id === action.payload.invoice._id) {
+                    state.invoice = action.payload.invoice;
+                }
+            })
+            .addCase(markSalesInvoiceAsPaid.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.message = action.payload;

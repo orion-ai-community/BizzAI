@@ -54,8 +54,12 @@ const invoiceSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["cash", "upi", "card", "due", "split"],
+      enum: ["cash", "upi", "card", "due", "split", "bank_transfer", "cheque"],
       default: "cash",
+    },
+    bankAccount: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'BankAccount',
     },
     returnedAmount: {
       type: Number,
