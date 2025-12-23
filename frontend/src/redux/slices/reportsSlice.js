@@ -14,6 +14,7 @@ const initialState = {
   salesReport: null,
   stockReport: null,
   customerReport: null,
+  dashboardStats: null,
   isLoading: false,
   isSuccess: false,
   isError: false,
@@ -63,6 +64,24 @@ export const getCustomerReport = createAsyncThunk(
     try {
       const token = thunkAPI.getState().auth.user.token;
       const response = await axios.get(`${API_URL}/customers`, getConfig(token));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response && error.response.data && error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Get dashboard stats
+export const getDashboardStats = createAsyncThunk(
+  'reports/getDashboardStats',
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      const response = await axios.get(`${API_URL}/dashboard-stats`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -125,6 +144,20 @@ export const reportsSlice = createSlice({
         state.customerReport = action.payload;
       })
       .addCase(getCustomerReport.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      // Get dashboard stats
+      .addCase(getDashboardStats.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getDashboardStats.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.dashboardStats = action.payload;
+      })
+      .addCase(getDashboardStats.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
