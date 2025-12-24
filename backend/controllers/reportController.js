@@ -68,6 +68,16 @@ export const getDashboardStats = async (req, res) => {
   try {
     const userId = req.user._id;
 
+    // 0. Summary metrics
+    const allInvoices = await Invoice.find({ createdBy: userId });
+    const totalInvoices = allInvoices.length;
+    const totalRevenue = allInvoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+    const totalCollected = allInvoices.reduce((sum, inv) => {
+      const collected = Math.min(inv.totalAmount || 0, (inv.paidAmount || 0) + (inv.creditApplied || 0));
+      return sum + collected;
+    }, 0);
+    const totalOutstanding = Math.max(0, totalRevenue - totalCollected);
+
     // 1. Sales over time (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -158,6 +168,10 @@ export const getDashboardStats = async (req, res) => {
       .select('name dues');
 
     res.status(200).json({
+      totalInvoices,
+      totalRevenue,
+      totalCollected,
+      totalOutstanding,
       dailySales,
       revenueVsExpenses,
       paymentMethods,

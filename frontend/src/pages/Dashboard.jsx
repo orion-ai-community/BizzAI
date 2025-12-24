@@ -222,7 +222,7 @@ const Dashboard = () => {
               </div>
             </div>
             <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Invoices</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">0</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalInvoices || 0}</p>
           </div>
 
           {/* Total Revenue */}
@@ -245,7 +245,7 @@ const Dashboard = () => {
               </div>
             </div>
             <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Revenue</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹0.00</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalRevenue || 0).toFixed(2)}</p>
           </div>
 
           {/* Total Expenses */}
@@ -362,7 +362,7 @@ const Dashboard = () => {
             <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
               Pending Payments
             </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">0</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalOutstanding || 0).toFixed(2)}</p>
           </div>
         </div>
 
