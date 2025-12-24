@@ -27,6 +27,8 @@ const POS = () => {
         paidAmount: '',
         changeReturned: '',
         applyCreditEnabled: false,
+        creditUsed: 0,
+        availableCredit: 0,
       }
     ];
   });
@@ -709,7 +711,7 @@ const POS = () => {
                       )}
                     </div>
                     <button
-                      onClick={() => updateTabData({ customer: null, applyCreditEnabled: false })}
+                      onClick={() => updateTabData({ customer: null, applyCreditEnabled: false, availableCredit: 0, creditUsed: 0 })}
                       className="text-red-600 hover:text-red-700"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -727,7 +729,22 @@ const POS = () => {
                 </button>
               )}
 
-
+              {/* Credit Balance Display */}
+              {
+                activeTab.customer && activeTab.availableCredit > 0 && (
+                  <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-green-800">Available Credit</span>
+                      </div>
+                      <span className="text-lg font-bold text-green-600">₹{activeTab.availableCredit.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )
+              }
 
               {/* Pending Dues Display */}
               {
@@ -900,10 +917,16 @@ const POS = () => {
                   <span>Total:</span>
                   <span className="text-indigo-600">₹{total.toFixed(2)}</span>
                 </div>
+                {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
+                  <div className="flex justify-between text-lg font-bold text-indigo-600">
+                    <span>Amount to Pay:</span>
+                    <span>₹{(total - getCreditApplied()).toFixed(2)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Payment Method */}
-              < div className="mb-4" >
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
                 <select
                   value={activeTab.paymentMethod}
@@ -1552,8 +1575,8 @@ const POS = () => {
             </div>
           )
         }
-      </div>
-    </Layout>
+      </div >
+    </Layout >
   );
 };
 
