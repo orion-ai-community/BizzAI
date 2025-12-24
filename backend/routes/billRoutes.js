@@ -5,6 +5,7 @@ import {
   getBillById,
   updateBill,
   deleteBill,
+  updateBillPayment
 } from "../controllers/billController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
@@ -15,5 +16,6 @@ router.post("/", protect, createBill);
 router.get("/:id", protect, getBillById);
 router.put("/:id", protect, updateBill);
 router.delete("/:id", protect, deleteBill);
+router.put("/:id/payment", protect, updateBillPayment);
 
 export default router;

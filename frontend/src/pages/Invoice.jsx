@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import { getAllInvoices, deleteInvoice, reset } from "../redux/slices/posSlice";
 import Layout from "../components/Layout";
+import PaymentModal from '../components/PaymentModal';
+>>>>>>> main
 
 const Invoices = () => {
   const navigate = useNavigate();
@@ -14,6 +18,10 @@ const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [paymentModal, setPaymentModal] = useState({
+    isOpen: false,
+    invoice: null
+  });
 
   useEffect(() => {
     dispatch(getAllInvoices());
@@ -26,6 +34,31 @@ const Invoices = () => {
     await dispatch(deleteInvoice(id));
     setDeleteConfirm(null);
     dispatch(getAllInvoices());
+  };
+
+  const handleReceivePayment = (invoice) => {
+    setPaymentModal({
+      isOpen: true,
+      invoice
+    });
+  };
+
+  const handlePaymentSubmit = async (paymentData) => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      const token = userData?.token;
+      await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/pos/invoice/${paymentModal.invoice._id}/payment`,
+        paymentData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success('Payment received successfully');
+      setPaymentModal({ isOpen: false, invoice: null });
+      dispatch(getAllInvoices());
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Payment failed');
+    }
   };
 
   const filteredInvoices = invoices.filter((invoice) => {
@@ -379,6 +412,14 @@ const Invoices = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        {invoice.paymentStatus !== 'paid' && (
+                          <button
+                            onClick={() => handleReceivePayment(invoice)}
+                            className="text-green-600 hover:text-green-900 mr-4 font-medium"
+                          >
+                            Receive Payment
+                          </button>
+                        )}
                         <button
                           onClick={() =>
                             navigate(`/pos/invoice/${invoice._id}`)
@@ -429,6 +470,18 @@ const Invoices = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Payment Modal */}
+        {paymentModal.isOpen && paymentModal.invoice && (
+          <PaymentModal
+            isOpen={paymentModal.isOpen}
+            onClose={() => setPaymentModal({ isOpen: false, invoice: null })}
+            onSubmit={handlePaymentSubmit}
+            documentType="Invoice"
+            totalAmount={paymentModal.invoice.totalAmount}
+            paidAmount={paymentModal.invoice.paidAmount || 0}
+          />
         )}
       </div>
     </Layout>

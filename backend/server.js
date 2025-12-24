@@ -9,6 +9,7 @@ import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import posRoutes from "./routes/posRoutes.js";
 import salesInvoiceRoutes from "./routes/salesInvoiceRoutes.js";
+import purchaseReturnRoutes from "./routes/purchaseReturnRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import supplierRoutes from "./routes/supplierRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
@@ -18,6 +19,7 @@ import estimateRoutes from "./routes/estimateRoutes.js";
 import dueRoutes from "./routes/dueRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 // import settingsRoutes from "./routes/settingsRoutes.js";
+import cashbankRoutes from "./routes/cashbankRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -51,9 +53,16 @@ app.use("/api/suppliers", supplierRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/returns", returnRoutes);
+<<<<<<< HEAD
+app.use("/api/purchase-returns", purchaseReturnRoutes);
 app.use("/api/estimates", estimateRoutes);
 app.use("/api/due", dueRoutes);
+=======
+app.use("/api/estimates", estimateRoutes);
+app.use("/api/due", dueRoutes);
+>>>>>>> main
 app.use("/api/reports", reportRoutes);
+app.use("/api/cashbank", cashbankRoutes);
 // app.use("/api/settings", settingsRoutes);
 
 

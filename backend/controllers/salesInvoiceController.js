@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import Invoice from "../models/Invoice.js";
-import { error } from "../utils/logger.js";
+import CashbankTransaction from "../models/CashbankTransaction.js";
+import BankAccount from "../models/BankAccount.js";
+import { info, error } from "../utils/logger.js";
 
 /**
  * @desc Get all sales invoices (only for current owner)
@@ -79,6 +81,111 @@ export const deleteSalesInvoice = async (req, res) => {
     res.status(200).json({ message: "Invoice deleted" });
   } catch (err) {
     error(`Delete sales invoice failed: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Mark sales invoice as paid with bank account selection
+ * @route PUT /api/sales-invoice/invoice/:id/mark-paid
+ */
+export const markSalesInvoiceAsPaid = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, bankAccount, paymentMethod = 'bank_transfer' } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ message: "Valid payment amount is required" });
+    }
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid invoice ID format" });
+    }
+
+    // Find invoice
+    const invoice = await Invoice.findOne({
+      _id: id,
+      createdBy: req.user._id
+    });
+
+    if (!invoice) {
+      return res.status(404).json({ message: "Invoice not found or unauthorized" });
+    }
+
+    // Check if invoice is already fully paid
+    if (invoice.paymentStatus === 'paid') {
+      return res.status(400).json({ message: "Invoice is already fully paid" });
+    }
+
+    // Validate bank payment
+    if (paymentMethod === 'bank_transfer' && bankAccount) {
+      const bankAcc = await BankAccount.findOne({ _id: bankAccount, userId: req.user._id });
+      if (!bankAcc) {
+        return res.status(400).json({ message: 'Bank account not found' });
+      }
+
+      if (bankAcc.currentBalance < amount) {
+        return res.status(400).json({
+          message: `Insufficient balance. Available: ₹${bankAcc.currentBalance}`
+        });
+      }
+    }
+
+    // Calculate new paid amount and status
+    const newPaidAmount = invoice.paidAmount + amount;
+    let newPaymentStatus = 'partial';
+
+    if (newPaidAmount >= invoice.totalAmount) {
+      newPaymentStatus = 'paid';
+    }
+
+    // Update invoice
+    const updatedInvoice = await Invoice.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          paidAmount: newPaidAmount,
+          paymentStatus: newPaymentStatus,
+          paymentMethod: paymentMethod
+        }
+      },
+      { new: true }
+    );
+
+    // Handle bank payment
+    if (paymentMethod === 'bank_transfer' && bankAccount) {
+      // Create cashbank transaction (money IN)
+      const cashbankTxn = await CashbankTransaction.create({
+        type: 'in',
+        amount,
+        fromAccount: 'sale',
+        toAccount: bankAccount,
+        description: `Payment for invoice ${invoice.invoiceNo}`,
+        date: new Date(),
+        userId: req.user._id,
+      });
+
+      // Update bank balance (add)
+      await BankAccount.updateOne(
+        { _id: bankAccount, userId: req.user._id },
+        {
+          $inc: { currentBalance: amount },
+          $push: { transactions: cashbankTxn._id }
+        }
+      );
+
+      info(`Bank payment recorded for sales invoice ${invoice.invoiceNo}: +₹${amount} to account ${bankAccount}`);
+    }
+
+    info(`Sales invoice ${invoice.invoiceNo} marked as ${newPaymentStatus} by ${req.user.name}: +₹${amount}`);
+
+    res.status(200).json({
+      message: `Invoice marked as ${newPaymentStatus}`,
+      invoice: updatedInvoice
+    });
+  } catch (err) {
+    error(`Mark sales invoice as paid failed: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };

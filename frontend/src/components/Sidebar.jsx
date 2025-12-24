@@ -165,6 +165,9 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
       ),
       submenu: [
         { name: 'Bank Accounts', path: '/cashbank/bank-accounts' },
+        { name: 'Bank Summary', path: '/cashbank/summary' },
+        { name: 'Cash/Bank Position', path: '/cashbank/position' },
+        { name: 'Transfers', path: '/transfers' },
         { name: 'Cash in Hand', path: '/cashbank/cash-in-hand' },
         { name: 'Cheques', path: '/cashbank/cheques' },
         { name: 'Loan Accounts', path: '/cashbank/loan-accounts' }

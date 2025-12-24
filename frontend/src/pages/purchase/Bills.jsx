@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
 import DataTable from '../../components/DataTable';
 import StatsCard from '../../components/StatsCard';
+import PaymentModal from '../../components/PaymentModal';
 import { getAllBills, createBill, updateBill, deleteBill, reset } from '../../redux/slices/billSlice';
 import { getAllSuppliers } from '../../redux/slices/supplierSlice';
 
@@ -18,28 +21,79 @@ const Bills = () => {
     const [showAddBill, setShowAddBill] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [editingBill, setEditingBill] = useState(null);
+    const [bankAccounts, setBankAccounts] = useState([]);
+    const [paymentModal, setPaymentModal] = useState({
+        isOpen: false,
+        bill: null
+    });
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
         supplier: '',
         amount: '',
         dueDate: '',
         status: 'unpaid',
-        description: ''
+        description: '',
+        paymentMethod: 'cash',
+        paidAmount: 0,
+        bankAccount: ''
     });
 
     useEffect(() => {
         dispatch(getAllBills());
         dispatch(getAllSuppliers());
+        fetchBankAccounts();
         return () => {
             dispatch(reset());
         };
     }, [dispatch]);
 
+    const fetchBankAccounts = async () => {
+        try {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            const token = userData?.token;
+            const response = await axios.get(
+                `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            console.log('Bank accounts response:', response.data);
+            // Show all accounts (status field might not exist in all documents)
+            setBankAccounts(response.data);
+        } catch (error) {
+            console.error('Error fetching bank accounts:', error);
+        }
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'paid': return 'bg-green-100 text-green-800';
+            case 'partial': return 'bg-yellow-100 text-yellow-800';
             case 'unpaid': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const handleMarkAsPaid = (bill) => {
+        setPaymentModal({
+            isOpen: true,
+            bill
+        });
+    };
+
+    const handlePaymentSubmit = async (paymentData) => {
+        try {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            const token = userData?.token;
+            await axios.put(
+                `${import.meta.env.VITE_BACKEND_URL}/api/bills/${paymentModal.bill._id}/payment`,
+                paymentData,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            toast.success('Payment recorded successfully');
+            setPaymentModal({ isOpen: false, bill: null });
+            dispatch(getAllBills());
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Payment failed');
         }
     };
 
@@ -89,7 +143,10 @@ const Bills = () => {
             amount: '',
             dueDate: '',
             status: 'unpaid',
-            description: ''
+            description: '',
+            paymentMethod: 'cash',
+            paidAmount: 0,
+            bankAccount: ''
         });
     };
 
@@ -98,13 +155,33 @@ const Bills = () => {
         { key: 'date', label: 'Date', sortable: true, render: (val) => new Date(val).toLocaleDateString() },
         { key: 'supplier', label: 'Supplier', sortable: true, render: (val) => val?.businessName || 'N/A' },
         { key: 'amount', label: 'Amount', sortable: true, render: (val) => <span className="font-medium">₹{val.toFixed(2)}</span> },
-        { key: 'status', label: 'Status', render: (val) => <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(val)}`}>{val}</span> },
+        {
+            key: 'paymentStatus',
+            label: 'Payment Status',
+            render: (val, row) => {
+                const displayStatus = val || row.status;
+                return <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(displayStatus)}`}>{displayStatus}</span>;
+            }
+        },
+        {
+            key: 'paidAmount',
+            label: 'Paid',
+            render: (val, row) => val ? <span className="text-green-600 font-medium">₹{val.toFixed(2)}</span> : <span className="text-gray-400">₹0.00</span>
+        },
         { key: 'dueDate', label: 'Due Date', sortable: true, render: (val) => val ? new Date(val).toLocaleDateString() : 'N/A' },
         {
             key: 'actions',
             label: 'Actions',
             render: (val, row) => (
                 <div className="flex space-x-2">
+                    {row.paymentStatus !== 'paid' && row.status !== 'paid' && (
+                        <button
+                            onClick={() => handleMarkAsPaid(row)}
+                            className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        >
+                            Mark as Paid
+                        </button>
+                    )}
                     <button
                         onClick={() => handleEdit(row)}
                         className="text-blue-600 hover:text-blue-900"
@@ -124,8 +201,8 @@ const Bills = () => {
 
     const filteredBills = bills.filter(bill => {
         const matchesSearch = bill.billNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             (bill.supplier?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             bill.amount.toString().includes(searchTerm);
+            (bill.supplier?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            bill.amount.toString().includes(searchTerm);
         const matchesStatus = statusFilter === 'all' || bill.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
@@ -263,16 +340,66 @@ const Bills = () => {
                                 />
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
                                     <select
                                         value={formData.status}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value, paidAmount: e.target.value === 'paid' ? formData.amount : 0 })}
                                         className="w-full px-4 py-2 border rounded-lg"
                                     >
                                         <option value="unpaid">Unpaid</option>
                                         <option value="paid">Paid</option>
                                     </select>
                                 </div>
+
+                                {formData.status === 'paid' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                                            <select
+                                                value={formData.paymentMethod}
+                                                onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value, bankAccount: '' })}
+                                                className="w-full px-4 py-2 border rounded-lg"
+                                            >
+                                                <option value="cash">Cash</option>
+                                                <option value="bank_transfer">Bank Transfer</option>
+                                                <option value="upi">UPI</option>
+                                                <option value="card">Card</option>
+                                                <option value="cheque">Cheque</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Paid Amount</label>
+                                            <input
+                                                type="number"
+                                                value={formData.paidAmount}
+                                                onChange={(e) => setFormData({ ...formData, paidAmount: parseFloat(e.target.value) || 0 })}
+                                                className="w-full px-4 py-2 border rounded-lg"
+                                                placeholder="Enter amount paid"
+                                                max={formData.amount}
+                                            />
+                                        </div>
+
+                                        {formData.paymentMethod === 'bank_transfer' && (
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Bank Account <span className="text-red-500">*</span></label>
+                                                <select
+                                                    value={formData.bankAccount}
+                                                    onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
+                                                    className="w-full px-4 py-2 border rounded-lg"
+                                                    required
+                                                >
+                                                    <option value="">Choose Bank Account</option>
+                                                    {bankAccounts.map(acc => (
+                                                        <option key={acc._id} value={acc._id}>
+                                                            {acc.bankName} - ****{acc.accountNumber.slice(-4)} (₹{acc.currentBalance.toFixed(2)})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
 
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
@@ -335,6 +462,18 @@ const Bills = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Payment Modal */}
+            {paymentModal.isOpen && paymentModal.bill && (
+                <PaymentModal
+                    isOpen={paymentModal.isOpen}
+                    onClose={() => setPaymentModal({ isOpen: false, bill: null })}
+                    onSubmit={handlePaymentSubmit}
+                    documentType="Bill"
+                    totalAmount={paymentModal.bill.amount}
+                    paidAmount={paymentModal.bill.paidAmount || 0}
+                />
             )}
         </Layout>
     );

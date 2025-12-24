@@ -8,6 +8,7 @@ import reportsReducer from './slices/reportsSlice';
 import supplierReducer from './slices/supplierSlice';
 import expenseReducer from './slices/expenseSlice';
 import billReducer from './slices/billSlice';
+import cashbankReducer from './slices/cashbankSlice';
 import dueReducer from './slices/dueSlice';
 
 export const store = configureStore({
@@ -21,6 +22,7 @@ export const store = configureStore({
     suppliers: supplierReducer,
     expense: expenseReducer,
     bill: billReducer,
+    cashbank: cashbankReducer,
     due: dueReducer,
   },
 });

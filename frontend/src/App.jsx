@@ -52,8 +52,12 @@ import ReportsDashboard from './pages/reports/ReportsDashboard';
 // Cash & Bank
 import BankAccounts from './pages/cashbank/BankAccounts';
 import CashInHand from './pages/cashbank/CashInHand';
+import Transfers from './pages/cashbank/Transfers';
 import Cheques from './pages/cashbank/Cheques';
 import LoanAccounts from './pages/cashbank/LoanAccounts';
+import AccountLedger from './pages/cashbank/AccountLedger';
+import BankSummary from './pages/cashbank/BankSummary';
+import CashBankPosition from './pages/cashbank/CashBankPosition';
 
 // Business
 import OnlineShop from './pages/business/OnlineShop';
@@ -98,6 +102,9 @@ function App() {
   console.log(import.meta.env.VITE_BACKEND_URL);
   return (
     <ThemeProvider>
+=======
+    <ThemeProvider>
+>>>>>>> main
       <ToastContainer />
       <Router>
         <Routes>
@@ -157,6 +164,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+>>>>>>> main
 
           {/* Customer Routes - Use nested routes for better organization */}
           <Route path="/customers">
@@ -201,6 +209,7 @@ function App() {
               }
             />
             <Route
+>>>>>>> main
               path=":id"
               element={
                 <ProtectedRoute>
@@ -309,6 +318,7 @@ function App() {
             <Route path="estimate" element={<ProtectedRoute><Estimate /></ProtectedRoute>} />
             <Route path="estimates" element={<ProtectedRoute><EstimateList /></ProtectedRoute>} />
             <Route path="estimate/:id" element={<ProtectedRoute><EstimateDetail /></ProtectedRoute>} />
+>>>>>>> main
             <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
             <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
             <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
@@ -349,6 +359,7 @@ function App() {
             <Route path="restore" element={<ProtectedRoute><Restore /></ProtectedRoute>} />
           </Route>
 
+>>>>>>> main
           {/* Utilities Routes */}
           <Route path="/utilities">
             <Route path="barcode" element={<ProtectedRoute><BarcodeGenerator /></ProtectedRoute>} />
@@ -365,6 +376,7 @@ function App() {
         </Routes>
       </Router>
     </ThemeProvider>
+>>>>>>> main
   );
 }
 
