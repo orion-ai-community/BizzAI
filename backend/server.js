@@ -53,14 +53,9 @@ app.use("/api/suppliers", supplierRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/bills", billRoutes);
 app.use("/api/returns", returnRoutes);
-<<<<<<< HEAD
 app.use("/api/purchase-returns", purchaseReturnRoutes);
 app.use("/api/estimates", estimateRoutes);
 app.use("/api/due", dueRoutes);
-=======
-app.use("/api/estimates", estimateRoutes);
-app.use("/api/due", dueRoutes);
->>>>>>> main
 app.use("/api/reports", reportRoutes);
 app.use("/api/cashbank", cashbankRoutes);
 // app.use("/api/settings", settingsRoutes);
