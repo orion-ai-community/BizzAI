@@ -374,24 +374,34 @@ const POS = () => {
   };
 
   const retrieveHoldOrder = (holdOrder) => {
-    // Create new tab with hold order data
+    // Create new tab with hold order data - restore ALL properties
+    const newTabId = Date.now(); // Use timestamp for unique ID
+    const nextTabNum = getNextTabNumber(tabs);
+    
     const newTab = {
-      id: nextTabId,
-      name: `Tab ${nextTabId}`,
+      id: newTabId,
+      name: `Tab ${nextTabNum}`,
       customer: holdOrder.customer,
-      cart: holdOrder.cart,
-      discount: holdOrder.discount,
-      paymentMethod: holdOrder.paymentMethod,
-      paidAmount: holdOrder.paidAmount,
+      cart: holdOrder.cart || [],
+      discount: holdOrder.discount || 0,
+      paymentMethod: holdOrder.paymentMethod || 'cash',
+      bankAccount: holdOrder.bankAccount || '',
+      paidAmount: holdOrder.paidAmount || '',
+      changeReturned: holdOrder.changeReturned || '',
+      applyCreditEnabled: holdOrder.applyCreditEnabled || false,
+      creditUsed: holdOrder.creditUsed || 0,
+      availableCredit: holdOrder.availableCredit || 0,
     };
 
     setTabs([...tabs, newTab]);
-    setActiveTabId(nextTabId);
-    setNextTabId(nextTabId + 1);
+    setActiveTabId(newTabId);
 
     // Remove from hold orders
     setHoldOrders(holdOrders.filter(order => order.id !== holdOrder.id));
     setShowHoldOrders(false);
+    
+    // Show success message to user
+    toast.success('Order retrieved successfully!');
   };
 
   const deleteHoldOrder = (orderId) => {
