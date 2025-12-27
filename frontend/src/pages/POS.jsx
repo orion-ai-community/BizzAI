@@ -1014,20 +1014,20 @@ const POS = () => {
                   </div>
                 )}
 
+                <div className="flex justify-between text-lg font-bold border-t pt-2">
+                  <span>Total:</span>
+                  <span className="text-indigo-600">₹{(subtotal - activeTab.discount + (parseFloat(activeTab.previousDueApplied) || 0)).toFixed(2)}</span>
+                </div>
                 {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Credit Applied:</span>
                     <span className="font-medium text-green-600">-₹{getCreditApplied().toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-bold border-t pt-2">
-                  <span>Total:</span>
-                  <span className="text-indigo-600">₹{total.toFixed(2)}</span>
-                </div>
                 {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
-                  <div className="flex justify-between text-lg font-bold text-indigo-600">
+                  <div className="flex justify-between text-lg font-bold text-indigo-600 border-t pt-2">
                     <span>Amount to Pay:</span>
-                    <span>₹{(total - getCreditApplied()).toFixed(2)}</span>
+                    <span>₹{total.toFixed(2)}</span>
                   </div>
                 )}
               </div>

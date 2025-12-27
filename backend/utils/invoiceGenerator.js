@@ -218,8 +218,39 @@ export const generateInvoicePDF = async (invoiceData) => {
   doc.text("Paid Amount:", labelX, yPos);
   doc.text(`Rs. ${(invoiceData.paidAmount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
 
+
+
+  // Customer Account Balance (if customer exists)
+  if (invoiceData.customer && invoiceData.customer.dues !== undefined) {
+    yPos += 10;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(labelX, yPos, valueX, yPos);
+    yPos += 7;
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    
+    if (invoiceData.customer.dues < 0) {
+      doc.setTextColor(0, 128, 0); // Green
+      doc.text("Available Credit Balance:", labelX, yPos);
+      doc.text(`Rs. ${Math.abs(invoiceData.customer.dues).toFixed(2)}`, valueX, yPos, { align: "right" });
+    } else if (invoiceData.customer.dues > 0) {
+      doc.setTextColor(180, 0, 0); // Red
+      doc.text("Customer Outstanding Due:", labelX, yPos);
+      doc.text(`Rs. ${invoiceData.customer.dues.toFixed(2)}`, valueX, yPos, { align: "right" });
+    } else {
+      doc.setTextColor(100, 100, 100); // Gray
+      doc.text("Account Balance:", labelX, yPos);
+      doc.text("Rs. 0.00", valueX, yPos, { align: "right" });
+    }
+    
+    doc.setTextColor(0, 0, 0); // Reset to black
+    doc.setFontSize(10);
+  }
   // Balance Due or Paid in Full
-  const balanceDue = (invoiceData.totalAmount || 0) - (invoiceData.paidAmount || 0);
+  const effectivePayment = (invoiceData.paidAmount || 0) + (invoiceData.creditApplied || 0);
+  const balanceDue = (invoiceData.totalAmount || 0) - effectivePayment;
   yPos += 7;
   if (balanceDue > 0) {
     doc.setFont("helvetica", "bold");
@@ -229,7 +260,6 @@ export const generateInvoicePDF = async (invoiceData) => {
     doc.setFont("helvetica", "normal");
     doc.text("Paid in Full", labelX, yPos);
   }
-
   // === FOOTER SECTION ===
   const footerY = pageHeight - 25;
   doc.setDrawColor(200, 200, 200);
