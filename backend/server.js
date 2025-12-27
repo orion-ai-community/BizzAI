@@ -56,6 +56,8 @@ app.use("/api/returns", returnRoutes);
 app.use("/api/purchase-returns", purchaseReturnRoutes);
 app.use("/api/estimates", estimateRoutes);
 app.use("/api/due", dueRoutes);
+app.use("/api/estimates", estimateRoutes);
+app.use("/api/due", dueRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/cashbank", cashbankRoutes);
 // app.use("/api/settings", settingsRoutes);

@@ -29,11 +29,7 @@ const transactionSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-<<<<<<< HEAD
-      enum: ["cash", "upi", "card", "due", "split", "bank_transfer", "bank", "credit"],
-=======
       enum: ["cash", "upi", "card", "due", "split", "bank", "credit"],
->>>>>>> main
       default: "cash",
     },
     description: {

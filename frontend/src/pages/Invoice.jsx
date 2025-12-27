@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 import { getAllInvoices, deleteInvoice, reset } from "../redux/slices/posSlice";
 import Layout from "../components/Layout";
 import PaymentModal from '../components/PaymentModal';
->>>>>>> main
 
 const Invoices = () => {
   const navigate = useNavigate();
