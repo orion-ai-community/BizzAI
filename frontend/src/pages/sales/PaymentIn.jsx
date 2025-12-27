@@ -59,8 +59,8 @@ const PaymentIn = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     {/* Payment Details */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Details</h2>
+                    <div className="app-card rounded-xl shadow-sm p-6 ">
+                        <h2 className="text-lg font-bold text-main mb-4">Payment Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormInput
                                 label="Receipt Number"
@@ -79,18 +79,17 @@ const PaymentIn = () => {
                     </div>
 
                     {/* Customer Selection */}
-                    {/* Customer Selection */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="app-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
+                            <h2 className="text-lg font-bold text-main">Customer</h2>
                             {/* Add Customer button removed */}
                         </div>
                         {formData.customer ? (
                             <div className="p-4 bg-indigo-50 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">{formData.customer.name}</p>
-                                        <p className="text-sm text-gray-600">{formData.customer.phone}</p>
+                                        <p className="font-medium text-main">{formData.customer.name}</p>
+                                        <p className="text-sm text-main">{formData.customer.phone}</p>
                                         <p className="text-sm text-orange-600 font-medium mt-1">Outstanding: ₹{formData.customer.outstanding || 0}</p>
                                     </div>
                                     <button
@@ -104,38 +103,40 @@ const PaymentIn = () => {
                         ) : (
                             <button
                                 onClick={() => setShowCustomerModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
+                                className="w-full px-4 py-3 border-2 border-dashed app-input rounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
                             >
                                 <span className="font-medium">Click to select customer</span>
-                                <span className="text-sm text-gray-400">Search by name, phone or email</span>
+                                <span className="text-sm text-secondary">Search by name, phone or email</span>
                             </button>
                         )}
                     </div>
 
                     {/* Payment Method */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Method</h2>
+                    <div className="app-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Payment Method</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {paymentMethods.map((method) => (
                                 <button
                                     key={method.value}
                                     onClick={() => setFormData({ ...formData, paymentMethod: method.value })}
-                                    className={`p-4 border-2 rounded-lg transition ${formData.paymentMethod === method.value
-                                        ? 'border-indigo-600 bg-indigo-50'
-                                        : 'border-gray-200 hover:border-indigo-300'
+                                    className={`p-4 rounded-lg transition border
+  ${formData.paymentMethod === method.value
+                                            ? 'border-primary bg-primary-soft'
+                                            : 'border-default hover:border-primary'
                                         }`}
+
                                 >
                                     <div className="text-3xl mb-2">{method.icon}</div>
-                                    <div className="text-sm font-medium text-gray-900">{method.label}</div>
+                                    <div className="text-sm font-medium text-main">{method.label}</div>
                                 </button>
                             ))}
                         </div>
                     </div>
 
                     {/* Outstanding Invoices */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="app-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Outstanding Invoices</h2>
+                            <h2 className="text-lg font-bold text-main">Outstanding Invoices</h2>
                             <button
                                 onClick={() => setShowInvoiceModal(true)}
                                 className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
@@ -145,13 +146,13 @@ const PaymentIn = () => {
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="app-card border-b">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice No</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pay Amount</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Invoice No</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Date</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Total</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Balance</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Pay Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -177,8 +178,8 @@ const PaymentIn = () => {
                     </div>
 
                     {/* Notes */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Notes</h2>
+                    <div className="app-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
                         <textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -191,13 +192,13 @@ const PaymentIn = () => {
 
                 {/* Summary Sidebar */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Payment Summary</h2>
+                    <div className="app-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Payment Summary</h2>
 
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Amount Received</label>
+                            <label className="block text-sm font-medium text-main mb-2">Amount Received</label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">₹</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg">₹</span>
                                 <input
                                     type="number"
                                     value={formData.amount}
@@ -208,7 +209,7 @@ const PaymentIn = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-3 mb-6 p-4 bg-gray-50 rounded-lg">
+                        <div className="space-y-3 mb-6 p-4 bg-gray-50 rounded-lg dark:bg-gray-800">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Total Outstanding:</span>
                                 <span className="font-medium text-orange-600">₹40,000.00</span>
@@ -220,7 +221,7 @@ const PaymentIn = () => {
                             <div className="border-t pt-3">
                                 <div className="flex justify-between">
                                     <span className="font-medium">Remaining Balance:</span>
-                                    <span className="text-lg font-bold text-gray-900">₹{(40000 - formData.amount).toFixed(2)}</span>
+                                    <span className="text-lg font-bold text-main">₹{(40000 - formData.amount).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

@@ -6,18 +6,39 @@
 
 /* Custom animations */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-down {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes bounce-arrow {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(10px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(10px);
+  }
 }
 
 .animate-fade-in {
@@ -124,4 +145,63 @@
   html.dark {
     color-scheme: dark;
   }
+}
+
+@layer components {
+
+  /* Page background */
+  .app-bg {
+    background-color: rgb(var(--color-bg));
+  }
+
+  /* Cards / sections */
+  .app-card {
+    background-color: rgb(var(--color-card));
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 0.75rem;
+  }
+
+  /* Inputs */
+  .app-input {
+    background-color: rgb(var(--color-input));
+    color: rgb(var(--color-text));
+    border: 1px solid rgb(var(--color-border));
+  }
+
+  /* Text */
+  .text-main {
+    color: rgb(var(--color-text));
+  }
+
+  .text-secondary {
+    color: rgb(var(--color-text-secondary));
+  }
+
+  .text-muted {
+    color: rgb(var(--color-text-muted));
+  }
+
+  /* Tables */
+  .table-header {
+    background-color: rgb(var(--color-table-header));
+  }
+
+  .table-row {
+    background-color: rgb(var(--color-table-row));
+    border-bottom: 1px solid rgb(var(--color-border));
+  }
+  
+  .border-default {
+    border-color: rgb(var(--color-border));
+  }
+
+  .border-primary {
+    border-color: rgb(var(--color-primary));
+  }
+
+  .bg-primary-soft {
+    background-color: rgb(var(--color-primary) / 0.1);
+  }
+
+
 }
