@@ -218,9 +218,9 @@ const CashInHand = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-100">
+            <div className="bg-card rounded-xl shadow-sm p-4 mb-6 border border-light">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
-                    <div className="flex items-center space-x-2 bg-gray-50 p-1 rounded-xl">
+                    <div className="flex items-center space-x-2 bg-surface p-1 rounded-xl">
                         {['all', 'in', 'out'].map(type => (
                             <button
                                 key={type}
@@ -229,7 +229,7 @@ const CashInHand = () => {
                                     ? type === 'in' ? 'bg-green-600 text-white shadow-lg'
                                         : type === 'out' ? 'bg-red-600 text-white shadow-lg'
                                             : 'bg-indigo-600 text-white shadow-lg'
-                                    : 'text-gray-600 hover:bg-gray-200'
+                                    : 'text-secondary hover:bg-surface'
                                     }`}
                             >
                                 {type.toUpperCase()}
@@ -237,14 +237,14 @@ const CashInHand = () => {
                         ))}
                     </div>
                     <div className="flex items-center space-x-3">
-                        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-2">
+                        <div className="flex items-center bg-surface border border-default rounded-lg px-2">
                             <input
                                 type="date"
                                 value={dateRange.from}
                                 onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
                                 className="bg-transparent px-2 py-2 text-sm focus:outline-none"
                             />
-                            <span className="text-gray-400">→</span>
+                            <span className="text-muted">→</span>
                             <input
                                 type="date"
                                 value={dateRange.to}
@@ -258,12 +258,12 @@ const CashInHand = () => {
 
             {/* Add Transaction Form */}
             {showAddTransaction && (
-                <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-100 animate-slide-down">
+                <div className="bg-card rounded-xl shadow-lg p-6 mb-6 border border-light animate-slide-down">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-900 border-l-4 border-indigo-600 pl-4 uppercase tracking-wider">
+                        <h2 className="text-xl font-bold text-main border-l-4 border-indigo-600 pl-4 uppercase tracking-wider">
                             {formData.type === 'in' ? 'Add Cash In (Source)' : 'Add Cash Out (Application)'}
                         </h2>
-                        <button onClick={() => setShowAddTransaction(false)} className="text-gray-400 hover:text-gray-600">
+                        <button onClick={() => setShowAddTransaction(false)} className="text-muted hover:text-secondary">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -288,11 +288,11 @@ const CashInHand = () => {
                                 required
                             />
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Category or Bank Account</label>
+                                <label className="block text-sm font-semibold text-secondarymb-2">Category or Bank Account</label>
                                 <select
                                     value={formData.otherAccount}
                                     onChange={(e) => setFormData({ ...formData, otherAccount: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white transition-all shadow-sm"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary bg-card transition-all shadow-sm"
                                     required
                                 >
                                     <option value="">Select origin/destination</option>
@@ -365,7 +365,7 @@ const CashInHand = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowAddTransaction(false)}
-                                className="px-10 py-3 border border-gray-300 text-gray-700 rounded-lg font-bold hover:bg-gray-50 transition"
+                                className="px-10 py-3 border border-default text-secondaryrounded-lg font-bold hover:bg-surface transition"
                             >
                                 Discard
                             </button>
@@ -375,7 +375,7 @@ const CashInHand = () => {
             )}
 
             {/* Transactions Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-card rounded-xl shadow-sm border border-light overflow-hidden">
                 <DataTable
                     columns={columns}
                     data={filteredTransactions}

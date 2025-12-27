@@ -92,7 +92,7 @@ const EditSupplier = () => {
           <div className="mb-8">
             <button
               onClick={() => navigate('/suppliers')}
-              className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+              className="flex items-center  text-secondary hover: text-main mb-4"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -111,7 +111,7 @@ const EditSupplier = () => {
             </button>
           </div>
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Supplier not found</p>
+            <p className=" text-muted text-lg">Supplier not found</p>
           </div>
         </div>
       </Layout>
@@ -125,7 +125,7 @@ const EditSupplier = () => {
         <div className="mb-8">
           <button
             onClick={() => navigate('/suppliers')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center  text-secondary hover: text-main mb-4"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -142,8 +142,8 @@ const EditSupplier = () => {
             </svg>
             Back to Suppliers
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit Supplier</h1>
-          <p className="text-gray-600">Update supplier information</p>
+          <h1 className="text-3xl font-bold  text-main mb-2">Edit Supplier</h1>
+          <p className=" text-secondary">Update supplier information</p>
         </div>
 
         {/* Error Message */}
@@ -154,13 +154,13 @@ const EditSupplier = () => {
         )}
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-card rounded-xl shadow-sm p-8">
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Business Name Input */}
             <div>
               <label
                 htmlFor="businessName"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Business Name <span className="text-red-500">*</span>
               </label>
@@ -171,7 +171,7 @@ const EditSupplier = () => {
                 value={businessName}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="ABC Suppliers Pvt Ltd"
               />
             </div>
@@ -180,7 +180,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="contactPersonName"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Contact Person Name <span className="text-red-500">*</span>
               </label>
@@ -191,7 +191,7 @@ const EditSupplier = () => {
                 value={contactPersonName}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="John Doe"
               />
             </div>
@@ -200,7 +200,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="contactNo"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Contact Number <span className="text-red-500">*</span>
               </label>
@@ -214,7 +214,7 @@ const EditSupplier = () => {
                 pattern="[0-9]{10}"
                 maxLength={10}
                 title="Please enter a valid 10-digit mobile number"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="+91 9876543210"
               />
             </div>
@@ -223,7 +223,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Email Address <span className="text-red-500">*</span>
               </label>
@@ -234,7 +234,7 @@ const EditSupplier = () => {
                 value={email}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="supplier@example.com"
               />
             </div>
@@ -243,7 +243,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="physicalAddress"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Physical Address <span className="text-red-500">*</span>
               </label>
@@ -254,7 +254,7 @@ const EditSupplier = () => {
                 onChange={onChange}
                 required
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Street address, City, State, PIN"
               />
             </div>
@@ -263,7 +263,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="gstNo"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 GST Number <span className="text-red-500">*</span>
               </label>
@@ -277,7 +277,7 @@ const EditSupplier = () => {
                 pattern="^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$"
                 maxLength={15}
                 title="Please enter a valid 15-character GST number (e.g., 22AAAAA0000A1Z5)"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="22AAAAA0000A1Z5"
               />
             </div>
@@ -286,7 +286,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="supplierType"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Supplier Type <span className="text-red-500">*</span>
               </label>
@@ -296,7 +296,7 @@ const EditSupplier = () => {
                 value={supplierType}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="manufacturer">Manufacturer</option>
                 <option value="wholesaler">Wholesaler</option>
@@ -308,7 +308,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="openingBalance"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Opening Balance
               </label>
@@ -320,7 +320,7 @@ const EditSupplier = () => {
                 onChange={onChange}
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="0.00"
               />
             </div>
@@ -329,7 +329,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="balanceType"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Balance Type
               </label>
@@ -338,7 +338,7 @@ const EditSupplier = () => {
                 name="balanceType"
                 value={balanceType}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="payable">Payable</option>
                 <option value="receivable">Receivable</option>
@@ -349,7 +349,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="creditPeriod"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Credit Period (in days)
               </label>
@@ -360,7 +360,7 @@ const EditSupplier = () => {
                 value={creditPeriod}
                 onChange={onChange}
                 min="0"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="30"
               />
             </div>
@@ -369,7 +369,7 @@ const EditSupplier = () => {
             <div>
               <label
                 htmlFor="status"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium  text-secondary mb-2"
               >
                 Status <span className="text-red-500">*</span>
               </label>
@@ -379,7 +379,7 @@ const EditSupplier = () => {
                 value={status}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -391,7 +391,7 @@ const EditSupplier = () => {
               <button
                 type="button"
                 onClick={() => navigate('/suppliers')}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+                className="flex-1 px-6 py-3 border border-default  text-secondary rounded-lg hover:bg-gray-50 font-medium transition"
               >
                 Cancel
               </button>

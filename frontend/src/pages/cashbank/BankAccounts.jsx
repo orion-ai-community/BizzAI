@@ -60,13 +60,13 @@ const BankAccounts = () => {
     };
 
     const columns = [
-        { key: 'bankName', label: 'Bank Name', sortable: true, render: (val) => <span className="font-medium text-gray-900">{val}</span> },
+        { key: 'bankName', label: 'Bank Name', sortable: true, render: (val) => <span className="font-medium text-main">{val}</span> },
         {
             key: 'accountNumber',
             label: 'Account No',
             render: (val, row) => (
                 <div className="flex items-center space-x-2">
-                    <span className="font-mono text-gray-600">
+                    <span className="font-mono text-secondary">
                         {revealedAccounts[row._id] ? val : maskAccountNumber(val)}
                     </span>
                     <button
@@ -160,11 +160,11 @@ const BankAccounts = () => {
             </div>
 
             {showAddAccount && (
-                <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Add New Bank Account</h2>
+                <form onSubmit={handleSubmit} className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold text-main mb-4">Add New Bank Account</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Bank Name</label>
                             <input
                                 type="text"
                                 value={formData.bankName}
@@ -175,7 +175,7 @@ const BankAccounts = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Account Number</label>
                             <input
                                 type="text"
                                 value={formData.accountNumber}
@@ -186,7 +186,7 @@ const BankAccounts = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Account Type</label>
                             <select
                                 value={formData.accountType}
                                 onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
@@ -198,7 +198,7 @@ const BankAccounts = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">IFSC Code</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">IFSC Code</label>
                             <input
                                 type="text"
                                 value={formData.ifsc}
@@ -209,7 +209,7 @@ const BankAccounts = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Branch</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Branch</label>
                             <input
                                 type="text"
                                 value={formData.branch}
@@ -219,7 +219,7 @@ const BankAccounts = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Opening Balance</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Opening Balance</label>
                             <input
                                 type="number"
                                 value={formData.openingBalance}
@@ -233,7 +233,7 @@ const BankAccounts = () => {
                         <button type="submit" disabled={isLoading} className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
                             {isLoading ? 'Saving...' : 'Save Account'}
                         </button>
-                        <button type="button" onClick={() => setShowAddAccount(false)} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                        <button type="button" onClick={() => setShowAddAccount(false)} className="px-6 py-2 border border-default text-secondary rounded-lg hover:bg-surface">Cancel</button>
                     </div>
                 </form>
             )}

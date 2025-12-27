@@ -61,8 +61,8 @@ const Login = () => {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Welcome Back</h1>
-          <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mt-2">Sign in to your billing account</p>
+          <h1 className="text-3xl font-bold  text-main dark:text-[rgb(var(--color-text))]">Welcome Back</h1>
+          <p className=" text-secondary dark:text-[rgb(var(--color-text-secondary))] mt-2">Sign in to your billing account</p>
         </div>
 
         {/* Login Form Card */}
@@ -78,7 +78,7 @@ const Login = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text))] mb-2"
+                className="block text-sm font-medium  text-secondary dark:text-[rgb(var(--color-text))] mb-2"
               >
                 Email Address
               </label>
@@ -89,7 +89,7 @@ const Login = () => {
                 value={email}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))]"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))]  text-main dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))]"
                 placeholder="you@example.com"
               />
             </div>
@@ -98,7 +98,7 @@ const Login = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-text))] mb-2"
+                className="block text-sm font-medium  text-secondary dark:text-[rgb(var(--color-text))] mb-2"
               >
                 Password
               </label>
@@ -110,13 +110,13 @@ const Login = () => {
                   value={password}
                   onChange={onChange}
                   required
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))]"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))]  text-main dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition placeholder:text-gray-400 dark:placeholder:text-[rgb(var(--color-placeholder))]"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[rgb(var(--color-text-secondary))] hover:text-gray-700 dark:hover:text-[rgb(var(--color-text))] focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2  text-muted dark:text-[rgb(var(--color-text-secondary))] hover: text-secondary dark:hover:text-[rgb(var(--color-text))] focus:outline-none"
                 >
                   {showPassword ? (
                     <svg
@@ -194,7 +194,7 @@ const Login = () => {
 
           {/* Links */}
           <div className="mt-6 text-center space-y-2">
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
+            <p className=" text-secondary dark:text-[rgb(var(--color-text-secondary))] text-sm">
               <Link
                 to="/forgot-password"
                 className="text-indigo-600 dark:text-[rgb(var(--color-primary))] font-medium hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))] transition"
@@ -202,7 +202,7 @@ const Login = () => {
                 Forgot Password?
               </Link>
             </p>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
+            <p className=" text-secondary dark:text-[rgb(var(--color-text-secondary))] text-sm">
               Don't have an account?{' '}
               <Link
                 to="/register"
@@ -215,7 +215,7 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-500 dark:text-[rgb(var(--color-text-muted))] text-sm mt-8">
+        <p className="text-center  text-muted dark:text-[rgb(var(--color-text-muted))] text-sm mt-8">
           Secure billing management for your business
         </p>
       </div>

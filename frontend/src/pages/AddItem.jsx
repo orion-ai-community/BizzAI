@@ -21,7 +21,7 @@ const AddItem = () => {
     lowStockLimit: '5',
     unit: 'pcs',
   });
-  
+
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const { name, sku, category, costPrice, sellingPrice, stockQty, lowStockLimit, unit } = formData;
@@ -44,7 +44,7 @@ const AddItem = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setShouldNavigate(true);
-    
+
     const itemData = {
       ...formData,
       costPrice: parseFloat(costPrice),
@@ -52,7 +52,7 @@ const AddItem = () => {
       stockQty: parseInt(stockQty) || 0,
       lowStockLimit: parseInt(lowStockLimit) || 5,
     };
-    
+
     await dispatch(addItem(itemData));
   };
 
@@ -63,7 +63,7 @@ const AddItem = () => {
         <div className="mb-8">
           <button
             onClick={() => navigate('/inventory')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-secondary hover:text-main mb-4"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -80,8 +80,8 @@ const AddItem = () => {
             </svg>
             Back to Inventory
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Item</h1>
-          <p className="text-gray-600">Add a new product to your inventory</p>
+          <h1 className="text-3xl font-bold text-main mb-2">Add New Item</h1>
+          <p className="text-secondary">Add a new product to your inventory</p>
         </div>
 
         {/* Error Message */}
@@ -92,17 +92,17 @@ const AddItem = () => {
         )}
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-card rounded-xl shadow-sm p-8">
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Basic Info Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-main mb-4">Basic Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name Input */}
                 <div className="md:col-span-2">
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Item Name <span className="text-red-500">*</span>
                   </label>
@@ -113,7 +113,7 @@ const AddItem = () => {
                     value={name}
                     onChange={onChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="e.g., Rice Bag 25kg"
                   />
                 </div>
@@ -122,7 +122,7 @@ const AddItem = () => {
                 <div>
                   <label
                     htmlFor="sku"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     SKU / Barcode
                   </label>
@@ -132,7 +132,7 @@ const AddItem = () => {
                     name="sku"
                     value={sku}
                     onChange={onChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="e.g., RICE-001"
                   />
                 </div>
@@ -141,7 +141,7 @@ const AddItem = () => {
                 <div>
                   <label
                     htmlFor="category"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Category
                   </label>
@@ -151,7 +151,7 @@ const AddItem = () => {
                     name="category"
                     value={category}
                     onChange={onChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="e.g., Grocery"
                   />
                 </div>
@@ -160,13 +160,13 @@ const AddItem = () => {
 
             {/* Pricing Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
+              <h3 className="text-lg font-semibold text-main mb-4">Pricing</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Cost Price */}
                 <div>
                   <label
                     htmlFor="costPrice"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Cost Price (₹) <span className="text-red-500">*</span>
                   </label>
@@ -179,17 +179,17 @@ const AddItem = () => {
                     required
                     step="0.01"
                     min="0"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="0.00"
                   />
-                  <p className="mt-1 text-sm text-gray-500">Purchase/Cost price per unit</p>
+                  <p className="mt-1 text-sm text-muted">Purchase/Cost price per unit</p>
                 </div>
 
                 {/* Selling Price */}
                 <div>
                   <label
                     htmlFor="sellingPrice"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Selling Price (₹) <span className="text-red-500">*</span>
                   </label>
@@ -202,16 +202,16 @@ const AddItem = () => {
                     required
                     step="0.01"
                     min="0"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="0.00"
                   />
-                  <p className="mt-1 text-sm text-gray-500">Retail/Selling price per unit</p>
+                  <p className="mt-1 text-sm text-muted">Retail/Selling price per unit</p>
                 </div>
 
                 {/* Profit Margin Display */}
                 {costPrice && sellingPrice && (
                   <div className="md:col-span-2 p-4 bg-green-50 rounded-lg">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-secondary">
                       <span className="font-medium">Profit Margin:</span>{' '}
                       <span className="text-green-600 font-bold">
                         {((sellingPrice - costPrice) / costPrice * 100).toFixed(1)}%
@@ -225,13 +225,13 @@ const AddItem = () => {
 
             {/* Stock Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Stock Information</h3>
+              <h3 className="text-lg font-semibold text-main mb-4">Stock Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Stock Quantity */}
                 <div>
                   <label
                     htmlFor="stockQty"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Stock Quantity
                   </label>
@@ -242,7 +242,7 @@ const AddItem = () => {
                     value={stockQty}
                     onChange={onChange}
                     min="0"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="0"
                   />
                 </div>
@@ -251,7 +251,7 @@ const AddItem = () => {
                 <div>
                   <label
                     htmlFor="lowStockLimit"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Low Stock Alert
                   </label>
@@ -262,17 +262,17 @@ const AddItem = () => {
                     value={lowStockLimit}
                     onChange={onChange}
                     min="0"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="5"
                   />
-                  <p className="mt-1 text-sm text-gray-500">Alert when stock falls below this</p>
+                  <p className="mt-1 text-sm text-muted">Alert when stock falls below this</p>
                 </div>
 
                 {/* Unit */}
                 <div>
                   <label
                     htmlFor="unit"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-secondary mb-2"
                   >
                     Unit
                   </label>
@@ -281,7 +281,7 @@ const AddItem = () => {
                     name="unit"
                     value={unit}
                     onChange={onChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
                     <option value="pcs">Pieces (pcs)</option>
                     <option value="kg">Kilograms (kg)</option>
@@ -301,7 +301,7 @@ const AddItem = () => {
               <button
                 type="button"
                 onClick={() => navigate('/inventory')}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+                className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-surface font-medium transition"
               >
                 Cancel
               </button>

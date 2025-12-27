@@ -17,7 +17,7 @@ const AddCustomer = () => {
     email: '',
     address: '',
   });
-  
+
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const { name, phone, email, address } = formData;
@@ -50,7 +50,7 @@ const AddCustomer = () => {
         <div className="mb-8">
           <button
             onClick={() => navigate('/customers')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-secondary hover:text-main mb-4"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -67,8 +67,8 @@ const AddCustomer = () => {
             </svg>
             Back to Customers
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Customer</h1>
-          <p className="text-gray-600">Create a new customer profile</p>
+          <h1 className="text-3xl font-bold text-main mb-2">Add New Customer</h1>
+          <p className="text-secondary">Create a new customer profile</p>
         </div>
 
         {/* Error Message */}
@@ -79,7 +79,7 @@ const AddCustomer = () => {
         )}
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-card rounded-xl shadow-sm p-8">
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Name Input */}
             <div>
@@ -96,7 +96,7 @@ const AddCustomer = () => {
                 value={name}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="John Doe"
               />
             </div>
@@ -105,7 +105,7 @@ const AddCustomer = () => {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Phone Number <span className="text-red-500">*</span>
               </label>
@@ -116,7 +116,7 @@ const AddCustomer = () => {
                 value={phone}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="+91 9876543210"
               />
             </div>
@@ -125,7 +125,7 @@ const AddCustomer = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Email Address
               </label>
@@ -135,7 +135,7 @@ const AddCustomer = () => {
                 name="email"
                 value={email}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="customer@example.com"
               />
             </div>
@@ -144,7 +144,7 @@ const AddCustomer = () => {
             <div>
               <label
                 htmlFor="address"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Address
               </label>
@@ -154,7 +154,7 @@ const AddCustomer = () => {
                 value={address}
                 onChange={onChange}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Street address, City, State, PIN"
               />
             </div>
@@ -164,7 +164,7 @@ const AddCustomer = () => {
               <button
                 type="button"
                 onClick={() => navigate('/customers')}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+                className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium transition"
               >
                 Cancel
               </button>

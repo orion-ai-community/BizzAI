@@ -96,38 +96,38 @@ const Restore = () => {
 
             {/* Upload Backup File */}
             {showUpload && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Upload Backup File</h2>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                        <svg className="mx-auto w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold text-main mb-4">Upload Backup File</h2>
+                    <div className="border-2 border-dashed border-defalut rounded-lg p-8 text-center">
+                        <svg className="mx-auto w-16 h-16 text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        <p className="text-lg font-medium text-gray-900 mb-2">Drop your backup file here</p>
-                        <p className="text-sm text-gray-600 mb-4">or click to browse</p>
+                        <p className="text-lg font-medium text-main mb-2">Drop your backup file here</p>
+                        <p className="text-sm text-secondary mb-4">or click to browse</p>
                         <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                             Choose File
                         </button>
-                        <p className="text-xs text-gray-500 mt-4">Supported format: .backup, .zip (Max 100MB)</p>
+                        <p className="text-xs text-muted mt-4">Supported format: .backup, .zip (Max 100MB)</p>
                     </div>
                 </div>
             )}
 
             {/* Restore Progress */}
             {isRestoring && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Restoring Data...</h2>
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold text-main mb-4">Restoring Data...</h2>
                     <div className="space-y-3">
                         <div className="flex justify-between text-sm mb-2">
-                            <span className="text-gray-600">Progress</span>
+                            <span className="text-secondary">Progress</span>
                             <span className="font-bold text-indigo-600">{restoreProgress}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-4">
+                        <div className="w-full bg-surface rounded-full h-4">
                             <div
                                 className="bg-indigo-600 h-4 rounded-full transition-all duration-500"
                                 style={{ width: `${restoreProgress}%` }}
                             />
                         </div>
-                        <p className="text-sm text-gray-600 text-center">
+                        <p className="text-sm text-secondary text-center">
                             Please wait while we restore your data. Do not close this window.
                         </p>
                     </div>
@@ -136,8 +136,8 @@ const Restore = () => {
 
             {/* Confirmation Dialog */}
             {showConfirmation && selectedBackup && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border-2 border-red-200">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Confirm Restore</h2>
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6 border-2 border-red-200">
+                    <h2 className="text-lg font-bold text-main mb-4">Confirm Restore</h2>
                     <div className="space-y-4">
                         <div className="p-4 bg-red-50 rounded-lg">
                             <p className="text-sm text-red-800">
@@ -147,8 +147,8 @@ const Restore = () => {
                                 All current data will be replaced with data from the selected backup.
                             </p>
                         </div>
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-2"><strong>Backup Details:</strong></p>
+                        <div className="p-4 bg-surface rounded-lg">
+                            <p className="text-sm text-secondary mb-2"><strong>Backup Details:</strong></p>
                             <div className="space-y-1 text-sm">
                                 <p>Date: {selectedBackup.date}</p>
                                 <p>Size: {selectedBackup.size}</p>
@@ -165,7 +165,7 @@ const Restore = () => {
                             </button>
                             <button
                                 onClick={() => setShowConfirmation(false)}
-                                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                className="px-6 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface"
                             >
                                 Cancel
                             </button>
@@ -175,19 +175,19 @@ const Restore = () => {
             )}
 
             {/* Available Backups */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Available Backups</h2>
+            <div className="bg-card rounded-xl shadow-sm p-6">
+                <h2 className="text-lg font-bold text-main mb-4">Available Backups</h2>
                 <div className="space-y-4">
                     {availableBackups.map((backup) => (
                         <div
                             key={backup.id}
-                            className={`border-2 rounded-xl p-4 transition ${selectedBackup?.id === backup.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'
+                            className={`border-2 rounded-xl p-4 transition ${selectedBackup?.id === backup.id ? 'border-indigo-600 bg-indigo-50' : 'border-defalut'
                                 }`}
                         >
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex-1">
                                     <div className="flex items-center space-x-3 mb-2">
-                                        <h3 className="font-bold text-gray-900">{backup.date}</h3>
+                                        <h3 className="font-bold text-main">{backup.date}</h3>
                                         {backup.compatible ? (
                                             <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full flex items-center">
                                                 <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,16 +203,16 @@ const Restore = () => {
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                         <div>
-                                            <p className="text-gray-600">Size</p>
-                                            <p className="font-medium text-gray-900">{backup.size}</p>
+                                            <p className="text-secondary">Size</p>
+                                            <p className="font-medium text-main">{backup.size}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-600">Location</p>
-                                            <p className="font-medium text-gray-900">{backup.location}</p>
+                                            <p className="text-secondary">Location</p>
+                                            <p className="font-medium text-main">{backup.location}</p>
                                         </div>
                                         <div className="col-span-2">
-                                            <p className="text-gray-600">Data Included</p>
-                                            <p className="font-medium text-gray-900">{backup.dataIncluded.join(', ')}</p>
+                                            <p className="text-secondary">Data Included</p>
+                                            <p className="font-medium text-main">{backup.dataIncluded.join(', ')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -225,16 +225,16 @@ const Restore = () => {
                                     }}
                                     disabled={!backup.compatible}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium ${backup.compatible
-                                            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                        : 'bg-surface text-muted cursor-not-allowed'
                                         }`}
                                 >
                                     Restore
                                 </button>
-                                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium">
+                                <button className="px-4 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface text-sm font-medium">
                                     View Details
                                 </button>
-                                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium">
+                                <button className="px-4 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface text-sm font-medium">
                                     Download
                                 </button>
                             </div>

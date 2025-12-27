@@ -62,7 +62,7 @@ const ReportsDashboard = () => {
                     <div key={idx}>
                         <div className="flex items-center space-x-3 mb-4">
                             <span className="text-3xl">{category.icon}</span>
-                            <h2 className="text-2xl font-bold text-gray-900">{category.title}</h2>
+                            <h2 className="text-2xl font-bold text-main">{category.title}</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {category.reports.map((report, reportIdx) => (
@@ -74,8 +74,8 @@ const ReportsDashboard = () => {
                                     <div className="flex items-center space-x-3">
                                         <span className="text-3xl group-hover:scale-110 transition">{report.icon}</span>
                                         <div className="text-left">
-                                            <h3 className="font-bold text-gray-900">{report.name}</h3>
-                                            <p className="text-xs text-gray-600">View detailed report</p>
+                                            <h3 className="font-bold text-main">{report.name}</h3>
+                                            <p className="text-xs text-secondary">View detailed report</p>
                                         </div>
                                     </div>
                                 </button>

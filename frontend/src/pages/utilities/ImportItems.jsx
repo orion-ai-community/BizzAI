@@ -31,8 +31,8 @@ const ImportItems = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Import Items</h1>
-                    <p className="text-gray-600">Import multiple items from CSV or Excel files</p>
+                    <h1 className="text-3xl font-bold text-main mb-2">Import Items</h1>
+                    <p className="text-muted">Import multiple items from CSV or Excel files</p>
                 </div>
 
                 {/* Instructions Card */}
@@ -57,9 +57,9 @@ const ImportItems = () => {
                 </div>
 
                 {/* File Upload Section */}
-                <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+                <div className="bg-card rounded-xl shadow-sm p-8 mb-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-semibold text-gray-900">Upload File</h3>
+                        <h3 className="text-lg font-semibold text-main">Upload File</h3>
                         <button
                             type="button"
                             className="flex items-center space-x-2 px-4 py-2 text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-50 transition"
@@ -71,7 +71,7 @@ const ImportItems = () => {
                         </button>
                     </div>
 
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-indigo-500 transition">
+                    <div className="border-2 border-dashed border-default rounded-lg p-12 text-center hover:border-indigo-500 transition">
                         <input
                             type="file"
                             accept=".csv,.xlsx,.xls"
@@ -85,10 +85,10 @@ const ImportItems = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
                             </div>
-                            <p className="text-gray-700 font-medium mb-2">
+                            <p className="text-secondary font-medium mb-2">
                                 {selectedFile ? selectedFile.name : 'Click to upload or drag and drop'}
                             </p>
-                            <p className="text-gray-500 text-sm">CSV or Excel files (MAX. 5MB)</p>
+                            <p className="text-muted text-sm">CSV or Excel files (MAX. 5MB)</p>
                         </label>
                     </div>
                 </div>
@@ -96,11 +96,11 @@ const ImportItems = () => {
                 {/* Summary Panel */}
                 {showPreview && (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-card rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-gray-500 text-sm font-medium">Total Rows</p>
-                                    <p className="text-3xl font-bold text-gray-900 mt-2">{mappingData.length}</p>
+                                    <p className="text-secondary text-sm font-medium">Total Rows</p>
+                                    <p className="text-3xl font-bold text-primary mt-2">{mappingData.length}</p>
                                 </div>
                                 <div className="p-3 bg-blue-100 rounded-lg">
                                     <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,10 +110,10 @@ const ImportItems = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-card rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-gray-500 text-sm font-medium">Valid Rows</p>
+                                    <p className="text-secondary text-sm font-medium">Valid Rows</p>
                                     <p className="text-3xl font-bold text-green-600 mt-2">{validRows}</p>
                                 </div>
                                 <div className="p-3 bg-green-100 rounded-lg">
@@ -124,10 +124,10 @@ const ImportItems = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-card rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-gray-500 text-sm font-medium">Warnings</p>
+                                    <p className="text-secondary text-sm font-medium">Warnings</p>
                                     <p className="text-3xl font-bold text-yellow-600 mt-2">{warningRows}</p>
                                 </div>
                                 <div className="p-3 bg-yellow-100 rounded-lg">
@@ -138,10 +138,10 @@ const ImportItems = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-card rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-gray-500 text-sm font-medium">Invalid Rows</p>
+                                    <p className="text-secondary text-sm font-medium">Invalid Rows</p>
                                     <p className="text-3xl font-bold text-red-600 mt-2">{errorRows}</p>
                                 </div>
                                 <div className="p-3 bg-red-100 rounded-lg">
@@ -156,15 +156,15 @@ const ImportItems = () => {
 
                 {/* Column Mapping */}
                 {showPreview && (
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Column Mapping</h3>
+                    <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                        <h3 className="text-lg font-semibold text-main mb-4">Column Mapping</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {['Name', 'SKU', 'Category', 'Cost Price', 'Selling Price', 'Stock Quantity'].map((field) => (
                                 <div key={field}>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-secondary mb-2">
                                         {field} {['Name', 'Cost Price', 'Selling Price'].includes(field) && <span className="text-red-500">*</span>}
                                     </label>
-                                    <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <select className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                                         <option value="">Select column...</option>
                                         <option value={field.toLowerCase().replace(' ', '_')} selected>{field}</option>
                                     </select>
@@ -176,28 +176,28 @@ const ImportItems = () => {
 
                 {/* Preview Table */}
                 {showPreview && (
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                    <div className="bg-card rounded-xl shadow-sm overflow-hidden mb-6">
                         <div className="p-6 border-b border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900">Data Preview</h3>
+                            <h3 className="text-lg font-semibold text-main">Data Preview</h3>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                                <thead className="bg-surface border-b border-gray-200">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Row</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cost Price</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Selling Price</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Row</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Status</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">SKU</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Category</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Cost Price</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Selling Price</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Stock</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-card divide-y divide-gray-200">
                                     {mappingData.map((row) => (
-                                        <tr key={row.row} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 text-sm text-gray-900">{row.row}</td>
+                                        <tr key={row.row} className="hover:bg-surface">
+                                            <td className="px-6 py-4 text-sm text-main">{row.row}</td>
                                             <td className="px-6 py-4">
                                                 {row.status === 'valid' && (
                                                     <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded flex items-center w-fit">
@@ -224,12 +224,12 @@ const ImportItems = () => {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">{row.name || <span className="text-red-500">Missing</span>}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500">{row.sku || '-'}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500">{row.category}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">₹{row.costPrice}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">₹{row.sellingPrice}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-900">{row.stock}</td>
+                                            <td className="px-6 py-4 text-sm text-main">{row.name || <span className="text-red-500">Missing</span>}</td>
+                                            <td className="px-6 py-4 text-sm text-muted">{row.sku || '-'}</td>
+                                            <td className="px-6 py-4 text-sm text-muted">{row.category}</td>
+                                            <td className="px-6 py-4 text-sm text-main">₹{row.costPrice}</td>
+                                            <td className="px-6 py-4 text-sm text-main">₹{row.sellingPrice}</td>
+                                            <td className="px-6 py-4 text-sm text-main">{row.stock}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -264,7 +264,7 @@ const ImportItems = () => {
                                 setSelectedFile(null);
                                 setMappingData([]);
                             }}
-                            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+                            className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-surface font-medium transition"
                         >
                             Clear / Reset
                         </button>

@@ -50,10 +50,10 @@ const Estimate = () => {
         cart.map((cartItem) =>
           cartItem.itemId === item._id
             ? {
-                ...cartItem,
-                quantity: cartItem.quantity + 1,
-                total: (cartItem.quantity + 1) * cartItem.price,
-              }
+              ...cartItem,
+              quantity: cartItem.quantity + 1,
+              total: (cartItem.quantity + 1) * cartItem.price,
+            }
             : cartItem
         )
       );
@@ -81,10 +81,10 @@ const Estimate = () => {
       cart.map((cartItem) =>
         cartItem.itemId === itemId
           ? {
-              ...cartItem,
-              quantity: newQuantity,
-              total: newQuantity * cartItem.price,
-            }
+            ...cartItem,
+            quantity: newQuantity,
+            total: newQuantity * cartItem.price,
+          }
           : cartItem
       )
     );
@@ -198,7 +198,7 @@ const Estimate = () => {
           {/* Header */}
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-2">
+              <h1 className="text-3xl font-bold text-maindark:text-[rgb(var(--color-text))] mb-2">
                 Create Estimate / Proforma
               </h1>
               <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
@@ -238,7 +238,7 @@ const Estimate = () => {
                 {customer ? (
                   <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                      <div className="font-medium text-maindark:text-[rgb(var(--color-text))]">
                         {customer.name}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
@@ -282,10 +282,10 @@ const Estimate = () => {
                     placeholder="Search products by name or SKU..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                   />
                   <svg
-                    className="absolute left-3 top-2.5 w-5 h-5 text-gray-400 dark:text-[rgb(var(--color-text-muted))]"
+                    className="absolute left-3 top-2.5 w-5 h-5 text-muted dark:text-[rgb(var(--color-text-muted))]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -305,19 +305,19 @@ const Estimate = () => {
                     <button
                       key={item._id}
                       onClick={() => addToCart(item)}
-                      className="p-4 border-2 border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg text-left transition hover:border-indigo-500 hover:shadow-md"
+                      className="p-4 border-2 border-default rounded-lg text-left transition hover:border-indigo-500 hover:shadow-md"
                     >
-                      <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))] mb-1 truncate">
+                      <div className="font-medium text-maindark:text-[rgb(var(--color-text))] mb-1 truncate">
                         {item.name}
                       </div>
                       <div className="text-lg font-bold text-indigo-600 dark:text-[rgb(var(--color-primary))]">
                         ₹{item.sellingPrice}
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))] mt-1">
+                      <div className="text-xs text-muted dark:text-[rgb(var(--color-text-secondary))] mt-1">
                         Stock: {item.stockQty} {item.unit}
                       </div>
                       {item.sku && (
-                        <div className="text-xs text-gray-400 dark:text-[rgb(var(--color-text-muted))] mt-1">
+                        <div className="text-xs text-muted dark:text-[rgb(var(--color-text-muted))] mt-1">
                           SKU: {item.sku}
                         </div>
                       )}
@@ -330,14 +330,14 @@ const Estimate = () => {
             {/* Right Side - Cart & Total */}
             <div className="lg:col-span-1">
               <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] p-6 sticky top-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4">
+                <h2 className="text-xl font-bold text-maindark:text-[rgb(var(--color-text))] mb-4">
                   Estimate Cart
                 </h2>
 
                 {/* Cart Items */}
                 <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                   {cart.length === 0 ? (
-                    <p className="text-gray-500 dark:text-[rgb(var(--color-text-secondary))] text-center py-8">
+                    <p className="text-muted dark:text-[rgb(var(--color-text-secondary))] text-center py-8">
                       Cart is empty
                     </p>
                   ) : (
@@ -347,10 +347,10 @@ const Estimate = () => {
                         className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[rgb(var(--color-input))] rounded-lg"
                       >
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))] text-sm">
+                          <div className="font-medium text-maindark:text-[rgb(var(--color-text))] text-sm">
                             {item.name}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                          <div className="text-xs text-muted dark:text-[rgb(var(--color-text-secondary))]">
                             ₹{item.price} each
                           </div>
                         </div>
@@ -363,7 +363,7 @@ const Estimate = () => {
                           >
                             -
                           </button>
-                          <span className="w-8 text-center font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          <span className="w-8 text-center font-medium text-maindark:text-[rgb(var(--color-text))]">
                             {item.quantity}
                           </span>
                           <button
@@ -393,7 +393,7 @@ const Estimate = () => {
                             </svg>
                           </button>
                         </div>
-                        <div className="ml-3 font-bold text-gray-900 dark:text-[rgb(var(--color-text))] w-20 text-right">
+                        <div className="ml-3 font-bold text-maindark:text-[rgb(var(--color-text))] w-20 text-right">
                           ₹{item.total.toFixed(2)}
                         </div>
                       </div>
@@ -414,7 +414,7 @@ const Estimate = () => {
                     }
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                     placeholder="0.00"
                   />
                 </div>
@@ -428,18 +428,18 @@ const Estimate = () => {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows="2"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))] focus:border-transparent"
                     placeholder="Additional notes..."
                   />
                 </div>
 
                 {/* Totals */}
-                <div className="border-t border-gray-200 dark:border-[rgb(var(--color-border))] pt-4 mb-4 space-y-2">
+                <div className="border-t border-default dark:border-[rgb(var(--color-border))] pt-4 mb-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                       Subtotal:
                     </span>
-                    <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                    <span className="font-medium text-maindark:text-[rgb(var(--color-text))]">
                       ₹{subtotal.toFixed(2)}
                     </span>
                   </div>
@@ -451,8 +451,8 @@ const Estimate = () => {
                       -₹{discount.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-[rgb(var(--color-border))] pt-2">
-                    <span className="text-gray-900 dark:text-[rgb(var(--color-text))]">
+                  <div className="flex justify-between text-lg font-bold border-t border-default dark:border-[rgb(var(--color-border))] pt-2">
+                    <span className="text-maindark:text-[rgb(var(--color-text))]">
                       Estimated Total:
                     </span>
                     <span className="text-indigo-600 dark:text-[rgb(var(--color-primary))]">
@@ -507,13 +507,13 @@ const Estimate = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-2xl border dark:border-[rgb(var(--color-border))] max-w-2xl w-full max-h-[90vh] flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                <div className="flex items-center justify-between p-6 border-b border-default dark:border-[rgb(var(--color-border))]">
+                  <h3 className="text-xl font-bold text-maindark:text-[rgb(var(--color-text))]">
                     Select Customer
                   </h3>
                   <button
                     onClick={() => setShowCustomerSelect(false)}
-                    className="text-gray-400 dark:text-[rgb(var(--color-text-muted))] hover:text-gray-600 dark:hover:text-[rgb(var(--color-text))]"
+                    className="text-muted dark:text-[rgb(var(--color-text-muted))] hover:text-gray-600 dark:hover:text-[rgb(var(--color-text))]"
                   >
                     <svg
                       className="w-6 h-6"
@@ -538,7 +538,7 @@ const Estimate = () => {
                     placeholder="Search by name or phone..."
                     value={customerSearchTerm}
                     onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-gray-900 dark:text-[rgb(var(--color-text))] rounded-lg mb-4 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-[rgb(var(--color-primary))]"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] bg-white dark:bg-[rgb(var(--color-input))] text-maindark:text-[rgb(var(--color-text))] rounded-lg mb-4 focus:ring-2 focus:ring-primary dark:focus:ring-[rgb(var(--color-primary))]"
                   />
 
                   <div className="space-y-2">
@@ -546,9 +546,9 @@ const Estimate = () => {
                       <button
                         key={c._id}
                         onClick={() => selectCustomer(c)}
-                        className="w-full p-4 border border-gray-200 dark:border-[rgb(var(--color-border))] rounded-lg hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition"
+                        className="w-full p-4 border border-default dark:border-[rgb(var(--color-border))] rounded-lg hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition"
                       >
-                        <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
+                        <div className="font-medium text-maindark:text-[rgb(var(--color-text))]">
                           {c.name}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">

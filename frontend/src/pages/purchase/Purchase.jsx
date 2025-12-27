@@ -37,23 +37,23 @@ const Purchase = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Purchase Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Purchase Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormInput label="Purchase Number" value={formData.purchaseNo} onChange={(e) => setFormData({ ...formData, purchaseNo: e.target.value })} required />
                             <FormInput label="Purchase Date" type="date" value={formData.purchaseDate} onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })} required />
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Supplier</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Supplier</h2>
                         {formData.supplier ? (
                             <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">{formData.supplier.businessName}</p>
-                                        <p className="text-sm text-gray-600">{formData.supplier.contactPersonName}</p>
-                                        <p className="text-sm text-gray-600">{formData.supplier.contactNo}</p>
+                                        <p className="font-medium text-main">{formData.supplier.businessName}</p>
+                                        <p className="text-sm text-secondary">{formData.supplier.contactPersonName}</p>
+                                        <p className="text-sm text-secondary">{formData.supplier.contactNo}</p>
                                     </div>
                                     <button
                                         onClick={() => setFormData({ ...formData, supplier: null })}
@@ -68,27 +68,27 @@ const Purchase = () => {
                         ) : (
                             <button
                                 onClick={() => setShowSupplierModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600"
+                                className="w-full px-4 py-3 border-2 border-dashed border-defaultrounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600"
                             >
                                 Click to select supplier
                             </button>
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Items</h2>
+                            <h2 className="text-lg font-bold text-main">Items</h2>
                             <button onClick={addItem} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Item</button>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-surface border-b">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tax %</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Qty</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Rate</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Tax %</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -114,30 +114,30 @@ const Purchase = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Notes</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
                         <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Add notes..." />
                     </div>
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Summary</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Summary</h2>
                         <div className="space-y-3 mb-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Subtotal:</span>
+                                <span className="text-secondary">Subtotal:</span>
                                 <span className="font-medium">₹{calculateSubtotal().toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax:</span>
+                                <span className="text-secondary">Tax:</span>
                                 <span className="font-medium">₹{calculateTax().toFixed(2)}</span>
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-600 mb-1">Discount:</label>
+                                <label className="block text-sm text-secondary mb-1">Discount:</label>
                                 <input type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-600 mb-1">Shipping:</label>
+                                <label className="block text-sm text-secondary mb-1">Shipping:</label>
                                 <input type="number" value={formData.shippingCharges} onChange={(e) => setFormData({ ...formData, shippingCharges: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
                             </div>
                         </div>
@@ -149,7 +149,7 @@ const Purchase = () => {
                         </div>
                         <div className="mt-6 space-y-3">
                             <button className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">Save Purchase</button>
-                            <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Save as Draft</button>
+                            <button className="w-full py-3 border border-defaulttext-secondary rounded-lg hover:bg-gray-50">Save as Draft</button>
                         </div>
                     </div>
                 </div>

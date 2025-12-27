@@ -31,11 +31,11 @@ const BarcodeGenerator = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Barcode Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Barcode Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Item Name</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Item Name</label>
                                 <input
                                     type="text"
                                     value={formData.itemName}
@@ -45,7 +45,7 @@ const BarcodeGenerator = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">SKU / Barcode Number</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">SKU / Barcode Number</label>
                                 <input
                                     type="text"
                                     value={formData.sku}
@@ -55,7 +55,7 @@ const BarcodeGenerator = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Price</label>
                                 <input
                                     type="number"
                                     value={formData.price}
@@ -65,7 +65,7 @@ const BarcodeGenerator = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Barcode Type</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Barcode Type</label>
                                 <select
                                     value={formData.barcodeType}
                                     onChange={(e) => setFormData({ ...formData, barcodeType: e.target.value })}
@@ -75,7 +75,7 @@ const BarcodeGenerator = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Quantity</label>
                                 <input
                                     type="number"
                                     value={formData.quantity}
@@ -85,7 +85,7 @@ const BarcodeGenerator = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Paper Size</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Paper Size</label>
                                 <select
                                     value={formData.paperSize}
                                     onChange={(e) => setFormData({ ...formData, paperSize: e.target.value })}
@@ -97,8 +97,8 @@ const BarcodeGenerator = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Print Options</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Print Options</h2>
                         <div className="space-y-3">
                             <label className="flex items-center space-x-3">
                                 <input
@@ -107,7 +107,7 @@ const BarcodeGenerator = () => {
                                     onChange={(e) => setFormData({ ...formData, includeName: e.target.checked })}
                                     className="w-5 h-5 text-indigo-600 rounded"
                                 />
-                                <span className="text-gray-700">Include Item Name</span>
+                                <span className="text-secondary">Include Item Name</span>
                             </label>
                             <label className="flex items-center space-x-3">
                                 <input
@@ -116,14 +116,14 @@ const BarcodeGenerator = () => {
                                     onChange={(e) => setFormData({ ...formData, includePrice: e.target.checked })}
                                     className="w-5 h-5 text-indigo-600 rounded"
                                 />
-                                <span className="text-gray-700">Include Price</span>
+                                <span className="text-secondary">Include Price</span>
                             </label>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Bulk Generate from Items</h2>
-                        <p className="text-gray-600 mb-4">Generate barcodes for multiple items at once</p>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Bulk Generate from Items</h2>
+                        <p className="text-secondary mb-4">Generate barcodes for multiple items at once</p>
                         <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                             Select Items from Inventory
                         </button>
@@ -131,11 +131,11 @@ const BarcodeGenerator = () => {
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Preview</h2>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Preview</h2>
+                        <div className="border-2 border-dashed border-default rounded-lg p-8 text-center">
                             <div className="mb-4">
-                                <div className="inline-block bg-white p-4 border-2 border-gray-200 rounded-lg">
+                                <div className="inline-block bg-card p-4 border-2 border-default rounded-lg">
                                     <svg className="w-48 h-24 mx-auto" viewBox="0 0 200 100">
                                         <rect x="10" y="20" width="4" height="60" fill="black" />
                                         <rect x="18" y="20" width="2" height="60" fill="black" />
@@ -163,20 +163,20 @@ const BarcodeGenerator = () => {
                                         <text x="100" y="95" textAnchor="middle" fontSize="12" fill="black">{formData.sku || '1234567890'}</text>
                                     </svg>
                                     {formData.includeName && formData.itemName && (
-                                        <p className="text-sm font-medium text-gray-900 mt-2">{formData.itemName}</p>
+                                        <p className="text-sm font-medium text-main mt-2">{formData.itemName}</p>
                                     )}
                                     {formData.includePrice && formData.price && (
-                                        <p className="text-lg font-bold text-gray-900">₹{formData.price}</p>
+                                        <p className="text-lg font-bold text-main">₹{formData.price}</p>
                                     )}
                                 </div>
                             </div>
-                            <p className="text-sm text-gray-500">Barcode preview will appear here</p>
+                            <p className="text-sm text-muted">Barcode preview will appear here</p>
                         </div>
                         <div className="mt-6 space-y-3">
                             <button className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
                                 Generate Barcode
                             </button>
-                            <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            <button className="w-full py-3 border border-default text-secondary rounded-lg hover:bg-surface">
                                 Download as PDF
                             </button>
                         </div>

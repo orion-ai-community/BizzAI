@@ -61,18 +61,18 @@ const GoogleProfile = () => {
             />
 
             {/* Profile Completeness */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
                 <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-bold text-gray-900">Profile Completeness</h3>
+                    <h3 className="text-lg font-bold text-main">Profile Completeness</h3>
                     <span className="text-2xl font-bold text-indigo-600">{completeness}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-default rounded-full h-3">
                     <div
                         className="bg-indigo-600 h-3 rounded-full transition-all"
                         style={{ width: `${completeness}%` }}
                     />
                 </div>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-secondary mt-2">
                     Complete your profile to improve visibility in Google Search and Maps
                 </p>
             </div>
@@ -112,10 +112,10 @@ const GoogleProfile = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     {/* Business Profile */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
-                                <h2 className="text-lg font-bold text-gray-900">Business Profile</h2>
+                                <h2 className="text-lg font-bold text-main">Business Profile</h2>
                                 {profileData.verified && (
                                     <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full flex items-center">
                                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,45 +186,45 @@ const GoogleProfile = () => {
                         ) : (
                             <div className="space-y-3">
                                 <div>
-                                    <p className="text-sm text-gray-600">Business Name</p>
-                                    <p className="font-medium text-gray-900">{profileData.businessName}</p>
+                                    <p className="text-sm text-secondary">Business Name</p>
+                                    <p className="font-medium text-main">{profileData.businessName}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Address</p>
-                                    <p className="font-medium text-gray-900">{profileData.address}</p>
+                                    <p className="text-sm text-secondary">Address</p>
+                                    <p className="font-medium text-main">{profileData.address}</p>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-sm text-gray-600">Phone</p>
-                                        <p className="font-medium text-gray-900">{profileData.phone}</p>
+                                        <p className="text-sm text-secondary">Phone</p>
+                                        <p className="font-medium text-main">{profileData.phone}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600">Email</p>
-                                        <p className="font-medium text-gray-900">{profileData.email}</p>
+                                        <p className="text-sm text-secondary">Email</p>
+                                        <p className="font-medium text-main">{profileData.email}</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-sm text-gray-600">Website</p>
+                                        <p className="text-sm text-secondary">Website</p>
                                         <p className="font-medium text-indigo-600">{profileData.website}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600">Category</p>
-                                        <p className="font-medium text-gray-900">{profileData.category}</p>
+                                        <p className="text-sm text-secondary">Category</p>
+                                        <p className="font-medium text-main">{profileData.category}</p>
                                     </div>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Description</p>
-                                    <p className="font-medium text-gray-900">{profileData.description}</p>
+                                    <p className="text-sm text-secondary">Description</p>
+                                    <p className="font-medium text-main">{profileData.description}</p>
                                 </div>
                             </div>
                         )}
                     </div>
 
                     {/* Hours of Operation */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Hours of Operation</h2>
+                            <h2 className="text-lg font-bold text-main">Hours of Operation</h2>
                             <button
                                 onClick={() => setShowHoursEditor(!showHoursEditor)}
                                 className="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
@@ -237,7 +237,7 @@ const GoogleProfile = () => {
                                 {Object.entries(hours).map(([day, time]) => (
                                     <div key={day} className="flex items-center space-x-4">
                                         <div className="w-24">
-                                            <p className="font-medium text-gray-900 capitalize">{day}</p>
+                                            <p className="font-medium text-main capitalize">{day}</p>
                                         </div>
                                         <label className="flex items-center">
                                             <input
@@ -249,7 +249,7 @@ const GoogleProfile = () => {
                                                 })}
                                                 className="w-4 h-4 text-indigo-600 rounded"
                                             />
-                                            <span className="ml-2 text-sm text-gray-600">Closed</span>
+                                            <span className="ml-2 text-sm text-secondary">Closed</span>
                                         </label>
                                         {!time.closed && (
                                             <>
@@ -262,7 +262,7 @@ const GoogleProfile = () => {
                                                     })}
                                                     className="px-3 py-2 border rounded-lg"
                                                 />
-                                                <span className="text-gray-500">to</span>
+                                                <span className="text-secondary">to</span>
                                                 <input
                                                     type="time"
                                                     value={time.close}
@@ -284,8 +284,8 @@ const GoogleProfile = () => {
                             <div className="space-y-2">
                                 {Object.entries(hours).map(([day, time]) => (
                                     <div key={day} className="flex justify-between">
-                                        <span className="font-medium text-gray-900 capitalize">{day}</span>
-                                        <span className="text-gray-600">
+                                        <span className="font-medium text-main capitalize">{day}</span>
+                                        <span className="text-secondary">
                                             {time.closed ? 'Closed' : `${time.open} - ${time.close}`}
                                         </span>
                                     </div>
@@ -295,9 +295,9 @@ const GoogleProfile = () => {
                     </div>
 
                     {/* Photos & Media */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Photos & Media</h2>
+                            <h2 className="text-lg font-bold text-main">Photos & Media</h2>
                             <button
                                 onClick={() => setShowPhotoUpload(!showPhotoUpload)}
                                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm"
@@ -306,12 +306,12 @@ const GoogleProfile = () => {
                             </button>
                         </div>
                         {showPhotoUpload && (
-                            <div className="mb-4 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                                <svg className="mx-auto w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="mb-4 p-4 border-2 border-dashed border-default rounded-lg text-center">
+                                <svg className="mx-auto w-12 h-12 text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                 </svg>
-                                <p className="text-sm text-gray-600 mb-2">Click to upload or drag and drop</p>
-                                <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                                <p className="text-sm text-secondary mb-2">Click to upload or drag and drop</p>
+                                <p className="text-xs text-muted">PNG, JPG up to 10MB</p>
                             </div>
                         )}
                         <div className="grid grid-cols-3 gap-4">
@@ -330,10 +330,10 @@ const GoogleProfile = () => {
                 {/* Sidebar */}
                 <div className="lg:col-span-1">
                     {/* Post to Google */}
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Post to Google</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Post to Google</h2>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">What's new?</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">What's new?</label>
                             <textarea
                                 rows="4"
                                 className="w-full px-4 py-2 border rounded-lg mb-3"
@@ -346,16 +346,16 @@ const GoogleProfile = () => {
                     </div>
 
                     {/* Quick Actions */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Quick Actions</h2>
                         <div className="space-y-3">
-                            <button className="w-full py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                            <button className="w-full py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 text-sm">
                                 View on Google
                             </button>
-                            <button className="w-full py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                            <button className="w-full py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 text-sm">
                                 Share Profile Link
                             </button>
-                            <button className="w-full py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm">
+                            <button className="w-full py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 text-sm">
                                 Download QR Code
                             </button>
                         </div>

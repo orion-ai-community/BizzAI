@@ -101,13 +101,13 @@ const Register = () => {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-          <p className="text-gray-600 mt-2">
+          <p className=" text-secondary mt-2">
             Start managing your billing today
           </p>
         </div>
 
         {/* Register Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-card rounded-2xl shadow-xl p-8">
           {(isError || validationError) && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 text-sm">
@@ -123,7 +123,7 @@ const Register = () => {
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium  text-secondary mb-2"
                 >
                   Full Name *
                 </label>
@@ -134,7 +134,7 @@ const Register = () => {
                   value={name}
                   onChange={onChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
                   placeholder="John Doe"
                 />
               </div>
@@ -143,7 +143,7 @@ const Register = () => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium  text-secondary mb-2"
                 >
                   Email Address *
                 </label>
@@ -154,7 +154,7 @@ const Register = () => {
                   value={email}
                   onChange={onChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
                   placeholder="you@example.com"
                 />
               </div>
@@ -166,7 +166,7 @@ const Register = () => {
               <div>
                 <label
                   htmlFor="shopName"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium  text-secondary mb-2"
                 >
                   Shop Name
                 </label>
@@ -176,7 +176,7 @@ const Register = () => {
                   name="shopName"
                   value={shopName}
                   onChange={onChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
                   placeholder="My Store"
                 />
               </div>
@@ -185,7 +185,7 @@ const Register = () => {
               <div>
                 <label
                   htmlFor="phone"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium  text-secondary mb-2"
                 >
                   Phone Number
                 </label>
@@ -195,7 +195,7 @@ const Register = () => {
                   name="phone"
                   value={phone}
                   onChange={onChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
                   placeholder="+91 9876543210"
                 />
               </div>
@@ -207,7 +207,7 @@ const Register = () => {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium  text-secondary mb-2"
                 >
                   Password *
                 </label>
@@ -219,13 +219,13 @@ const Register = () => {
                     value={password}
                     onChange={onChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
                     placeholder="Min 8+ characters"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2  text-muted hover: text-secondary focus:outline-none"
                   >
                     {showPassword ? (
                       <svg
@@ -270,7 +270,7 @@ const Register = () => {
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium  text-secondary mb-2"
                 >
                   Confirm Password *
                 </label>
@@ -282,13 +282,13 @@ const Register = () => {
                     value={confirmPassword}
                     onChange={onChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
                     placeholder="Re-enter password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2  text-muted hover: text-secondary focus:outline-none"
                   >
                     {showConfirmPassword ? (
                       <svg
@@ -334,7 +334,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2  focus:ring-primaryfocus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -367,7 +367,7 @@ const Register = () => {
 
           {/* Sign In Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className=" text-secondary text-sm">
               Already have an account?{" "}
               <Link
                 to="/login"
@@ -380,7 +380,7 @@ const Register = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-500 text-sm mt-8">
+        <p className="text-center  text-muted text-sm mt-8">
           By creating an account, you agree to our Terms of Service
         </p>
       </div>

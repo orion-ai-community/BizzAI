@@ -104,30 +104,30 @@ const PurchaseReturn = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Debit Note Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Debit Note Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormInput label="Debit Note Number" value={formData.debitNoteNo} onChange={(e) => setFormData({ ...formData, debitNoteNo: e.target.value })} required />
                             <FormInput label="Debit Note Date" type="date" value={formData.debitNoteDate} onChange={(e) => setFormData({ ...formData, debitNoteDate: e.target.value })} required />
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Original Purchase</h2>
-                        <button className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Original Purchase</h2>
+                        <button className="w-full px-4 py-3 border-2 border-dashed border-defaultrounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600">
                             Click to select original purchase
                         </button>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Supplier</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Supplier</h2>
                         {formData.supplier ? (
                             <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">{formData.supplier.businessName}</p>
-                                        <p className="text-sm text-gray-600">{formData.supplier.contactPersonName}</p>
-                                        <p className="text-sm text-gray-600">{formData.supplier.contactNo}</p>
+                                        <p className="font-medium text-main">{formData.supplier.businessName}</p>
+                                        <p className="text-sm text-secondary">{formData.supplier.contactPersonName}</p>
+                                        <p className="text-sm text-secondary">{formData.supplier.contactNo}</p>
                                     </div>
                                     <button
                                         onClick={() => setFormData({ ...formData, supplier: null })}
@@ -142,28 +142,28 @@ const PurchaseReturn = () => {
                         ) : (
                             <button
                                 onClick={() => setShowSupplierModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600"
+                                className="w-full px-4 py-3 border-2 border-dashed border-defaultrounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600"
                             >
                                 Click to select supplier
                             </button>
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Return Items</h2>
+                            <h2 className="text-lg font-bold text-main">Return Items</h2>
                             <button onClick={addItem} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Item</button>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-surface border-b">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tax %</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Qty</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Rate</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Tax %</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Amount</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Reason</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -195,26 +195,26 @@ const PurchaseReturn = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Refund Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Refund Details</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Refund Method</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Refund Method</label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {['credit', 'cash', 'bank_transfer', 'adjust_next_bill'].map(method => (
                                         <button
                                             key={method}
                                             onClick={() => setFormData({ ...formData, refundMethod: method })}
-                                            className={`p-3 border-2 rounded-lg transition ${formData.refundMethod === method ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300'}`}
+                                            className={`p-3 border-2 rounded-lg transition ${formData.refundMethod === method ? 'border-indigo-600 bg-indigo-50' : 'border-defaulthover:border-indigo-300'}`}
                                         >
-                                            <div className="text-sm font-medium text-gray-900 capitalize">{method.replace('_', ' ')}</div>
+                                            <div className="text-sm font-medium text-main capitalize">{method.replace('_', ' ')}</div>
                                         </button>
                                     ))}
                                 </div>
                             </div>
                             {formData.refundMethod === 'bank_transfer' && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Select Bank Account</label>
                                     <select
                                         value={formData.bankAccount}
                                         onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
@@ -230,7 +230,7 @@ const PurchaseReturn = () => {
                                 </div>
                             )}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Notes</label>
                                 <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Add notes..." />
                             </div>
                         </div>
@@ -238,19 +238,19 @@ const PurchaseReturn = () => {
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Return Summary</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Return Summary</h2>
                         <div className="space-y-3 mb-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Subtotal:</span>
+                                <span className="text-secondary">Subtotal:</span>
                                 <span className="font-medium">₹{calculateSubtotal().toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax:</span>
+                                <span className="text-secondary">Tax:</span>
                                 <span className="font-medium">₹{calculateTax().toFixed(2)}</span>
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-600 mb-1">Discount:</label>
+                                <label className="block text-sm text-secondary mb-1">Discount:</label>
                                 <input type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
                             </div>
                         </div>
@@ -268,7 +268,7 @@ const PurchaseReturn = () => {
                             >
                                 {loading ? 'Saving...' : 'Save Debit Note'}
                             </button>
-                            <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Print Debit Note</button>
+                            <button className="w-full py-3 border border-defaulttext-secondary rounded-lg hover:bg-surface">Print Debit Note</button>
                         </div>
                     </div>
                 </div>

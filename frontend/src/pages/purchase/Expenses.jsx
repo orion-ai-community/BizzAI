@@ -126,14 +126,14 @@ const Expenses = () => {
             </div>
 
             {showAddExpense && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Add New Expense</h2>
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold text-main mb-4">Add New Expense</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <FormInput label="Expense Number" value={formData.expenseNo} onChange={(e) => setFormData({ ...formData, expenseNo: e.target.value })} required />
                             <FormInput label="Date" type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Category <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Category <span className="text-red-500">*</span></label>
                                 <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 border rounded-lg" required>
                                     <option value="">Select category</option>
                                     {expenseCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -141,7 +141,7 @@ const Expenses = () => {
                             </div>
                             <FormInput label="Amount" type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })} required />
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Payment Method</label>
                                 <select value={formData.paymentMethod} onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })} className="w-full px-4 py-2 border rounded-lg">
                                     <option value="cash">Cash</option>
                                     <option value="upi">UPI</option>
@@ -149,22 +149,22 @@ const Expenses = () => {
                                     <option value="cheque">Cheque</option>
                                     <option value="bank_transfer">Bank Transfer</option>
                                 </select>
-                             </div>
-                             {formData.paymentMethod === 'bank_transfer' && (
-                                 <div>
-                                     <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
-                                     <select value={formData.bankAccount} onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })} className="w-full px-4 py-2 border rounded-lg" required>
-                                         <option value="">Choose account</option>
-                                         {accounts.map(account => (
-                                             <option key={account._id} value={account._id}>
-                                                 {account.bankName} - {account.accountType} (₹{account.currentBalance})
-                                             </option>
-                                         ))}
-                                     </select>
-                                 </div>
-                             )}
-                             <div className="md:col-span-2">
-                                 <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            </div>
+                            {formData.paymentMethod === 'bank_transfer' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Select Bank Account</label>
+                                    <select value={formData.bankAccount} onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })} className="w-full px-4 py-2 border rounded-lg" required>
+                                        <option value="">Choose account</option>
+                                        {accounts.map(account => (
+                                            <option key={account._id} value={account._id}>
+                                                {account.bankName} - {account.accountType} (₹{account.currentBalance})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-secondary mb-2">Description</label>
                                 <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows="2" className="w-full px-4 py-2 border rounded-lg" placeholder="Add description..." />
                             </div>
                         </div>
@@ -172,14 +172,14 @@ const Expenses = () => {
                             <button type="submit" disabled={isLoading} className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
                                 {isLoading ? 'Saving...' : 'Save Expense'}
                             </button>
-                            <button type="button" onClick={() => setShowAddExpense(false)} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                            <button type="button" onClick={() => setShowAddExpense(false)} className="px-6 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50">Cancel</button>
                         </div>
                     </form>
                 </div>
             )}
 
             {/* Search Bar */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
                 <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                     <div className="w-full sm:w-96">
                         <div className="relative">
@@ -188,14 +188,14 @@ const Expenses = () => {
                                 placeholder="Search by expense number, category, description, payment method, or amount..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             />
-                            <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="absolute left-3 top-2.5 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-muted">
                         {filteredExpenses.length} of {expenses.length} expenses
                     </div>
                 </div>
@@ -214,7 +214,7 @@ const Expenses = () => {
                         <div className="flex space-x-4">
                             <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                             >
                                 Cancel
                             </button>

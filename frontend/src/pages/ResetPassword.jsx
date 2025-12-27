@@ -71,11 +71,11 @@ const ResetPassword = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Reset Password</h1>
-          <p className="text-gray-600 mt-2">Set a new password for {email || 'your account'}</p>
+          <h1 className="text-3xl font-bold  text-main">Reset Password</h1>
+          <p className=" text-secondary mt-2">Set a new password for {email || 'your account'}</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-card rounded-2xl shadow-xl p-8">
           {(validationError || isError || isSuccess) && (
             <div className={`mb-6 p-4 border rounded-lg ${validationError ? 'bg-yellow-50 border-yellow-200' : isSuccess ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
               <p className={`${validationError ? 'text-yellow-700' : isSuccess ? 'text-green-700' : 'text-red-600'} text-sm`}>
@@ -86,7 +86,7 @@ const ResetPassword = () => {
 
           <form onSubmit={onSubmit} className="space-y-6">
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+              <label htmlFor="password" className="block text-sm font-medium  text-secondary mb-2">New Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -95,13 +95,13 @@ const ResetPassword = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   placeholder="Min 8+ characters"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover: text-secondary focus:outline-none"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
@@ -119,7 +119,7 @@ const ResetPassword = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium  text-secondary mb-2">Confirm Password</label>
               <div className="relative">
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -128,13 +128,13 @@ const ResetPassword = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   placeholder="Re-enter password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-secondary focus:outline-none"
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
                   {showConfirmPassword ? (
@@ -157,7 +157,7 @@ const ResetPassword = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className=" text-secondary text-sm">
               Back to{' '}<Link to="/login" className="text-indigo-600 font-medium hover:text-indigo-700 transition">Sign In</Link>
             </p>
           </div>

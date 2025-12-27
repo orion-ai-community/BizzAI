@@ -146,8 +146,8 @@ const LoanAccounts = () => {
 
             {/* Add Loan Form */}
             {showAddLoan && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Add Loan Account</h2>
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold  text-main mb-4">Add Loan Account</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <FormInput
                             label="Lender/Borrower Name"
@@ -157,7 +157,7 @@ const LoanAccounts = () => {
                             required
                         />
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Loan Type</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Loan Type</label>
                             <select
                                 value={formData.loanType}
                                 onChange={(e) => setFormData({ ...formData, loanType: e.target.value })}
@@ -212,7 +212,7 @@ const LoanAccounts = () => {
                             placeholder="Purpose of loan"
                         />
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Notes</label>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -228,7 +228,7 @@ const LoanAccounts = () => {
                         </button>
                         <button
                             onClick={() => setShowAddLoan(false)}
-                            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                            className="px-6 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface"
                         >
                             Cancel
                         </button>
@@ -238,20 +238,20 @@ const LoanAccounts = () => {
 
             {/* Pay EMI Form */}
             {showPayEMI && selectedLoan && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">Pay EMI</h2>
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold  text-main mb-4">Pay EMI</h2>
                     <div className="p-4 bg-indigo-50 rounded-lg mb-4">
-                        <p className="text-sm text-gray-600 mb-1">Loan Account</p>
-                        <p className="font-bold text-gray-900">{selectedLoan.lenderName}</p>
+                        <p className="text-sm text-secondary mb-1">Loan Account</p>
+                        <p className="font-bold  text-main">{selectedLoan.lenderName}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">EMI Amount</p>
+                            <p className="text-sm text-secondary mb-1">EMI Amount</p>
                             <p className="text-2xl font-bold text-indigo-600">₹{selectedLoan.emiAmount.toLocaleString()}</p>
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600 mb-1">Due Date</p>
-                            <p className="font-bold text-gray-900">{selectedLoan.nextEMIDate}</p>
+                            <p className="text-sm text-secondary mb-1">Due Date</p>
+                            <p className="font-bold  text-main">{selectedLoan.nextEMIDate}</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -261,7 +261,7 @@ const LoanAccounts = () => {
                             value={new Date().toISOString().split('T')[0]}
                         />
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Payment Method</label>
                             <select className="w-full px-4 py-2 border rounded-lg">
                                 <option value="cash">Cash</option>
                                 <option value="bank_transfer">Bank Transfer</option>
@@ -270,7 +270,7 @@ const LoanAccounts = () => {
                             </select>
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Reference</label>
+                            <label className="block text-sm font-medium text-secondary mb-2">Reference</label>
                             <input
                                 type="text"
                                 className="w-full px-4 py-2 border rounded-lg"
@@ -284,7 +284,7 @@ const LoanAccounts = () => {
                         </button>
                         <button
                             onClick={() => setShowPayEMI(false)}
-                            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                            className="px-6 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface"
                         >
                             Cancel
                         </button>
@@ -294,34 +294,34 @@ const LoanAccounts = () => {
 
             {/* EMI Schedule */}
             {showEMISchedule && selectedLoan && (
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-bold text-gray-900 mb-4">EMI Schedule - {selectedLoan.lenderName}</h2>
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
+                    <h2 className="text-lg font-bold  text-main mb-4">EMI Schedule - {selectedLoan.lenderName}</h2>
                     <div className="mb-4 p-4 bg-indigo-50 rounded-lg">
                         <div className="grid grid-cols-3 gap-4 text-sm">
                             <div>
-                                <p className="text-gray-600">Loan Amount</p>
+                                <p className="text-secondary">Loan Amount</p>
                                 <p className="font-bold">₹{selectedLoan.loanAmount.toLocaleString()}</p>
                             </div>
                             <div>
-                                <p className="text-gray-600">Interest Rate</p>
+                                <p className="text-secondary">Interest Rate</p>
                                 <p className="font-bold">{selectedLoan.interestRate}% p.a.</p>
                             </div>
                             <div>
-                                <p className="text-gray-600">EMI Amount</p>
+                                <p className="text-secondary">EMI Amount</p>
                                 <p className="font-bold">₹{selectedLoan.emiAmount.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-gray-50 border-b">
+                            <thead className="bg-surface border-b">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">EMI No</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">EMI Amount</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Principal</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Interest</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium  text-muted uppercase">EMI No</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium  text-muted uppercase">EMI Amount</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium  text-muted uppercase">Principal</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium  text-muted uppercase">Interest</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium  text-muted uppercase">Balance</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium  text-muted uppercase">Status</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -345,7 +345,7 @@ const LoanAccounts = () => {
                     </div>
                     <button
                         onClick={() => setShowEMISchedule(false)}
-                        className="mt-4 px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                        className="mt-4 px-6 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface"
                     >
                         Close
                     </button>
@@ -355,11 +355,11 @@ const LoanAccounts = () => {
             {/* Loan Accounts List */}
             <div className="space-y-4">
                 {loans.map((loan) => (
-                    <div key={loan.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition">
+                    <div key={loan.id} className="bg-card rounded-xl shadow-sm p-6 hover:shadow-md transition">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
                                 <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="text-lg font-bold text-gray-900">{loan.lenderName}</h3>
+                                    <h3 className="text-lg font-bold  text-main">{loan.lenderName}</h3>
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(loan.status)}`}>
                                         {loan.status}
                                     </span>
@@ -367,44 +367,44 @@ const LoanAccounts = () => {
                                         {loan.loanType}
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-600">Started on {loan.startDate}</p>
+                                <p className="text-sm text-secondary">Started on {loan.startDate}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-sm text-gray-600 mb-1">Balance Remaining</p>
+                                <p className="text-sm text-secondary mb-1">Balance Remaining</p>
                                 <p className="text-2xl font-bold text-indigo-600">₹{loan.balanceRemaining.toLocaleString()}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                             <div>
-                                <p className="text-xs text-gray-600 mb-1">Loan Amount</p>
-                                <p className="font-bold text-gray-900">₹{loan.loanAmount.toLocaleString()}</p>
+                                <p className="text-xs text-secondary mb-1">Loan Amount</p>
+                                <p className="font-bold  text-main">₹{loan.loanAmount.toLocaleString()}</p>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-600 mb-1">Interest Rate</p>
-                                <p className="font-bold text-gray-900">{loan.interestRate}% p.a.</p>
+                                <p className="text-xs text-secondary mb-1">Interest Rate</p>
+                                <p className="font-bold  text-main">{loan.interestRate}% p.a.</p>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-600 mb-1">EMI Amount</p>
-                                <p className="font-bold text-gray-900">₹{loan.emiAmount.toLocaleString()}</p>
+                                <p className="text-xs text-secondary mb-1">EMI Amount</p>
+                                <p className="font-bold  text-main">₹{loan.emiAmount.toLocaleString()}</p>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-600 mb-1">Tenure</p>
-                                <p className="font-bold text-gray-900">{loan.tenure} months</p>
+                                <p className="text-xs text-secondary mb-1">Tenure</p>
+                                <p className="font-bold  text-main">{loan.tenure} months</p>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-600 mb-1">EMIs Paid</p>
-                                <p className="font-bold text-gray-900">{loan.paidEMIs} / {loan.tenure}</p>
+                                <p className="text-xs text-secondary mb-1">EMIs Paid</p>
+                                <p className="font-bold  text-main">{loan.paidEMIs} / {loan.tenure}</p>
                             </div>
                         </div>
 
                         {/* Progress Bar */}
                         <div className="mb-4">
-                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                            <div className="flex justify-between text-xs text-secondary mb-1">
                                 <span>Progress</span>
                                 <span>{Math.round((loan.paidEMIs / loan.tenure) * 100)}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="w-full bg-surface rounded-full h-2">
                                 <div
                                     className="bg-indigo-600 h-2 rounded-full transition-all"
                                     style={{ width: `${(loan.paidEMIs / loan.tenure) * 100}%` }}
@@ -414,14 +414,14 @@ const LoanAccounts = () => {
 
                         <div className="flex items-center justify-between pt-4 border-t">
                             {loan.nextEMIDate && (
-                                <p className="text-sm text-gray-600">
-                                    Next EMI: <span className="font-medium text-gray-900">{loan.nextEMIDate}</span>
+                                <p className="text-sm text-secondary">
+                                    Next EMI: <span className="font-medium  text-main">{loan.nextEMIDate}</span>
                                 </p>
                             )}
                             <div className="flex space-x-3">
                                 <button
                                     onClick={() => { setSelectedLoan(loan); setShowEMISchedule(true); }}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+                                    className="px-4 py-2 border border-defalut text-secondary rounded-lg hover:bg-surface transition text-sm font-medium"
                                 >
                                     View Schedule
                                 </button>

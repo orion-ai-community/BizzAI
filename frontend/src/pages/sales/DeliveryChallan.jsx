@@ -53,8 +53,8 @@ const DeliveryChallan = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Challan Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Challan Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormInput label="Challan Number" value={formData.challanNo} onChange={(e) => setFormData({ ...formData, challanNo: e.target.value })} required />
                             <FormInput label="Challan Date" type="date" value={formData.challanDate} onChange={(e) => setFormData({ ...formData, challanDate: e.target.value })} required />
@@ -62,18 +62,18 @@ const DeliveryChallan = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Customer</h2>
+                            <h2 className="text-lg font-bold text-main">Customer</h2>
                             {/* Add Customer button removed */}
                         </div>
                         {formData.customer ? (
                             <div className="p-4 bg-indigo-50 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">{formData.customer.name}</p>
-                                        <p className="text-sm text-gray-600">{formData.customer.phone}</p>
-                                        <p className="text-sm text-gray-600">{formData.customer.email}</p>
+                                        <p className="font-medium text-main">{formData.customer.name}</p>
+                                        <p className="text-sm text-secondary">{formData.customer.phone}</p>
+                                        <p className="text-sm text-secondary">{formData.customer.email}</p>
                                     </div>
                                     <button
                                         onClick={() => setFormData({ ...formData, customer: null })}
@@ -86,27 +86,27 @@ const DeliveryChallan = () => {
                         ) : (
                             <button
                                 onClick={() => setShowCustomerModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
+                                className="w-full px-4 py-3 border-2 border-dashed border-default rounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600 transition flex flex-col items-center justify-center gap-2"
                             >
                                 <span className="font-medium">Click to select customer</span>
-                                <span className="text-sm text-gray-400">Search by name, phone or email</span>
+                                <span className="text-sm text-muted">Search by name, phone or email</span>
                             </button>
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Items</h2>
+                            <h2 className="text-lg font-bold text-main">Items</h2>
                             <button onClick={addItem} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Item</button>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-surface border-b">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item Name</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item Name</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Quantity</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Unit</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Description</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -137,11 +137,11 @@ const DeliveryChallan = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Transport Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Transport Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Transport Mode</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Transport Mode</label>
                                 <select value={formData.transportMode} onChange={(e) => setFormData({ ...formData, transportMode: e.target.value })} className="w-full px-4 py-2 border rounded-lg">
                                     <option value="road">Road</option>
                                     <option value="rail">Rail</option>
@@ -155,15 +155,15 @@ const DeliveryChallan = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Notes</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
                         <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Add delivery notes..." />
                     </div>
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Delivery Summary</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Delivery Summary</h2>
                         <div className="space-y-4 mb-6">
                             <div className="p-4 bg-blue-50 rounded-lg">
                                 <div className="flex items-center space-x-2 mb-2">
@@ -187,7 +187,7 @@ const DeliveryChallan = () => {
                         <div className="space-y-3">
                             <button className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">Convert to Invoice</button>
                             <button className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">Save Challan</button>
-                            <button className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Print Challan</button>
+                            <button className="w-full py-3 border border-default text-secondary rounded-lg hover:bg-surface">Print Challan</button>
                         </div>
                     </div>
                 </div>

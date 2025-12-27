@@ -57,7 +57,7 @@ const AddSupplier = () => {
         <div className="mb-8">
           <button
             onClick={() => navigate('/suppliers')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-secondary hover:text-main mb-4"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -74,8 +74,8 @@ const AddSupplier = () => {
             </svg>
             Back to Suppliers
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Supplier</h1>
-          <p className="text-gray-600">Create a new supplier profile</p>
+          <h1 className="text-3xl font-bold text-main mb-2">Add New Supplier</h1>
+          <p className="text-secondary">Create a new supplier profile</p>
         </div>
 
         {/* Error Message */}
@@ -86,13 +86,13 @@ const AddSupplier = () => {
         )}
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-card rounded-xl shadow-sm p-8">
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Business Name Input */}
             <div>
               <label
                 htmlFor="businessName"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Business Name <span className="text-red-500">*</span>
               </label>
@@ -103,7 +103,7 @@ const AddSupplier = () => {
                 value={businessName}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="ABC Suppliers Pvt Ltd"
               />
             </div>
@@ -112,7 +112,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="contactPersonName"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Contact Person Name <span className="text-red-500">*</span>
               </label>
@@ -123,7 +123,7 @@ const AddSupplier = () => {
                 value={contactPersonName}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="John Doe"
               />
             </div>
@@ -132,7 +132,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="contactNo"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Contact Number <span className="text-red-500">*</span>
               </label>
@@ -146,7 +146,7 @@ const AddSupplier = () => {
                 pattern="[0-9]{10}"
                 maxLength={10}
                 title="Please enter a valid 10-digit mobile number"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="+91 9876543210"
               />
             </div>
@@ -155,7 +155,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Email Address <span className="text-red-500">*</span>
               </label>
@@ -166,7 +166,7 @@ const AddSupplier = () => {
                 value={email}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="supplier@example.com"
               />
             </div>
@@ -175,7 +175,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="physicalAddress"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Physical Address <span className="text-red-500">*</span>
               </label>
@@ -186,7 +186,7 @@ const AddSupplier = () => {
                 onChange={onChange}
                 required
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Street address, City, State, PIN"
               />
             </div>
@@ -195,7 +195,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="gstNo"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 GST Number <span className="text-red-500">*</span>
               </label>
@@ -218,7 +218,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="supplierType"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Supplier Type <span className="text-red-500">*</span>
               </label>
@@ -228,7 +228,7 @@ const AddSupplier = () => {
                 value={supplierType}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="manufacturer">Manufacturer</option>
                 <option value="wholesaler">Wholesaler</option>
@@ -240,7 +240,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="openingBalance"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Opening Balance
               </label>
@@ -252,7 +252,7 @@ const AddSupplier = () => {
                 onChange={onChange}
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="0.00"
               />
             </div>
@@ -261,7 +261,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="balanceType"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Balance Type
               </label>
@@ -270,7 +270,7 @@ const AddSupplier = () => {
                 name="balanceType"
                 value={balanceType}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="payable">Payable</option>
                 <option value="receivable">Receivable</option>
@@ -281,7 +281,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="creditPeriod"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Credit Period (in days)
               </label>
@@ -292,7 +292,7 @@ const AddSupplier = () => {
                 value={creditPeriod}
                 onChange={onChange}
                 min="0"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="30"
               />
             </div>
@@ -301,7 +301,7 @@ const AddSupplier = () => {
             <div>
               <label
                 htmlFor="status"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Status <span className="text-red-500">*</span>
               </label>
@@ -311,7 +311,7 @@ const AddSupplier = () => {
                 value={status}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -323,14 +323,14 @@ const AddSupplier = () => {
               <button
                 type="button"
                 onClick={() => navigate('/suppliers')}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+                className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center">

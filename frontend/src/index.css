@@ -6,18 +6,39 @@
 
 /* Custom animations */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-down {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes bounce-arrow {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(10px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(10px);
+  }
 }
 
 .animate-fade-in {
@@ -123,5 +144,71 @@
 
   html.dark {
     color-scheme: dark;
+  }
+}
+
+@layer components {
+  .bg-app {
+    background-color: rgb(var(--color-bg));
+  }
+
+  .bg-card {
+    background-color: rgb(var(--color-card));
+  }
+
+  .bg-surface {
+    background-color: rgb(var(--color-table-header));
+  }
+
+  .bg-input {
+    background-color: rgb(var(--color-input));
+  }
+
+  .text-main {
+    color: rgb(var(--color-text));
+  }
+
+  .text-secondary {
+    color: rgb(var(--color-text-secondary));
+  }
+
+  .text-muted {
+    color: rgb(var(--color-text-muted));
+  }
+
+  .placeholder-muted::placeholder {
+    color: rgb(var(--color-placeholder));
+  }
+
+  .border-default {
+    border-color: rgb(var(--color-border));
+  }
+
+  .border-light {
+    border-color: rgb(var(--color-border-light));
+  }
+
+  .divide-border> :not([hidden])~ :not([hidden]) {
+    border-color: rgb(var(--color-border));
+  }
+
+  .bg-primary {
+    background-color: rgb(var(--color-primary));
+  }
+
+  .bg-primary-hover {
+    background-color: rgb(var(--color-primary-hover));
+  }
+
+  .bg-primary-soft {
+    background-color: rgb(var(--color-primary) / 0.1);
+  }
+
+  .text-primary {
+    color: rgb(var(--color-primary));
+  }
+
+  .hover\:bg-primary-hover:hover {
+    background-color: rgb(var(--color-primary-hover));
   }
 }

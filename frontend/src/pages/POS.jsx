@@ -377,7 +377,7 @@ const POS = () => {
     // Create new tab with hold order data - restore ALL properties
     const newTabId = Date.now(); // Use timestamp for unique ID
     const nextTabNum = getNextTabNumber(tabs);
-    
+
     const newTab = {
       id: newTabId,
       name: `Tab ${nextTabNum}`,
@@ -399,7 +399,7 @@ const POS = () => {
     // Remove from hold orders
     setHoldOrders(holdOrders.filter(order => order.id !== holdOrder.id));
     setShowHoldOrders(false);
-    
+
     // Show success message to user
     toast.success('Order retrieved successfully!');
   };
@@ -616,8 +616,8 @@ const POS = () => {
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Point of Sale</h1>
-            <p className="text-gray-600">Multi-tab billing system with advanced features</p>
+            <h1 className="text-3xl font-bold text-main mb-2">Point of Sale</h1>
+            <p className="text-secondary">Multi-tab billing system with advanced features</p>
           </div>
           <div className="flex space-x-2">
             <button
@@ -654,7 +654,7 @@ const POS = () => {
         )}
 
         {/* Tab System */}
-        <div className="mb-6 bg-white rounded-xl shadow-sm">
+        <div className="mb-6 bg-card rounded-xl shadow-sm">
           <div className="flex items-center space-x-1 p-2 border-b overflow-x-auto">
             {tabs.map((tab) => (
               <div
@@ -665,7 +665,7 @@ const POS = () => {
                 onDragEnd={handleDragEnd}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-grab transition select-none ${activeTabId === tab.id
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 text-secondary hover:bg-gray-200'
                   } ${draggedTabId === tab.id ? 'opacity-50' : ''}`}
               >
                 <button
@@ -688,7 +688,7 @@ const POS = () => {
                     }}
                     className={`ml-1 rounded-full p-0.5 transition-colors ${activeTabId === tab.id
                       ? 'hover:bg-indigo-500 text-white/70 hover:text-white'
-                      : 'hover:bg-gray-300 text-gray-500 hover:text-gray-700'
+                      : 'hover:bg-gray-300 text-secondary hover:text-secondary'
                       }`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -711,14 +711,14 @@ const POS = () => {
           {/* Left Side - Products */}
           <div className="lg:col-span-2 space-y-4">
             {/* Customer Selection */}
-            <div className="bg-white rounded-xl shadow-sm p-4">
+            <div className="bg-card rounded-xl shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-secondary">
                   Customer
                 </label>
                 <button
                   onClick={() => setShowAddCustomer(true)}
-                  className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                  className="text-primary hover:text-primary-hover text-sm font-medium"
                 >
                   + Add New Customer
                 </button>
@@ -726,10 +726,10 @@ const POS = () => {
 
               {activeTab.customer ? (
                 <div>
-                  <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-surface rounded-lg">
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{activeTab.customer.name}</div>
-                      <div className="text-sm text-gray-600">{activeTab.customer.phone}</div>
+                      <div className="font-medium text-main">{activeTab.customer.name}</div>
+                      <div className="text-sm text-secondary">{activeTab.customer.phone}</div>
                       {getAvailableCredit() > 0 && (
                         <div className="mt-1 flex items-center space-x-1">
                           <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -754,7 +754,7 @@ const POS = () => {
               ) : (
                 <button
                   onClick={() => setShowCustomerSelect(true)}
-                  className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600 transition"
+                  className="w-full px-4 py-3 border-2 border-dashed border-default rounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600 transition"
                 >
                   Walk-in Customer (Click to select)
                 </button>
@@ -796,10 +796,10 @@ const POS = () => {
             </div >
 
             {/* Product Search */}
-            < div className="bg-white rounded-xl shadow-sm p-4" >
+            < div className="bg-card rounded-xl shadow-sm p-4" >
               {/* Barcode Scanner Input */}
               < div className="mb-4" >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-secondary mb-2">
                   Barcode Scanner
                 </label>
                 <input
@@ -808,7 +808,7 @@ const POS = () => {
                   onChange={(e) => setBarcodeInput(e.target.value)}
                   onKeyPress={handleBarcodeInput}
                   placeholder="Scan barcode or type SKU and press Enter..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div >
 
@@ -818,9 +818,9 @@ const POS = () => {
                   placeholder="Search products by name or SKU..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
-                <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-3 top-2.5 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -833,14 +833,14 @@ const POS = () => {
                     onClick={() => addToCart(item)}
                     disabled={item.stockQty === 0}
                     className={`p-4 border-2 rounded-lg text-left transition ${item.stockQty === 0
-                      ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-50'
-                      : 'border-gray-200 hover:border-indigo-500 hover:shadow-md'
+                      ? 'border-default bg-surface cursor-not-allowed opacity-50'
+                      : 'border-default hover:border-primary hover:shadow-md'
                       }`}
                   >
-                    <div className="font-medium text-gray-900 mb-1 truncate">{item.name}</div>
-                    <div className="text-lg font-bold text-indigo-600">₹{item.sellingPrice}</div>
-                    <div className="text-xs text-gray-500 mt-1">Stock: {item.stockQty} {item.unit}</div>
-                    {item.sku && <div className="text-xs text-gray-400 mt-1">SKU: {item.sku}</div>}
+                    <div className="font-medium text-main mb-1 truncate">{item.name}</div>
+                    <div className="text-lg font-bold text-primary">₹{item.sellingPrice}</div>
+                    <div className="text-xs text-muted mt-1">Stock: {item.stockQty} {item.unit}</div>
+                    {item.sku && <div className="text-xs text-muted mt-1">SKU: {item.sku}</div>}
                   </button>
                 ))}
               </div>
@@ -849,31 +849,31 @@ const POS = () => {
 
           {/* Right Side - Cart & Checkout */}
           < div className="lg:col-span-1" >
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Cart</h2>
+            <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+              <h2 className="text-xl font-bold text-main mb-4">Cart</h2>
 
               {/* Cart Items */}
               <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                 {activeTab.cart.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Cart is empty</p>
+                  <p className="text-secondary text-center py-8">Cart is empty</p>
                 ) : (
                   activeTab.cart.map((item) => (
-                    <div key={item.item} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={item.item} className="flex items-center justify-between p-3 bg-surface rounded-lg">
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 text-sm">{item.name}</div>
-                        <div className="text-xs text-gray-500">₹{item.price} each</div>
+                        <div className="font-medium text-main text-sm">{item.name}</div>
+                        <div className="text-xs text-secondary">₹{item.price} each</div>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => updateQuantity(item.item, item.quantity - 1)}
-                          className="w-7 h-7 bg-gray-200 rounded hover:bg-gray-300"
+                          className="w-7 h-7 bg-surface rounded hover:bg-gray-300"
                         >
                           -
                         </button>
                         <span className="w-8 text-center font-medium">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.item, item.quantity + 1)}
-                          className="w-7 h-7 bg-gray-200 rounded hover:bg-gray-300"
+                          className="w-7 h-7 bg-surface rounded hover:bg-gray-300"
                         >
                           +
                         </button>
@@ -886,7 +886,7 @@ const POS = () => {
                           </svg>
                         </button>
                       </div>
-                      <div className="ml-3 font-bold text-gray-900 w-20 text-right">₹{item.total.toFixed(2)}</div>
+                      <div className="ml-3 font-bold text-main w-20 text-right">₹{item.total.toFixed(2)}</div>
                     </div>
                   ))
                 )}
@@ -894,14 +894,14 @@ const POS = () => {
 
               {/* Discount */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Discount (₹)</label>
+                <label className="block text-sm font-medium text-secondary mb-2">Discount (₹)</label>
                 <input
                   type="number"
                   value={activeTab.discount}
                   onChange={(e) => updateTabData({ discount: parseFloat(e.target.value) || 0 })}
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
@@ -914,9 +914,9 @@ const POS = () => {
                       type="checkbox"
                       checked={activeTab.applyCreditEnabled}
                       onChange={(e) => updateTabData({ applyCreditEnabled: e.target.checked })}
-                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      className="w-4 h-4 text-green-600 border-default rounded focus:ring-green-500"
                     />
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-secondary">
                       Apply Customer Credit (₹{getAvailableCredit().toFixed(2)} available)
                     </span>
                   </label>
@@ -929,18 +929,18 @@ const POS = () => {
               )}
 
               {/* Totals */}
-              <div className="border-t border-gray-200 pt-4 mb-4 space-y-2">
+              <div className="border-t border-default pt-4 mb-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="text-secondary">Subtotal:</span>
                   <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Discount:</span>
+                  <span className="text-secondary">Discount:</span>
                   <span className="font-medium">-₹{activeTab.discount.toFixed(2)}</span>
                 </div>
                 {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Credit Applied:</span>
+                    <span className="text-secondary">Credit Applied:</span>
                     <span className="font-medium text-green-600">-₹{getCreditApplied().toFixed(2)}</span>
                   </div>
                 )}
@@ -958,11 +958,11 @@ const POS = () => {
 
               {/* Payment Method */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                <label className="block text-sm font-medium text-secondary mb-2">Payment Method</label>
                 <select
                   value={activeTab.paymentMethod}
                   onChange={(e) => updateTabData({ paymentMethod: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value="cash">Cash</option>
                   <option value="upi">UPI</option>
@@ -974,14 +974,14 @@ const POS = () => {
 
               {/* Paid Amount */}
               < div className="mb-4" >
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount Paid (₹)</label>
+                <label className="block text-sm font-medium text-secondary mb-2">Amount Paid (₹)</label>
                 <input
                   type="number"
                   value={activeTab.paidAmount}
                   onChange={(e) => updateTabData({ paidAmount: e.target.value })}
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="0.00"
                 />
               </div >
@@ -991,7 +991,7 @@ const POS = () => {
                 activeTab.paidAmount && (
                   <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-secondary">
                         {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
                       </span>
                       <span className={`text-xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1005,11 +1005,11 @@ const POS = () => {
               {/* Bank Account Selection */}
               {activeTab.paymentMethod === 'bank_transfer' && (
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
+                  <label className="block text-sm font-medium text-secondary mb-2">Select Bank Account</label>
                   <select
                     value={activeTab.bankAccount}
                     onChange={(e) => updateTabData({ bankAccount: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
                   >
                     <option value="">Choose account</option>
@@ -1024,14 +1024,14 @@ const POS = () => {
 
               {/* Paid Amount */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount Paid (₹)</label>
+                <label className="block text-sm font-medium text-secondary mb-2">Amount Paid (₹)</label>
                 <input
                   type="number"
                   value={activeTab.paidAmount}
                   onChange={(e) => updateTabData({ paidAmount: e.target.value })}
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
@@ -1041,7 +1041,7 @@ const POS = () => {
                 activeTab.paidAmount && (
                   <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
                     <div className="flex justify-between items-center">
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-secondary">
                         {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
                       </span>
                       <span className={`text-xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -1052,7 +1052,7 @@ const POS = () => {
                     {/* Change Returned Input - only show if customer paid MORE than total */}
                     {balance > 0 && (
                       <div className="mt-3 pt-3 border-t border-green-200">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-secondary mb-2">
                           Change Returned:
                         </label>
                         <input
@@ -1062,7 +1062,7 @@ const POS = () => {
                           min="0"
                           max={balance}
                           step="0.01"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                           placeholder="Enter change returned to customer"
                         />
 
@@ -1139,7 +1139,7 @@ const POS = () => {
                 <button
                   onClick={printReceipt}
                   disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-gray-600 text-gray-600 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm"
+                  className="py-2 border border-gray-600 text-secondary rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm"
                 >
                   Print
                 </button>
@@ -1150,7 +1150,7 @@ const POS = () => {
                 activeTab.cart.length > 0 && (
                   <button
                     onClick={() => updateTabData({ cart: [] })}
-                    className="w-full mt-2 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                    className="w-full mt-2 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                   >
                     Clear Cart
                   </button>
@@ -1163,46 +1163,46 @@ const POS = () => {
         {/* Add Customer Modal */}
         {
           showAddCustomer && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Customer</h3>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-gray-500 z-50">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-bold text-main mb-4">Add New Customer</h3>
                 <form onSubmit={handleAddCustomer} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                    <label className="block text-sm font-medium text-secondary mb-1">Name *</label>
                     <input
                       type="text"
                       value={newCustomer.name}
                       onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                    <label className="block text-sm font-medium text-secondary mb-1">Phone *</label>
                     <input
                       type="tel"
                       value={newCustomer.phone}
                       onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-secondary mb-1">Email</label>
                     <input
                       type="email"
                       value={newCustomer.email}
                       onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <label className="block text-sm font-medium text-secondary mb-1">Address</label>
                     <textarea
                       value={newCustomer.address}
                       onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div className="flex space-x-4 pt-2">
@@ -1212,7 +1212,7 @@ const POS = () => {
                         setShowAddCustomer(false);
                         setNewCustomer({ name: '', phone: '', email: '', address: '' });
                       }}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                      className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                     >
                       Cancel
                     </button>
@@ -1232,9 +1232,9 @@ const POS = () => {
         {/* Customer Select Modal */}
         {
           showCustomerSelect && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Select Customer</h3>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-white z-50">
+              <div className="bg-card rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                <h3 className="text-lg font-bold text-main mb-4">Select Customer</h3>
 
                 {/* Customer Search */}
                 <div className="mb-4">
@@ -1243,23 +1243,23 @@ const POS = () => {
                     placeholder="Search by name or phone..."
                     value={customerSearchTerm}
                     onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                     autoFocus
                   />
                 </div>
 
                 <div className="space-y-2">
                   {filteredCustomers.length === 0 ? (
-                    <p className="text-center text-gray-500 py-4">No customers found</p>
+                    <p className="text-center text-secondary py-4">No customers found</p>
                   ) : (
                     filteredCustomers.map((customer) => (
                       <button
                         key={customer._id}
                         onClick={() => selectCustomer(customer)}
-                        className="w-full p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 text-left transition"
+                        className="w-full p-4 border border-default rounded-lg hover:border-indigo-500 hover:bg-indigo-50 text-left transition"
                       >
-                        <div className="font-medium text-gray-900">{customer.name}</div>
-                        <div className="text-sm text-gray-600">{customer.phone}</div>
+                        <div className="font-medium text-main">{customer.name}</div>
+                        <div className="text-sm text-secondary">{customer.phone}</div>
                         {customer.dues > 0 && (
                           <div className="text-sm text-red-600 mt-1">Outstanding: ₹{customer.dues.toFixed(2)}</div>
                         )}
@@ -1272,7 +1272,7 @@ const POS = () => {
                     setShowCustomerSelect(false);
                     setCustomerSearchTerm('');
                   }}
-                  className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="w-full mt-4 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-surface"
                 >
                   Cancel
                 </button>
@@ -1284,27 +1284,27 @@ const POS = () => {
         {/* Hold Orders Modal */}
         {
           showHoldOrders && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-whitez-50">
+              <div className="bg-card rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                <h3 className="text-lg font-bold text-main mb-4">
                   Parked Orders ({holdOrders.length})
                 </h3>
 
                 {holdOrders.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">No parked orders</p>
+                  <p className="text-center text-secondary py-8">No parked orders</p>
                 ) : (
                   <div className="space-y-3">
                     {holdOrders.map((order) => (
-                      <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition">
+                      <div key={order.id} className="border border-default rounded-lg p-4 hover:border-indigo-500 transition">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <div className="font-medium text-gray-900">{order.customerName}</div>
-                            <div className="text-sm text-gray-500">
+                            <div className="font-medium text-main">{order.customerName}</div>
+                            <div className="text-sm text-secondary">
                               {new Date(order.timestamp).toLocaleString()}
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm text-gray-600">{order.cart.length} items</div>
+                            <div className="text-sm text-secondary">{order.cart.length} items</div>
                             <div className="font-bold text-indigo-600">
                               ₹{(order.cart.reduce((sum, item) => sum + item.total, 0) - order.discount).toFixed(2)}
                             </div>
@@ -1331,7 +1331,7 @@ const POS = () => {
 
                 <button
                   onClick={() => setShowHoldOrders(false)}
-                  className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="w-full mt-4 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                 >
                   Close
                 </button>
@@ -1343,12 +1343,12 @@ const POS = () => {
         {/* Split Payment Modal */}
         {
           showSplitPayment && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Split Payment</h3>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-white z-50">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-bold text-main mb-4">Split Payment</h3>
                 <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="text-secondary">Total Amount:</span>
                     <span className="font-bold text-indigo-600">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
@@ -1359,7 +1359,7 @@ const POS = () => {
                       <select
                         value={payment.method}
                         onChange={(e) => updateSplitPayment(index, 'method', e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        className="flex-1 px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                       >
                         <option value="cash">Cash</option>
                         <option value="upi">UPI</option>
@@ -1370,7 +1370,7 @@ const POS = () => {
                         value={payment.amount}
                         onChange={(e) => updateSplitPayment(index, 'amount', e.target.value)}
                         placeholder="Amount"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        className="flex-1 px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                       />
                       {splitPayments.length > 1 && (
                         <button
@@ -1393,13 +1393,13 @@ const POS = () => {
 
                 <div className="mb-4 p-3 bg-gray-50 rounded-lg">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Total Paid:</span>
+                    <span className="text-secondary">Total Paid:</span>
                     <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
                       ₹{calculateSplitTotal().toFixed(2)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Balance:</span>
+                    <span className="text-secondary">Balance:</span>
                     <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
                       ₹{(total - calculateSplitTotal()).toFixed(2)}
                     </span>
@@ -1412,7 +1412,7 @@ const POS = () => {
                       setShowSplitPayment(false);
                       setSplitPayments([{ method: 'cash', amount: '' }]);
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -1432,33 +1432,33 @@ const POS = () => {
         {/* Unpaid Invoice Confirmation Modal */}
         {
           showUnpaidConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-whitez-50 p-4">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
                     <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Unpaid Invoice Confirmation</h3>
+                  <h3 className="text-lg font-bold text-main">Unpaid Invoice Confirmation</h3>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-gray-700 mb-3">
+                  <p className="text-secondary mb-3">
                     This invoice has an outstanding balance. Please confirm before proceeding:
                   </p>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <div className="bg-surface p-4 rounded-lg space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Customer:</span>
-                      <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
+                      <span className="text-secondary">Customer:</span>
+                      <span className="font-medium text-main">{activeTab.customer?.name}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                      <span className="text-secondary">Total Amount:</span>
+                      <span className="font-bold text-main">₹{total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Paid Amount:</span>
-                      <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                      <span className="text-secondary">Paid Amount:</span>
+                      <span className="text-main">₹{paid.toFixed(2)}</span>
                     </div>
                     <div className="border-t pt-2 flex justify-between">
                       <span className="font-medium text-red-600">Balance Due:</span>
@@ -1467,14 +1467,14 @@ const POS = () => {
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 mb-6">
+                <p className="text-sm text-secondary mb-6">
                   The customer will be responsible for paying the outstanding balance of ₹{(total - paid).toFixed(2)}.
                 </p>
 
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowUnpaidConfirm(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium"
                   >
                     Cancel
                   </button>
@@ -1493,41 +1493,41 @@ const POS = () => {
         {/* Overpayment Confirmation Modal - for saved customers */}
         {
           showOverpaymentConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center  dark:bg-white z-50 p-4">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Partial Change Confirmation</h3>
+                  <h3 className="text-lg font-bold text-main">Partial Change Confirmation</h3>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-gray-700 mb-3">
+                  <p className="text-secondary mb-3">
                     The customer overpaid but you are not returning the full change:
                   </p>
                   <div className="bg-blue-50 p-4 rounded-lg space-y-2 border border-blue-200">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Customer:</span>
-                      <span className="font-medium text-gray-900">{activeTab.customer?.name}</span>
+                      <span className="text-secondary">Customer:</span>
+                      <span className="font-medium text-main">{activeTab.customer?.name}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                      <span className="text-secondary">Total Amount:</span>
+                      <span className="font-bold text-main">₹{total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Amount Paid:</span>
-                      <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                      <span className="text-secondary">Amount Paid:</span>
+                      <span className="text-main">₹{paid.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Change Required:</span>
+                      <span className="text-secondary">Change Required:</span>
                       <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
                     </div>
                     <div className="border-t pt-2 flex justify-between">
-                      <span className="text-gray-600">Change Returned:</span>
-                      <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
+                      <span className="text-secondary">Change Returned:</span>
+                      <span className="font-bold text-main">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
                       <span className="font-medium text-yellow-800">Remaining Credit:</span>
@@ -1543,14 +1543,14 @@ const POS = () => {
                   </p>
                 </div>
 
-                <p className="text-xs text-gray-500 mb-6">
+                <p className="text-xs text-secondary mb-6">
                   This is to prevent accidental loss of change and maintain accurate accounting records.
                 </p>
 
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowOverpaymentConfirm(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium"
                   >
                     Cancel
                   </button>
@@ -1572,37 +1572,37 @@ const POS = () => {
         {/* Walk-in Overpayment Modal (must return full change) */}
         {
           showWalkinChangeConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center  dark:bg-white z-50 p-4">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
                     <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Return Full Change (Walk-in)</h3>
+                  <h3 className="text-lg font-bold text-main">Return Full Change (Walk-in)</h3>
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-gray-700 mb-3">
+                  <p className="text-secondary mb-3">
                     Walk-in customers must receive the full change. Please return all change before continuing:
                   </p>
                   <div className="bg-yellow-50 p-4 rounded-lg space-y-2 border border-yellow-200">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                      <span className="text-secondary">Total Amount:</span>
+                      <span className="font-bold text-main">₹{total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Amount Paid:</span>
-                      <span className="text-gray-900">₹{paid.toFixed(2)}</span>
+                      <span className="text-secondary">Amount Paid:</span>
+                      <span className="text-main">₹{paid.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Change Required:</span>
+                      <span className="text-secondary">Change Required:</span>
                       <span className="font-bold text-indigo-600">₹{(paid - total).toFixed(2)}</span>
                     </div>
                     <div className="border-t pt-2 flex justify-between">
-                      <span className="text-gray-600">Change Returned:</span>
-                      <span className="font-bold text-gray-900">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
+                      <span className="text-secondary">Change Returned:</span>
+                      <span className="font-bold text-main">₹{(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm bg-yellow-100 p-2 rounded border border-yellow-300">
                       <span className="font-medium text-yellow-800">Remaining Change to Return:</span>
@@ -1611,7 +1611,7 @@ const POS = () => {
                   </div>
                 </div>
 
-                <p className="text-xs text-gray-500 mb-6">
+                <p className="text-xs text-secondary mb-6">
                   You can adjust the paid amount or return full change to proceed.
                 </p>
 

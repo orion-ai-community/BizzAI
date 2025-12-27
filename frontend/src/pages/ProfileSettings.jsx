@@ -109,7 +109,7 @@ const ProfileSettings = () => {
       <Layout>
         <div className="flex justify-center items-center h-64">
           <div className="text-center">
-            <p className="text-gray-600">Loading profile...</p>
+            <p className="text-secondary">Loading profile...</p>
           </div>
         </div>
       </Layout>
@@ -123,7 +123,7 @@ const ProfileSettings = () => {
         <div className="mb-8">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="flex items-center text-secondary hover:text-main mb-4"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -140,8 +140,8 @@ const ProfileSettings = () => {
             </svg>
             Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile Settings</h1>
-          <p className="text-gray-600">Update your personal and business information</p>
+          <h1 className="text-3xl font-bold text-main mb-2">Profile Settings</h1>
+          <p className="text-secondary">Update your personal and business information</p>
         </div>
 
         {/* Success Message */}
@@ -167,13 +167,13 @@ const ProfileSettings = () => {
         )}
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-sm p-8">
+        <div className="bg-card rounded-xl shadow-sm p-8">
           <form onSubmit={onSubmit} className="space-y-6">
             {/* Full Name Input */}
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Full Name <span className="text-red-500">*</span>
               </label>
@@ -183,11 +183,10 @@ const ProfileSettings = () => {
                 name="name"
                 value={name}
                 onChange={onChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.name
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition ${errors.name
+                  ? 'border-red-500 bg-red-50'
+                  : ' border-default'
+                  }`}
                 placeholder="Enter your full name"
               />
               {errors.name && (
@@ -199,7 +198,7 @@ const ProfileSettings = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Email Address <span className="text-red-500">*</span>
               </label>
@@ -209,11 +208,10 @@ const ProfileSettings = () => {
                 name="email"
                 value={email}
                 onChange={onChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.email
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition ${errors.email
+                  ? 'border-red-500 bg-red-50'
+                  : ' border-default'
+                  }`}
                 placeholder="Enter your email address"
               />
               {errors.email && (
@@ -225,7 +223,7 @@ const ProfileSettings = () => {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Phone Number
               </label>
@@ -235,11 +233,10 @@ const ProfileSettings = () => {
                 name="phone"
                 value={phone}
                 onChange={onChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition ${
-                  errors.phone
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition ${errors.phone
+                  ? 'border-red-500 bg-red-50'
+                  : ' border-default'
+                  }`}
                 placeholder="Enter your phone number"
               />
               {errors.phone && (
@@ -251,7 +248,7 @@ const ProfileSettings = () => {
             <div>
               <label
                 htmlFor="shopName"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-secondary mb-2"
               >
                 Shop Name
               </label>
@@ -261,22 +258,22 @@ const ProfileSettings = () => {
                 name="shopName"
                 value={shopName}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 border  border-default rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition"
                 placeholder="Enter your shop/business name"
               />
             </div>
 
             {/* Additional Info Section */}
-            <div className="pt-4 border-t border-gray-200">
-              <h3 className="text-sm font-medium text-gray-900 mb-4">Account Information</h3>
+            <div className="pt-4 border-t  border-default">
+              <h3 className="text-sm font-medium text-main mb-4">Account Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-xs font-medium text-gray-500 mb-1">User ID</p>
-                  <p className="text-sm text-gray-900 break-all">{user._id}</p>
+                <div className=" bg-surface p-4 rounded-lg">
+                  <p className="text-xs font-medium text-muted mb-1">User ID</p>
+                  <p className="text-sm text-main break-all">{user._id}</p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-xs font-medium text-gray-500 mb-1">Role</p>
-                  <p className="text-sm text-gray-900 capitalize">{user.role || 'Owner'}</p>
+                <div className=" bg-surface p-4 rounded-lg">
+                  <p className="text-xs font-medium text-muted mb-1">Role</p>
+                  <p className="text-sm text-main capitalize">{user.role || 'Owner'}</p>
                 </div>
               </div>
             </div>
@@ -294,7 +291,7 @@ const ProfileSettings = () => {
                   });
                   setErrors({});
                 }}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
+                className="flex-1 px-6 py-3 border  border-default text-secondary rounded-lg hover: bg-surface font-medium transition"
               >
                 Reset
               </button>

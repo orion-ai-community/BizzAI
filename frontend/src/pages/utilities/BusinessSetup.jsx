@@ -52,17 +52,17 @@ const BusinessSetup = () => {
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Business Setup</h1>
-                    <p className="text-gray-600">Configure your business profile and preferences</p>
+                    <h1 className="text-3xl font-bold text-main mb-2">Business Setup</h1>
+                    <p className="text-secondary">Configure your business profile and preferences</p>
                 </div>
 
                 {/* Profile Completeness Indicator */}
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div className="bg-card rounded-xl shadow-sm p-6 mb-6">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-medium text-gray-700">Profile Completeness</h3>
+                        <h3 className="text-sm font-medium text-secondary">Profile Completeness</h3>
                         <span className="text-sm font-bold text-indigo-600">{completionPercentage()}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full bg-surface rounded-full h-3">
                         <div
                             className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-300"
                             style={{ width: `${completionPercentage()}%` }}
@@ -96,18 +96,18 @@ const BusinessSetup = () => {
                 {/* Main Form */}
                 <form onSubmit={onSubmit}>
                     {/* Business Profile */}
-                    <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-6">Business Profile</h3>
+                    <div className="bg-card rounded-xl shadow-sm p-8 mb-6">
+                        <h3 className="text-lg font-semibold text-main mb-6">Business Profile</h3>
 
                         {/* Logo Upload */}
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-3">Business Logo</label>
+                            <label className="block text-sm font-medium text-secondary mb-3">Business Logo</label>
                             <div className="flex items-center space-x-6">
-                                <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                                <div className="w-24 h-24 bg-surface rounded-lg flex items-center justify-center overflow-hidden">
                                     {logo ? (
                                         <img src={logo} alt="Logo" className="w-full h-full object-cover" />
                                     ) : (
-                                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-12 h-12 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     )}
@@ -126,7 +126,7 @@ const BusinessSetup = () => {
                                     >
                                         Upload Logo
                                     </label>
-                                    <p className="text-sm text-gray-500 mt-2">PNG, JPG up to 2MB</p>
+                                    <p className="text-sm text-muted mt-2">PNG, JPG up to 2MB</p>
                                 </div>
                             </div>
                         </div>
@@ -134,7 +134,7 @@ const BusinessSetup = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Business Name */}
                             <div className="md:col-span-2">
-                                <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="businessName" className="block text-sm font-medium text-secondary mb-2">
                                     Business Name <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -144,14 +144,14 @@ const BusinessSetup = () => {
                                     value={formData.businessName}
                                     onChange={onChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="Enter your business name"
                                 />
                             </div>
 
                             {/* Owner Name */}
                             <div>
-                                <label htmlFor="ownerName" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="ownerName" className="block text-sm font-medium text-secondary mb-2">
                                     Owner Name <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -161,14 +161,14 @@ const BusinessSetup = () => {
                                     value={formData.ownerName}
                                     onChange={onChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="Enter owner name"
                                 />
                             </div>
 
                             {/* Business Category */}
                             <div>
-                                <label htmlFor="businessCategory" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="businessCategory" className="block text-sm font-medium text-secondary mb-2">
                                     Business Category
                                 </label>
                                 <select
@@ -176,7 +176,7 @@ const BusinessSetup = () => {
                                     name="businessCategory"
                                     value={formData.businessCategory}
                                     onChange={onChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 >
                                     <option value="retail">Retail</option>
                                     <option value="wholesale">Wholesale</option>
@@ -189,7 +189,7 @@ const BusinessSetup = () => {
 
                             {/* GSTIN */}
                             <div>
-                                <label htmlFor="gstin" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="gstin" className="block text-sm font-medium text-secondary mb-2">
                                     GSTIN
                                 </label>
                                 <input
@@ -199,14 +199,14 @@ const BusinessSetup = () => {
                                     value={formData.gstin}
                                     onChange={onChange}
                                     maxLength={15}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="22AAAAA0000A1Z5"
                                 />
                             </div>
 
                             {/* PAN */}
                             <div>
-                                <label htmlFor="pan" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="pan" className="block text-sm font-medium text-secondary mb-2">
                                     PAN
                                 </label>
                                 <input
@@ -216,14 +216,14 @@ const BusinessSetup = () => {
                                     value={formData.pan}
                                     onChange={onChange}
                                     maxLength={10}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="ABCDE1234F"
                                 />
                             </div>
 
                             {/* Email */}
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="email" className="block text-sm font-medium text-secondary mb-2">
                                     Email <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -233,14 +233,14 @@ const BusinessSetup = () => {
                                     value={formData.email}
                                     onChange={onChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="business@example.com"
                                 />
                             </div>
 
                             {/* Phone */}
                             <div>
-                                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="phone" className="block text-sm font-medium text-secondary mb-2">
                                     Phone Number <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -250,14 +250,14 @@ const BusinessSetup = () => {
                                     value={formData.phone}
                                     onChange={onChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="+91 9876543210"
                                 />
                             </div>
 
                             {/* Address */}
                             <div className="md:col-span-2">
-                                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="address" className="block text-sm font-medium text-secondary mb-2">
                                     Business Address
                                 </label>
                                 <textarea
@@ -266,14 +266,14 @@ const BusinessSetup = () => {
                                     value={formData.address}
                                     onChange={onChange}
                                     rows={3}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     placeholder="Enter complete business address"
                                 />
                             </div>
 
                             {/* Currency */}
                             <div>
-                                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="currency" className="block text-sm font-medium text-secondary mb-2">
                                     Currency
                                 </label>
                                 <select
@@ -281,7 +281,7 @@ const BusinessSetup = () => {
                                     name="currency"
                                     value={formData.currency}
                                     onChange={onChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 >
                                     <option value="INR">₹ INR - Indian Rupee</option>
                                     <option value="USD">$ USD - US Dollar</option>
@@ -292,7 +292,7 @@ const BusinessSetup = () => {
 
                             {/* Financial Year */}
                             <div>
-                                <label htmlFor="financialYear" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="financialYear" className="block text-sm font-medium text-secondary mb-2">
                                     Financial Year
                                 </label>
                                 <select
@@ -300,7 +300,7 @@ const BusinessSetup = () => {
                                     name="financialYear"
                                     value={formData.financialYear}
                                     onChange={onChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 >
                                     <option value="2024-2025">2024-2025</option>
                                     <option value="2023-2024">2023-2024</option>
@@ -311,17 +311,17 @@ const BusinessSetup = () => {
                     </div>
 
                     {/* Tax Configuration */}
-                    <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-6">Tax Configuration</h3>
+                    <div className="bg-card rounded-xl shadow-sm p-8 mb-6">
+                        <h3 className="text-lg font-semibold text-main mb-6">Tax Configuration</h3>
 
                         <div className="space-y-6">
                             {/* Enable GST */}
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div className="flex items-center justify-between p-4 bg-surface rounded-lg">
                                 <div>
-                                    <label htmlFor="gstEnabled" className="text-sm font-medium text-gray-900">
+                                    <label htmlFor="gstEnabled" className="text-sm font-medium text-main">
                                         Enable GST
                                     </label>
-                                    <p className="text-sm text-gray-500">Apply GST to your invoices and transactions</p>
+                                    <p className="text-sm text-muted">Apply GST to your invoices and transactions</p>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
@@ -332,18 +332,18 @@ const BusinessSetup = () => {
                                         onChange={onChange}
                                         className="sr-only peer"
                                     />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    <div className="w-11 h-6 bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                 </label>
                             </div>
 
                             {/* Tax Mode */}
                             {formData.gstEnabled && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                                    <label className="block text-sm font-medium text-secondary mb-3">
                                         Tax Mode
                                     </label>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.taxMode === 'inclusive' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}`}>
+                                        <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.taxMode === 'inclusive' ? 'border-indigo-600 bg-indigo-50' : 'border-default'}`}>
                                             <input
                                                 type="radio"
                                                 name="taxMode"
@@ -353,11 +353,11 @@ const BusinessSetup = () => {
                                                 className="w-4 h-4 text-indigo-600"
                                             />
                                             <div className="ml-3">
-                                                <p className="text-sm font-medium text-gray-900">Tax Inclusive</p>
-                                                <p className="text-xs text-gray-500">Price includes tax</p>
+                                                <p className="text-sm font-medium text-main">Tax Inclusive</p>
+                                                <p className="text-xs text-muted">Price includes tax</p>
                                             </div>
                                         </label>
-                                        <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.taxMode === 'exclusive' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}`}>
+                                        <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.taxMode === 'exclusive' ? 'border-indigo-600 bg-indigo-50' : 'border-default'}`}>
                                             <input
                                                 type="radio"
                                                 name="taxMode"
@@ -367,8 +367,8 @@ const BusinessSetup = () => {
                                                 className="w-4 h-4 text-indigo-600"
                                             />
                                             <div className="ml-3">
-                                                <p className="text-sm font-medium text-gray-900">Tax Exclusive</p>
-                                                <p className="text-xs text-gray-500">Tax added separately</p>
+                                                <p className="text-sm font-medium text-main">Tax Exclusive</p>
+                                                <p className="text-xs text-muted">Tax added separately</p>
                                             </div>
                                         </label>
                                     </div>
@@ -378,15 +378,15 @@ const BusinessSetup = () => {
                     </div>
 
                     {/* Advanced Settings */}
-                    <div className="bg-white rounded-xl shadow-sm p-8 mb-6">
+                    <div className="bg-card rounded-xl shadow-sm p-8 mb-6">
                         <button
                             type="button"
                             onClick={() => setShowAdvanced(!showAdvanced)}
                             className="flex items-center justify-between w-full text-left"
                         >
-                            <h3 className="text-lg font-semibold text-gray-900">Advanced Settings</h3>
+                            <h3 className="text-lg font-semibold text-main">Advanced Settings</h3>
                             <svg
-                                className={`w-5 h-5 text-gray-500 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+                                className={`w-5 h-5 text-muted transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -396,23 +396,23 @@ const BusinessSetup = () => {
                         </button>
 
                         {showAdvanced && (
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <p className="text-sm text-gray-600 mb-4">Additional configuration options will appear here</p>
+                            <div className="mt-6 pt-6 border-t border-default">
+                                <p className="text-sm text-secondary mb-4">Additional configuration options will appear here</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="p-4 bg-gray-50 rounded-lg">
-                                        <p className="text-sm font-medium text-gray-700">Invoice Prefix</p>
+                                    <div className="p-4 bg-surface rounded-lg">
+                                        <p className="text-sm font-medium text-secondary">Invoice Prefix</p>
                                         <input
                                             type="text"
                                             placeholder="INV-"
-                                            className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            className="mt-2 w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                         />
                                     </div>
-                                    <div className="p-4 bg-gray-50 rounded-lg">
-                                        <p className="text-sm font-medium text-gray-700">Starting Invoice Number</p>
+                                    <div className="p-4 bg-surface rounded-lg">
+                                        <p className="text-sm font-medium text-secondary">Starting Invoice Number</p>
                                         <input
                                             type="number"
                                             placeholder="1"
-                                            className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            className="mt-2 w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
