@@ -184,10 +184,8 @@ const Return = () => {
     for (const item of itemsWithQty) {
       if (item.returnedQty > item.remainingQty) {
         alert(
-          `Return quantity for ${
-            item.productName
-          } cannot exceed remaining quantity (${
-            item.remainingQty
+          `Return quantity for ${item.productName
+          } cannot exceed remaining quantity (${item.remainingQty
           }). Already returned: ${item.alreadyReturned || 0}`
         );
         return false;
@@ -321,24 +319,24 @@ const Return = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Invoice Selection */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-bold text-main mb-4">
               Select Invoice
             </h2>
             {formData.selectedInvoice ? (
               <div className="p-4 bg-indigo-50 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-main">
                       Invoice: {formData.selectedInvoice.invoiceNo}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-secondary">
                       Date:{" "}
                       {new Date(
                         formData.selectedInvoice.createdAt
                       ).toLocaleDateString()}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-secondary">
                       Amount: ₹{formData.selectedInvoice.totalAmount.toFixed(2)}
                     </p>
                   </div>
@@ -361,7 +359,7 @@ const Return = () => {
             ) : (
               <button
                 onClick={() => setShowInvoiceModal(true)}
-                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600"
+                className="w-full px-4 py-3 border-2 border-dashed border-default rounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600"
               >
                 Click to select invoice
               </button>
@@ -370,17 +368,17 @@ const Return = () => {
 
           {/* Customer Info */}
           {formData.customer && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Customer</h2>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="font-medium text-gray-900">
+            <div className="bg-card rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-bold text-main mb-4">Customer</h2>
+              <div className="p-4 bg-surface rounded-lg">
+                <p className="font-medium text-main">
                   {formData.customer.name}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-secondary">
                   {formData.customer.phone}
                 </p>
                 {formData.customer.email && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-secondary">
                     {formData.customer.email}
                   </p>
                 )}
@@ -390,36 +388,36 @@ const Return = () => {
 
           {/* Return Items */}
           {formData.items.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="bg-card rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-bold text-main mb-4">
                 Return Items
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
+                  <thead className="bg-surface border-b">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Item
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Original Qty
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Already Returned
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Remaining
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Return Qty
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Rate
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Condition
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">
                         Reason
                       </th>
                     </tr>
@@ -427,10 +425,10 @@ const Return = () => {
                   <tbody className="divide-y">
                     {formData.items.map((item, index) => (
                       <tr key={index}>
-                        <td className="px-4 py-3 text-gray-900">
+                        <td className="px-4 py-3 text-main">
                           {item.productName}
                         </td>
-                        <td className="px-4 py-3 text-gray-600">
+                        <td className="px-4 py-3 text-secondary">
                           {item.originalQty}
                         </td>
                         <td className="px-4 py-3 text-orange-600 font-medium">
@@ -458,7 +456,7 @@ const Return = () => {
                             max={item.remainingQty}
                           />
                         </td>
-                        <td className="px-4 py-3 text-gray-900">
+                        <td className="px-4 py-3 text-main">
                           ₹{item.rate.toFixed(2)}
                         </td>
                         <td className="px-4 py-3">
@@ -504,13 +502,13 @@ const Return = () => {
 
           {/* Refund Details */}
           {formData.items.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="bg-card rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-bold text-main mb-4">
                 Refund Details
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-secondary mb-2">
                     Refund Method <span className="text-red-600">*</span>
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -521,13 +519,12 @@ const Return = () => {
                           onClick={() =>
                             setFormData({ ...formData, refundMethod: method })
                           }
-                          className={`p-3 border-2 rounded-lg transition ${
-                            formData.refundMethod === method
-                              ? "border-indigo-600 bg-indigo-50"
-                              : "border-gray-200 hover:border-indigo-300"
-                          }`}
+                          className={`p-3 border-2 rounded-lg transition ${formData.refundMethod === method
+                            ? "border-indigo-600 bg-indigo-50"
+                            : "border-default hover:border-indigo-300"
+                            }`}
                         >
-                          <div className="text-sm font-medium text-gray-900 capitalize">
+                          <div className="text-sm font-medium text-main capitalize">
                             {method.replace("_", " ")}
                           </div>
                         </button>
@@ -536,7 +533,7 @@ const Return = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-secondary mb-2">
                     Notes
                   </label>
                   <textarea
@@ -556,19 +553,19 @@ const Return = () => {
 
         {/* Summary Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
+          <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+            <h2 className="text-lg font-bold text-main mb-4">
               Return Summary
             </h2>
             <div className="space-y-3 mb-4">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal:</span>
+                <span className="text-secondary">Subtotal:</span>
                 <span className="font-medium">
                   ₹{calculateSubtotal().toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax:</span>
+                <span className="text-secondary">Tax:</span>
                 <span className="font-medium">
                   ₹{calculateTax().toFixed(2)}
                 </span>
@@ -598,7 +595,7 @@ const Return = () => {
               </button>
               <button
                 onClick={() => navigate("/sales/returned-items")}
-                className="w-full py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="w-full py-3 border border-default text-secondary rounded-lg hover:bg-surface"
               >
                 View Returned Items
               </button>
@@ -609,16 +606,16 @@ const Return = () => {
 
       {/* Invoice Selection Modal */}
       {showInvoiceModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50   dark:bg-gray-700 p-4">
+          <div className="bg-card rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
             <div className="p-6 border-b">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold text-main">
                   Select Invoice
                 </h3>
                 <button
                   onClick={() => setShowInvoiceModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted hover:text-secondary"
                 >
                   <svg
                     className="w-6 h-6"
@@ -645,7 +642,7 @@ const Return = () => {
             </div>
             <div className="overflow-y-auto max-h-96 p-6">
               {filteredInvoices.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-muted py-8">
                   No invoices found
                 </p>
               ) : (
@@ -658,30 +655,29 @@ const Return = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-main">
                             {invoice.invoiceNo}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-secondary">
                             {invoice.customer?.name || "Walk-in Customer"}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted">
                             {new Date(invoice.createdAt).toLocaleDateString(
                               "en-IN"
                             )}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-900">
+                          <p className="font-bold text-main">
                             ₹{invoice.totalAmount.toFixed(2)}
                           </p>
                           <span
-                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                              invoice.paymentStatus === "paid"
-                                ? "bg-green-100 text-green-800"
-                                : invoice.paymentStatus === "partial"
+                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${invoice.paymentStatus === "paid"
+                              ? "bg-green-100 text-green-800"
+                              : invoice.paymentStatus === "partial"
                                 ? "bg-yellow-100 text-yellow-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
+                              }`}
                           >
                             {invoice.paymentStatus}
                           </span>
