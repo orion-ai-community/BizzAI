@@ -209,22 +209,39 @@ const InvoiceDetail = () => {
                   <span className="font-medium text-red-600">-₹{invoice.discount.toFixed(2)}</span>
                 </div>
               )}
+              {invoice.previousDueAmount > 0 && (
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-gray-600">Previous Due Added:</span>
+                  <span className="font-medium text-amber-600">+₹{invoice.previousDueAmount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between py-3 border-b-2 border-gray-300">
                 <span className="text-lg font-bold text-gray-900">Total Amount:</span>
                 <span className="text-lg font-bold text-indigo-600">
                   ₹{invoice.totalAmount.toFixed(2)}
                 </span>
               </div>
+              {invoice.creditApplied > 0 && (
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-gray-600">Credit Applied:</span>
+                  <span className="font-medium text-green-600">-₹{invoice.creditApplied.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Paid Amount:</span>
                 <span className="font-medium text-green-600">₹{invoice.paidAmount.toFixed(2)}</span>
               </div>
-              {invoice.paidAmount < invoice.totalAmount && (
+              {invoice.paidAmount < invoice.totalAmount ? (
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600 font-medium">Balance Due:</span>
                   <span className="font-bold text-red-600">
                     ₹{(invoice.totalAmount - invoice.paidAmount).toFixed(2)}
                   </span>
+                </div>
+              ) : (
+                <div className="flex justify-between py-2">
+                  <span className="text-gray-600 font-medium">Paid in Full</span>
+                  <span className="font-bold text-green-600">✓</span>
                 </div>
               )}
             </div>
