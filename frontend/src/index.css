@@ -148,27 +148,22 @@
 }
 
 @layer components {
-
-  /* Page background */
-  .app-bg {
+  .bg-app {
     background-color: rgb(var(--color-bg));
   }
 
-  /* Cards / sections */
-  .app-card {
+  .bg-card {
     background-color: rgb(var(--color-card));
-    border: 1px solid rgb(var(--color-border));
-    border-radius: 0.75rem;
   }
 
-  /* Inputs */
-  .app-input {
+  .bg-surface {
+    background-color: rgb(var(--color-table-header));
+  }
+
+  .bg-input {
     background-color: rgb(var(--color-input));
-    color: rgb(var(--color-text));
-    border: 1px solid rgb(var(--color-border));
   }
 
-  /* Text */
   .text-main {
     color: rgb(var(--color-text));
   }
@@ -176,34 +171,44 @@
   .text-secondary {
     color: rgb(var(--color-text-secondary));
   }
- .bg-surface {
-    background-color: rgb(var(--color-table-header));
-  }
+
   .text-muted {
     color: rgb(var(--color-text-muted));
   }
 
-  /* Tables */
-  .table-header {
-    background-color: rgb(var(--color-table-header));
+  .placeholder-muted::placeholder {
+    color: rgb(var(--color-placeholder));
   }
 
-  .table-row {
-    background-color: rgb(var(--color-table-row));
-    border-bottom: 1px solid rgb(var(--color-border));
-  }
-  
   .border-default {
     border-color: rgb(var(--color-border));
   }
 
-  .border-primary {
-    border-color: rgb(var(--color-primary));
+  .border-light {
+    border-color: rgb(var(--color-border-light));
+  }
+
+  .divide-border> :not([hidden])~ :not([hidden]) {
+    border-color: rgb(var(--color-border));
+  }
+
+  .bg-primary {
+    background-color: rgb(var(--color-primary));
+  }
+
+  .bg-primary-hover {
+    background-color: rgb(var(--color-primary-hover));
   }
 
   .bg-primary-soft {
     background-color: rgb(var(--color-primary) / 0.1);
   }
 
+  .text-primary {
+    color: rgb(var(--color-primary));
+  }
 
+  .hover\:bg-primary-hover:hover {
+    background-color: rgb(var(--color-primary-hover));
+  }
 }
