@@ -209,7 +209,7 @@ const PaymentIn = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-3 mb-6 p-4 bg-gray-50 rounded-lg dark:bg-gray-800">
+                        <div className="space-y-3 mb-6 p-4 bg-surface rounded-lg ">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Total Outstanding:</span>
                                 <span className="font-medium text-orange-600">₹40,000.00</span>

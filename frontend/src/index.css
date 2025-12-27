@@ -176,7 +176,9 @@
   .text-secondary {
     color: rgb(var(--color-text-secondary));
   }
-
+ .bg-surface {
+    background-color: rgb(var(--color-table-header));
+  }
   .text-muted {
     color: rgb(var(--color-text-muted));
   }
