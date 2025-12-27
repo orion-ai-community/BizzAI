@@ -38,14 +38,14 @@ const PurchaseOrder = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">PO Details</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">PO Details</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormInput label="PO Number" value={formData.poNo} onChange={(e) => setFormData({ ...formData, poNo: e.target.value })} required />
                             <FormInput label="PO Date" type="date" value={formData.poDate} onChange={(e) => setFormData({ ...formData, poDate: e.target.value })} required />
                             <FormInput label="Expected Delivery" type="date" value={formData.deliveryDate} onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })} />
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Status</label>
                                 <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2 border rounded-lg">
                                     <option value="pending">Pending</option>
                                     <option value="approved">Approved</option>
@@ -56,15 +56,15 @@ const PurchaseOrder = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Supplier</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Supplier</h2>
                         {formData.supplier ? (
                             <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="font-medium text-gray-900">{formData.supplier.businessName}</p>
-                                        <p className="text-sm text-gray-600">{formData.supplier.contactPersonName}</p>
-                                        <p className="text-sm text-gray-600">{formData.supplier.contactNo}</p>
+                                        <p className="font-medium text-main">{formData.supplier.businessName}</p>
+                                        <p className="text-sm text-secondary">{formData.supplier.contactPersonName}</p>
+                                        <p className="text-sm text-secondary">{formData.supplier.contactNo}</p>
                                     </div>
                                     <button
                                         onClick={() => setFormData({ ...formData, supplier: null })}
@@ -79,27 +79,27 @@ const PurchaseOrder = () => {
                         ) : (
                             <button
                                 onClick={() => setShowSupplierModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-500 hover:text-indigo-600"
+                                className="w-full px-4 py-3 border-2 border-dashed border-default rounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600"
                             >
                                 Click to select supplier
                             </button>
                         )}
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-card rounded-xl shadow-sm p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-gray-900">Items</h2>
+                            <h2 className="text-lg font-bold text-main">Items</h2>
                             <button onClick={addItem} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Item</button>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50 border-b">
+                                <thead className="bg-surface border-b">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tax %</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Qty</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Rate</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Tax %</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -125,26 +125,26 @@ const PurchaseOrder = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Notes</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Notes</h2>
                         <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Add notes..." />
                     </div>
                 </div>
 
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Summary</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Summary</h2>
                         <div className="space-y-3 mb-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Subtotal:</span>
+                                <span className="text-secondary">Subtotal:</span>
                                 <span className="font-medium">₹{calculateSubtotal().toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax:</span>
+                                <span className="text-secondary">Tax:</span>
                                 <span className="font-medium">₹{calculateTax().toFixed(2)}</span>
                             </div>
                             <div>
-                                <label className="block text-sm text-gray-600 mb-1">Discount:</label>
+                                <label className="block text-sm text-secondary mb-1">Discount:</label>
                                 <input type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
                             </div>
                         </div>

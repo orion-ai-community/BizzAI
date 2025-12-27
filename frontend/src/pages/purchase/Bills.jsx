@@ -166,7 +166,7 @@ const Bills = () => {
         {
             key: 'paidAmount',
             label: 'Paid',
-            render: (val, row) => val ? <span className="text-green-600 font-medium">₹{val.toFixed(2)}</span> : <span className="text-gray-400">₹0.00</span>
+            render: (val, row) => val ? <span className="text-green-600 font-medium">₹{val.toFixed(2)}</span> : <span className="text-muted">₹0.00</span>
         },
         { key: 'dueDate', label: 'Due Date', sortable: true, render: (val) => val ? new Date(val).toLocaleDateString() : 'N/A' },
         {
@@ -259,7 +259,7 @@ const Bills = () => {
                 />
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
                 <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                     <div className="w-full sm:w-96">
                         <div className="relative">
@@ -268,14 +268,14 @@ const Bills = () => {
                                 placeholder="Search by bill number or supplier..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                className="w-full pl-10 pr-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
                             />
-                            <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="absolute left-3 top-2.5 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
                     </div>
-                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 border border-gray-300 rounded-lg">
+                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-2 border border-default rounded-lg">
                         <option value="all">All Status</option>
                         <option value="paid">Paid</option>
                         <option value="unpaid">Unpaid</option>
@@ -294,7 +294,7 @@ const Bills = () => {
             {showAddBill && (
                 <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">
+                        <h2 className="text-lg font-bold text-main mb-4">
                             {editingBill ? 'Edit Bill' : 'Add New Bill'}
                         </h2>
                         <form onSubmit={handleSubmit}>
@@ -308,7 +308,7 @@ const Bills = () => {
                                 />
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Supplier <span className="text-red-500">*</span></label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Supplier <span className="text-red-500">*</span></label>
                                     <select
                                         value={formData.supplier}
                                         onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
@@ -340,7 +340,7 @@ const Bills = () => {
                                 />
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Payment Status</label>
                                     <select
                                         value={formData.status}
                                         onChange={(e) => setFormData({ ...formData, status: e.target.value, paidAmount: e.target.value === 'paid' ? formData.amount : 0 })}
@@ -354,7 +354,7 @@ const Bills = () => {
                                 {formData.status === 'paid' && (
                                     <>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                                            <label className="block text-sm font-medium text-secondary mb-2">Payment Method</label>
                                             <select
                                                 value={formData.paymentMethod}
                                                 onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value, bankAccount: '' })}
@@ -369,7 +369,7 @@ const Bills = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Paid Amount</label>
+                                            <label className="block text-sm font-medium text-secondary mb-2">Paid Amount</label>
                                             <input
                                                 type="number"
                                                 value={formData.paidAmount}
@@ -382,7 +382,7 @@ const Bills = () => {
 
                                         {formData.paymentMethod === 'bank_transfer' && (
                                             <div className="md:col-span-2">
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Bank Account <span className="text-red-500">*</span></label>
+                                                <label className="block text-sm font-medium text-secondary mb-2">Bank Account <span className="text-red-500">*</span></label>
                                                 <select
                                                     value={formData.bankAccount}
                                                     onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
@@ -402,7 +402,7 @@ const Bills = () => {
                                 )}
 
                                 <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Description</label>
                                     <textarea
                                         value={formData.description}
                                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -428,7 +428,7 @@ const Bills = () => {
                                         setEditingBill(null);
                                         resetForm();
                                     }}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                    className="px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                                 >
                                     Cancel
                                 </button>
@@ -442,14 +442,14 @@ const Bills = () => {
             {deleteConfirm && (
                 <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white/90 backdrop-blur-md rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl border border-white/20">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Confirm Delete</h3>
+                        <h3 className="text-lg font-bold text-main mb-4">Confirm Delete</h3>
                         <p className="text-gray-600 mb-6">
                             Are you sure you want to delete this bill? This action cannot be undone.
                         </p>
                         <div className="flex space-x-4">
                             <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
                             >
                                 Cancel
                             </button>
