@@ -231,17 +231,36 @@ const InvoiceDetail = () => {
                 <span className="text-gray-600">Paid Amount:</span>
                 <span className="font-medium text-green-600">₹{invoice.paidAmount.toFixed(2)}</span>
               </div>
-              {invoice.paidAmount < invoice.totalAmount ? (
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-600 font-medium">Balance Due:</span>
-                  <span className="font-bold text-red-600">
-                    ₹{(invoice.totalAmount - invoice.paidAmount).toFixed(2)}
+              {(() => {
+                const effectivePayment = invoice.paidAmount + (invoice.creditApplied || 0);
+                const balanceDue = invoice.totalAmount - effectivePayment;
+                
+                if (balanceDue > 0) {
+                  return (
+                    <div className="flex justify-between py-2">
+                      <span className="text-gray-600 font-medium">Balance Due:</span>
+                      <span className="font-bold text-red-600">
+                        ₹{balanceDue.toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="flex justify-between py-2">
+                      <span className="text-gray-600 font-medium">Paid in Full</span>
+                      <span className="font-bold text-green-600">✓</span>
+                    </div>
+                  );
+                }
+              })()}
+              {invoice.customer && invoice.customer.dues !== undefined && (
+                <div className={`flex justify-between py-2 mt-2 pt-2 border-t ${invoice.customer.dues < 0 ? 'bg-green-50' : invoice.customer.dues > 0 ? 'bg-red-50' : 'bg-gray-50'}`}>
+                  <span className="text-sm font-medium text-gray-700">
+                    {invoice.customer.dues < 0 ? 'Available Credit Balance:' : invoice.customer.dues > 0 ? 'Customer Outstanding Due:' : 'Account Balance:'}
                   </span>
-                </div>
-              ) : (
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-600 font-medium">Paid in Full</span>
-                  <span className="font-bold text-green-600">✓</span>
+                  <span className={`text-sm font-bold ${invoice.customer.dues < 0 ? 'text-green-700' : invoice.customer.dues > 0 ? 'text-red-700' : 'text-gray-700'}`}>
+                    ₹{Math.abs(invoice.customer.dues).toFixed(2)}
+                  </span>
                 </div>
               )}
             </div>
