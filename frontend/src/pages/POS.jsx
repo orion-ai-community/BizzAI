@@ -33,6 +33,7 @@ const POS = () => {
         applyCreditEnabled: false,
         creditUsed: 0,
         availableCredit: 0,
+        previousDueApplied: 0,
       }
     ];
   });
@@ -111,6 +112,7 @@ const POS = () => {
           paidAmount: '',
           changeReturned: '',
           applyCreditEnabled: false,
+          previousDueApplied: 0,
         };
         setTabs([freshTab]);
         setActiveTabId(freshTab.id);
@@ -180,6 +182,7 @@ const POS = () => {
       paidAmount: '',
       changeReturned: '',
       applyCreditEnabled: false,
+      previousDueApplied: 0,
     };
     setTabs([...tabs, newTab]);
     setActiveTabId(newTabId);
@@ -302,7 +305,9 @@ const POS = () => {
     const availableCredit = getAvailableCredit();
     const creditToApply = activeTab.applyCreditEnabled ? Math.min(availableCredit, afterDiscount) : 0;
 
-    return afterDiscount - creditToApply;
+    const prevDue = parseFloat(activeTab.previousDueApplied) || 0;
+
+    return afterDiscount + prevDue - creditToApply;
   };
 
   const getAvailableCredit = () => {
@@ -337,7 +342,8 @@ const POS = () => {
   const selectCustomer = (customer) => {
     updateTabData({
       customer,
-      applyCreditEnabled: false // Reset credit checkbox when selecting new customer
+      applyCreditEnabled: false, // Reset credit checkbox when selecting new customer
+      previousDueApplied: 0,
     });
     setShowCustomerSelect(false);
     setCustomerSearchTerm('');
@@ -368,6 +374,7 @@ const POS = () => {
       paidAmount: '',
       changeReturned: '',
       applyCreditEnabled: false,
+      previousDueApplied: 0,
     });
 
     alert('Order parked successfully!');
@@ -391,6 +398,7 @@ const POS = () => {
       applyCreditEnabled: holdOrder.applyCreditEnabled || false,
       creditUsed: holdOrder.creditUsed || 0,
       availableCredit: holdOrder.availableCredit || 0,
+      previousDueApplied: holdOrder.previousDueApplied || 0,
     };
 
     setTabs([...tabs, newTab]);
@@ -487,10 +495,43 @@ const POS = () => {
             <td>Discount:</td>
             <td class="right">-₹${activeTab.discount.toFixed(2)}</td>
           </tr>
+          ${activeTab.previousDueApplied > 0 ? `
+            <tr>
+              <td>Previous Due Added:</td>
+              <td class="right">+₹${(parseFloat(activeTab.previousDueApplied) || 0).toFixed(2)}</td>
+            </tr>
+          ` : ''}
           <tr class="bold">
             <td>Total:</td>
             <td class="right">₹${total.toFixed(2)}</td>
           </tr>
+          ${getCreditApplied() > 0 ? `
+            <tr>
+              <td>Credit Applied:</td>
+              <td class="right">-₹${getCreditApplied().toFixed(2)}</td>
+            </tr>
+          ` : ''}
+          <tr>
+            <td>Amount Paid:</td>
+            <td class="right">₹${(parseFloat(activeTab.paidAmount) || 0).toFixed(2)}</td>
+          </tr>
+          ${balance > 0 ? `
+            <tr>
+              <td>Change Returned:</td>
+              <td class="right">₹${(parseFloat(activeTab.changeReturned) || 0).toFixed(2)}</td>
+            </tr>
+            ${parseFloat(activeTab.changeReturned) < balance ? `
+              <tr>
+                <td>Balance Due:</td>
+                <td class="right bold">₹${(balance - parseFloat(activeTab.changeReturned || 0)).toFixed(2)}</td>
+              </tr>
+            ` : ''}
+          ` : `
+            <tr>
+              <td>Balance Due:</td>
+              <td class="right bold">₹${Math.max(0, balance).toFixed(2)}</td>
+            </tr>
+          `}
         </table>
         <div class="line"></div>
         <p style="text-align: center;">Thank You!</p>
@@ -595,6 +636,7 @@ const POS = () => {
       discount: parseFloat(activeTab.discount) || 0,
       paidAmount: paid,
       creditApplied,
+      previousDueAmount: parseFloat(activeTab.previousDueApplied) || 0,
       paymentMethod: activeTab.paymentMethod,
       bankAccount: activeTab.paymentMethod === 'bank_transfer' ? activeTab.bankAccount : null,
       changeReturned: parseFloat(activeTab.changeReturned) || 0,
@@ -938,6 +980,40 @@ const POS = () => {
                   <span className="text-gray-600">Discount:</span>
                   <span className="font-medium">-₹{activeTab.discount.toFixed(2)}</span>
                 </div>
+
+                {/* Previous Due Handling */}
+                {activeTab.customer && (activeTab.customer.dues || 0) > 0 && (
+                  <div className="space-y-2">
+                    {activeTab.previousDueApplied > 0 ? (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Previous Due Added:</span>
+                        <span className="font-medium text-amber-600">+₹{activeTab.previousDueApplied.toFixed(2)}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Outstanding Previous Due:</span>
+                        <span className="font-medium">₹{(activeTab.customer.dues || 0).toFixed(2)}</span>
+                      </div>
+                    )}
+
+                    {activeTab.previousDueApplied > 0 ? (
+                      <button
+                        onClick={() => updateTabData({ previousDueApplied: 0 })}
+                        className="w-full px-3 py-2 text-sm bg-amber-100 hover:bg-amber-200 text-amber-800 rounded"
+                      >
+                        Remove Previous Due from Bill
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => updateTabData({ previousDueApplied: Math.max(0, activeTab.customer.dues || 0) })}
+                        className="w-full px-3 py-2 text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded"
+                      >
+                        Add Previous Due to Bill
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Credit Applied:</span>
@@ -986,21 +1062,7 @@ const POS = () => {
                 />
               </div >
 
-              {/* Balance */}
-              {
-                activeTab.paidAmount && (
-                  <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium text-gray-700">
-                        {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
-                      </span>
-                      <span className={`text-xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        ₹{Math.abs(balance).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                )
-              }
+              {/* Balance summary removed to avoid duplication; detailed section below shows balance and change-return input */}
 
               {/* Bank Account Selection */}
               {activeTab.paymentMethod === 'bank_transfer' && (
@@ -1022,19 +1084,7 @@ const POS = () => {
                 </div>
               )}
 
-              {/* Paid Amount */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Amount Paid (₹)</label>
-                <input
-                  type="number"
-                  value={activeTab.paidAmount}
-                  onChange={(e) => updateTabData({ paidAmount: e.target.value })}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
+              {/* Paid Amount - removed duplicate field (already present above) */}
 
               {/* Balance */}
               {

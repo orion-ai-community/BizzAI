@@ -15,7 +15,7 @@ import { info, error } from "../utils/logger.js";
  */
 export const createInvoice = async (req, res) => {
   try {
-    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditApplied = 0 } = req.body;
+    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditApplied = 0, previousDueAmount = 0 } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
@@ -28,7 +28,7 @@ export const createInvoice = async (req, res) => {
       console.log('Calculating item:', it);
       subtotal += it.quantity * it.price;
     }
-    const totalAmount = subtotal - discount;
+    const totalAmount = subtotal - discount + previousDueAmount;
     console.log('Totals calculated:', { subtotal, discount, totalAmount });
 
     // Validate credit usage
@@ -91,6 +91,14 @@ export const createInvoice = async (req, res) => {
         console.log('Customer not found');
         return res.status(400).json({
           message: "Customer not found or unauthorized"
+        });
+      }
+
+      // Validate adding previous dues to bill
+      const outstandingDue = customer.dues > 0 ? customer.dues : 0;
+      if (previousDueAmount > outstandingDue) {
+        return res.status(400).json({
+          message: `Previous due amount (₹${previousDueAmount}) exceeds customer's outstanding dues (₹${outstandingDue.toFixed(2)})`
         });
       }
 
@@ -171,6 +179,7 @@ export const createInvoice = async (req, res) => {
       subtotal,
       discount,
       totalAmount,
+      previousDueAmount,
       paidAmount: actualPaidAmount,
       paymentMethod,
       paymentStatus,
@@ -185,6 +194,7 @@ export const createInvoice = async (req, res) => {
       subtotal,
       discount,
       totalAmount,
+      previousDueAmount,
       paidAmount: actualPaidAmount,
       creditApplied,
       paymentMethod,
@@ -213,6 +223,26 @@ export const createInvoice = async (req, res) => {
         paymentMethod: "credit",
         description: `Customer credit applied to invoice ${invoiceNo}`,
       });
+    }
+
+    // Settle previous dues using any remaining payment after base total
+    if (customerId && previousDueAmount > 0) {
+      const baseTotal = subtotal - discount;
+      const payToBase = Math.min(effectivePaidAmount, baseTotal);
+      const remainingPay = Math.max(0, effectivePaidAmount - payToBase);
+      const payToPrevDue = Math.min(remainingPay, previousDueAmount);
+
+      if (payToPrevDue > 0) {
+        await Customer.findByIdAndUpdate(customerId, { $inc: { dues: -payToPrevDue } });
+        await Transaction.create({
+          type: "payment",
+          customer: customerId,
+          invoice: invoice._id,
+          amount: payToPrevDue,
+          paymentMethod,
+          description: `Previous due settled via invoice ${invoiceNo}`,
+        });
+      }
     }
 
     // Handle customer dues if unpaid (after credit application)

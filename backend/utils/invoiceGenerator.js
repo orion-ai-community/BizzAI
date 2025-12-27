@@ -191,24 +191,44 @@ export const generateInvoicePDF = async (invoiceData) => {
     doc.text(`Rs. ${(invoiceData.discount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
   }
 
+  // Previous Due Added (only if applied)
+  if ((invoiceData.previousDueAmount || 0) > 0) {
+    yPos += 7;
+    doc.text("Previous Due Added:", labelX, yPos);
+    doc.text(`Rs. ${(invoiceData.previousDueAmount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
+  }
+
   // Total
   yPos += 7;
   doc.setFont("helvetica", "bold");
   doc.text("Total:", labelX, yPos);
   doc.text(`Rs. ${(invoiceData.totalAmount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
 
-  // Paid To Date
+  // Credit Applied (only if applied)
+  if ((invoiceData.creditApplied || 0) > 0) {
+    yPos += 7;
+    doc.setFont("helvetica", "normal");
+    doc.text("Credit Applied:", labelX, yPos);
+    doc.text(`Rs. ${(invoiceData.creditApplied || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
+  }
+
+  // Paid Amount
   yPos += 7;
   doc.setFont("helvetica", "normal");
-  doc.text("Paid To Date:", labelX, yPos);
+  doc.text("Paid Amount:", labelX, yPos);
   doc.text(`Rs. ${(invoiceData.paidAmount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
 
-  // Balance Due
+  // Balance Due or Paid in Full
   const balanceDue = (invoiceData.totalAmount || 0) - (invoiceData.paidAmount || 0);
   yPos += 7;
-  doc.setFont("helvetica", balanceDue > 0 ? "bold" : "normal");
-  doc.text("Balance Due:", labelX, yPos);
-  doc.text(`Rs. ${Math.max(0, balanceDue).toFixed(2)}`, valueX, yPos, { align: "right" });
+  if (balanceDue > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.text("Balance Due:", labelX, yPos);
+    doc.text(`Rs. ${balanceDue.toFixed(2)}`, valueX, yPos, { align: "right" });
+  } else {
+    doc.setFont("helvetica", "normal");
+    doc.text("Paid in Full", labelX, yPos);
+  }
 
   // === FOOTER SECTION ===
   const footerY = pageHeight - 25;
