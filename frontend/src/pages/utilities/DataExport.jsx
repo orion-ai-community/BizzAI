@@ -54,16 +54,16 @@ const DataExport = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Data Export</h1>
-                    <p className="text-gray-600">Export your business data in various formats</p>
+                    <h1 className="text-3xl font-bold text-main mb-2">Data Export</h1>
+                    <p className="text-secondary">Export your business data in various formats</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Export Panel */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Export Format Selector */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Format</h3>
+                        <div className="bg-card rounded-xl shadow-sm p-6">
+                            <h3 className="text-lg font-semibold text-main mb-4">Export Format</h3>
                             <div className="grid grid-cols-3 gap-4">
                                 {['excel', 'csv', 'pdf'].map((format) => (
                                     <button
@@ -71,8 +71,8 @@ const DataExport = () => {
                                         type="button"
                                         onClick={() => setExportFormat(format)}
                                         className={`p-4 border-2 rounded-lg transition ${exportFormat === format
-                                                ? 'border-indigo-600 bg-indigo-50'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                            ? 'border-indigo-600 bg-indigo-50'
+                                            : 'border-default hover:border-gray-400'
                                             }`}
                                     >
                                         <div className="text-center">
@@ -81,7 +81,7 @@ const DataExport = () => {
                                                 {format === 'csv' && '📄'}
                                                 {format === 'pdf' && '📕'}
                                             </div>
-                                            <p className="text-sm font-medium text-gray-900 uppercase">{format}</p>
+                                            <p className="text-sm font-medium text-main uppercase">{format}</p>
                                         </div>
                                     </button>
                                 ))}
@@ -89,9 +89,9 @@ const DataExport = () => {
                         </div>
 
                         {/* Module Selection */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-card rounded-xl shadow-sm p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">Select Modules</h3>
+                                <h3 className="text-lg font-semibold text-main">Select Modules</h3>
                                 <button
                                     type="button"
                                     onClick={() => setSelectedModules(selectedModules.length === modules.length ? [] : modules.map(m => m.id))}
@@ -105,8 +105,8 @@ const DataExport = () => {
                                     <label
                                         key={module.id}
                                         className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${selectedModules.includes(module.id)
-                                                ? 'border-indigo-600 bg-indigo-50'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                            ? 'border-indigo-600 bg-indigo-50'
+                                            : 'border-default hover:border-gray-400'
                                             }`}
                                     >
                                         <input
@@ -117,8 +117,8 @@ const DataExport = () => {
                                         />
                                         <div className="ml-3 flex-1">
                                             <div className="flex items-center justify-between">
-                                                <p className="text-sm font-medium text-gray-900">{module.icon} {module.name}</p>
-                                                <span className="text-xs text-gray-500">{module.count}</span>
+                                                <p className="text-sm font-medium text-main">{module.icon} {module.name}</p>
+                                                <span className="text-xs text-muted">{module.count}</span>
                                             </div>
                                         </div>
                                     </label>
@@ -127,11 +127,11 @@ const DataExport = () => {
                         </div>
 
                         {/* Date Range Selector */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Date Range</h3>
+                        <div className="bg-card rounded-xl shadow-sm p-6">
+                            <h3 className="text-lg font-semibold text-main mb-4">Date Range</h3>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="dateFrom" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="dateFrom" className="block text-sm font-medium text-secondary mb-2">
                                         From Date
                                     </label>
                                     <input
@@ -139,11 +139,11 @@ const DataExport = () => {
                                         id="dateFrom"
                                         value={dateRange.from}
                                         onChange={(e) => setDateRange(prev => ({ ...prev, from: e.target.value }))}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="dateTo" className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label htmlFor="dateTo" className="block text-sm font-medium text-secondary mb-2">
                                         To Date
                                     </label>
                                     <input
@@ -151,20 +151,20 @@ const DataExport = () => {
                                         id="dateTo"
                                         value={dateRange.to}
                                         onChange={(e) => setDateRange(prev => ({ ...prev, to: e.target.value }))}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Export Settings */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Settings</h3>
+                        <div className="bg-card rounded-xl shadow-sm p-6">
+                            <h3 className="text-lg font-semibold text-main mb-4">Export Settings</h3>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center justify-between p-3 bg-surface rounded-lg">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900">Include Headers</p>
-                                        <p className="text-xs text-gray-500">Add column headers to export</p>
+                                        <p className="text-sm font-medium text-main">Include Headers</p>
+                                        <p className="text-xs text-muted">Add column headers to export</p>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
@@ -173,14 +173,14 @@ const DataExport = () => {
                                             onChange={() => toggleSetting('includeHeaders')}
                                             className="sr-only peer"
                                         />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                        <div className="w-11 h-6 bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center justify-between p-3 bg-surface rounded-lg">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900">Compress File</p>
-                                        <p className="text-xs text-gray-500">Create ZIP archive</p>
+                                        <p className="text-sm font-medium text-main">Compress File</p>
+                                        <p className="text-xs text-muted">Create ZIP archive</p>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
@@ -189,14 +189,14 @@ const DataExport = () => {
                                             onChange={() => toggleSetting('compressFile')}
                                             className="sr-only peer"
                                         />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                        <div className="w-11 h-6 bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center justify-between p-3 bg-surface rounded-lg">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900">Split by Month</p>
-                                        <p className="text-xs text-gray-500">Create separate files per month</p>
+                                        <p className="text-sm font-medium text-main">Split by Month</p>
+                                        <p className="text-xs text-muted">Create separate files per month</p>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
@@ -205,7 +205,7 @@ const DataExport = () => {
                                             onChange={() => toggleSetting('splitByMonth')}
                                             className="sr-only peer"
                                         />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                        <div className="w-11 h-6 bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-default after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                                     </label>
                                 </div>
                             </div>
@@ -228,37 +228,37 @@ const DataExport = () => {
                     {/* Sidebar */}
                     <div className="space-y-6">
                         {/* Storage Usage */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Storage Usage</h3>
+                        <div className="bg-card rounded-xl shadow-sm p-6">
+                            <h3 className="text-lg font-semibold text-main mb-4">Storage Usage</h3>
                             <div className="mb-3">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-gray-600">Used</span>
-                                    <span className="text-sm font-medium text-gray-900">{storageUsed} MB / {storageTotal} MB</span>
+                                    <span className="text-sm text-secondary">Used</span>
+                                    <span className="text-sm font-medium text-main">{storageUsed} MB / {storageTotal} MB</span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div className="w-full bg-surface rounded-full h-3">
                                     <div
                                         className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all"
                                         style={{ width: `${storagePercentage}%` }}
                                     ></div>
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">{(storageTotal - storageUsed).toFixed(1)} MB remaining</p>
+                            <p className="text-xs text-muted mt-2">{(storageTotal - storageUsed).toFixed(1)} MB remaining</p>
                         </div>
 
                         {/* Recent Exports */}
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Exports</h3>
+                        <div className="bg-card rounded-xl shadow-sm p-6">
+                            <h3 className="text-lg font-semibold text-main mb-4">Recent Exports</h3>
                             <div className="space-y-3">
                                 {recentExports.map((exp) => (
-                                    <div key={exp.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                    <div key={exp.id} className="p-3 bg-surface rounded-lg hover:bg-gray-100 transition">
                                         <div className="flex items-start justify-between mb-2">
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 truncate">{exp.name}</p>
+                                                <p className="text-sm font-medium text-main truncate">{exp.name}</p>
                                                 <div className="flex items-center space-x-2 mt-1">
                                                     <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">
                                                         {exp.format}
                                                     </span>
-                                                    <span className="text-xs text-gray-500">{exp.size}</span>
+                                                    <span className="text-xs text-muted">{exp.size}</span>
                                                 </div>
                                             </div>
                                             <button
@@ -271,7 +271,7 @@ const DataExport = () => {
                                                 </svg>
                                             </button>
                                         </div>
-                                        <p className="text-xs text-gray-500">{exp.date}</p>
+                                        <p className="text-xs text-muted">{exp.date}</p>
                                     </div>
                                 ))}
                             </div>

@@ -94,8 +94,8 @@ const Reports = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Reports & Analytics</h1>
-          <p className="text-gray-600">Business insights and performance metrics</p>
+          <h1 className="text-3xl font-bold text-main mb-2">Reports & Analytics</h1>
+          <p className="text-secondary">Business insights and performance metrics</p>
         </div>
 
         {/* Error Message */}
@@ -106,7 +106,7 @@ const Reports = () => {
         )}
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
+        <div className="mb-6 border-b border-default">
           <nav className="flex space-x-8">
             {[
               { id: 'overview', label: 'Overview', icon: '📊' },
@@ -119,8 +119,8 @@ const Reports = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition ${activeTab === tab.id
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-muted hover:text-secondary hover:border-gray-300'
                   }`}
               >
                 <span className="mr-2">{tab.icon}</span>
@@ -195,8 +195,8 @@ const Reports = () => {
                 {/* Charts Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Sales Trend Chart */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Sales Trend (Last 7 Days)</h3>
+                  <div className="bg-card rounded-xl shadow-sm p-6">
+                    <h3 className="text-lg font-bold text-main mb-4">Sales Trend (Last 7 Days)</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={salesChartData}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -210,8 +210,8 @@ const Reports = () => {
                   </div>
 
                   {/* Payment Methods Chart */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Payment Methods Distribution</h3>
+                  <div className="bg-card rounded-xl shadow-sm p-6">
+                    <h3 className="text-lg font-bold text-main mb-4">Payment Methods Distribution</h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
                         <Pie
@@ -237,7 +237,7 @@ const Reports = () => {
                 {/* AI Insights */}
                 {salesReport?.report?.insight && (
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <h3 className="text-lg font-bold text-main mb-4 flex items-center">
                       <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
@@ -247,7 +247,7 @@ const Reports = () => {
                       {salesReport.report.insight.map((insight, index) => (
                         <div key={index} className="flex items-start">
                           <span className="text-indigo-600 mr-2">•</span>
-                          <p className="text-gray-700">{insight}</p>
+                          <p className="text-secondary">{insight}</p>
                         </div>
                       ))}
                     </div>
@@ -261,8 +261,8 @@ const Reports = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Top Selling Products */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Top Selling Products</h3>
+                  <div className="bg-card rounded-xl shadow-sm p-6">
+                    <h3 className="text-lg font-bold text-main mb-4">Top Selling Products</h3>
                     {topSellingItems.length > 0 ? (
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={topSellingItems}>
@@ -275,17 +275,17 @@ const Reports = () => {
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <p className="text-gray-500 text-center py-8">No sales data available</p>
+                      <p className="text-muted text-center py-8">No sales data available</p>
                     )}
                   </div>
 
                   {/* Sales Summary */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Sales Summary</h3>
+                  <div className="bg-card rounded-xl shadow-sm p-6">
+                    <h3 className="text-lg font-bold text-main mb-4">Sales Summary</h3>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
                         <div>
-                          <p className="text-sm text-gray-600">Total Revenue</p>
+                          <p className="text-sm text-secondary">Total Revenue</p>
                           <p className="text-2xl font-bold text-blue-600">
                             ₹{salesReport?.report?.summary?.totalSales?.toFixed(2) || 0}
                           </p>
@@ -297,7 +297,7 @@ const Reports = () => {
 
                       <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg">
                         <div>
-                          <p className="text-sm text-gray-600">Total Invoices</p>
+                          <p className="text-sm text-secondary">Total Invoices</p>
                           <p className="text-2xl font-bold text-green-600">
                             {salesReport?.report?.summary?.totalInvoices || 0}
                           </p>
@@ -309,7 +309,7 @@ const Reports = () => {
 
                       <div className="flex justify-between items-center p-4 bg-purple-50 rounded-lg">
                         <div>
-                          <p className="text-sm text-gray-600">Average Bill Value</p>
+                          <p className="text-sm text-secondary">Average Bill Value</p>
                           <p className="text-2xl font-bold text-purple-600">
                             ₹{salesReport?.report?.summary?.averageBill?.toFixed(2) || 0}
                           </p>
@@ -339,11 +339,11 @@ const Reports = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {stockReport.lowStock.map((item) => (
                         <div key={item._id} className="bg-white rounded-lg p-4 border border-red-200">
-                          <div className="font-medium text-gray-900">{item.name}</div>
-                          <div className="text-sm text-gray-600 mt-1">
+                          <div className="font-medium text-main">{item.name}</div>
+                          <div className="text-sm text-secondary mt-1">
                             Stock: <span className="font-bold text-red-600">{item.stockQty}</span> {item.unit}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-muted">
                             Min. Required: {item.lowStockLimit} {item.unit}
                           </div>
                         </div>
@@ -353,22 +353,22 @@ const Reports = () => {
                 )}
 
                 {/* Stock Summary */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Inventory Summary</h3>
+                <div className="bg-card rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-bold text-main mb-4">Inventory Summary</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="text-center p-6 bg-blue-50 rounded-lg">
                       <p className="text-4xl font-bold text-blue-600">{stockReport?.totalItems || 0}</p>
-                      <p className="text-gray-600 mt-2">Total Items</p>
+                      <p className="text-secondary mt-2">Total Items</p>
                     </div>
                     <div className="text-center p-6 bg-green-50 rounded-lg">
                       <p className="text-4xl font-bold text-green-600">
                         {(stockReport?.totalItems || 0) - (stockReport?.lowStock?.length || 0)}
                       </p>
-                      <p className="text-gray-600 mt-2">In Stock</p>
+                      <p className="text-secondary mt-2">In Stock</p>
                     </div>
                     <div className="text-center p-6 bg-red-50 rounded-lg">
                       <p className="text-4xl font-bold text-red-600">{stockReport?.lowStock?.length || 0}</p>
-                      <p className="text-gray-600 mt-2">Low Stock</p>
+                      <p className="text-secondary mt-2">Low Stock</p>
                     </div>
                   </div>
                 </div>
@@ -379,9 +379,9 @@ const Reports = () => {
             {activeTab === 'bank' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Finance Summary</h3>
-                    <p className="text-gray-600 mb-6">Detailed overview of all bank accounts, balances, and reconciliation status.</p>
+                  <div className="bg-card rounded-xl shadow-sm p-6 border border-light">
+                    <h3 className="text-lg font-bold text-main mb-2">Finance Summary</h3>
+                    <p className="text-secondary mb-6">Detailed overview of all bank accounts, balances, and reconciliation status.</p>
                     <button
                       onClick={() => navigate('/cashbank/summary')}
                       className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
@@ -392,9 +392,9 @@ const Reports = () => {
                       </svg>
                     </button>
                   </div>
-                  <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">Liquidity Position</h3>
-                    <p className="text-gray-600 mb-6">Visual breakdown of your cash in hand vs. bank balances and total liquidity.</p>
+                  <div className="bg-card rounded-xl shadow-sm p-6 border border-light">
+                    <h3 className="text-lg font-bold text-main mb-2">Liquidity Position</h3>
+                    <p className="text-secondary mb-6">Visual breakdown of your cash in hand vs. bank balances and total liquidity.</p>
                     <button
                       onClick={() => navigate('/cashbank/position')}
                       className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
@@ -414,31 +414,31 @@ const Reports = () => {
               <div className="space-y-6">
                 {/* Customer Dues */}
                 {customerReport && customerReport.length > 0 ? (
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">
+                  <div className="bg-card rounded-xl shadow-sm p-6">
+                    <h3 className="text-lg font-bold text-main mb-4">
                       Customers with Outstanding Dues ({customerReport.length})
                     </h3>
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
+                        <thead className="bg-surface border-b border-default">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Due Amount</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Customer</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Phone</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase">Email</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase">Due Amount</th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-card divide-y divide-gray-200">
                           {customerReport.map((customer) => (
-                            <tr key={customer._id} className="hover:bg-gray-50">
+                            <tr key={customer._id} className="hover:bg-surface">
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{customer.name}</div>
+                                <div className="text-sm font-medium text-main">{customer.name}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900">{customer.phone}</div>
+                                <div className="text-sm text-main">{customer.phone}</div>
                               </td>
                               <td className="px-6 py-4">
-                                <div className="text-sm text-gray-900">{customer.email || '-'}</div>
+                                <div className="text-sm text-main">{customer.email || '-'}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right">
                                 <span className="text-sm font-bold text-red-600">₹{customer.dues.toFixed(2)}</span>
@@ -450,12 +450,12 @@ const Reports = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+                  <div className="bg-card rounded-xl shadow-sm p-12 text-center">
                     <svg className="w-16 h-16 text-green-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">All Clear! 🎉</h3>
-                    <p className="text-gray-600">No customers have outstanding dues.</p>
+                    <h3 className="text-xl font-bold text-main mb-2">All Clear! 🎉</h3>
+                    <p className="text-secondary">No customers have outstanding dues.</p>
                   </div>
                 )}
               </div>
