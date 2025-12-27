@@ -46,7 +46,7 @@ const WhatsAppMarketing = () => {
     };
 
     const columns = [
-        { key: 'name', label: 'Campaign Name', sortable: true, render: (val) => <span className="font-medium text-gray-900">{val}</span> },
+        { key: 'name', label: 'Campaign Name', sortable: true, render: (val) => <span className="font-medium text-main">{val}</span> },
         { key: 'date', label: 'Date', sortable: true },
         { key: 'sent', label: 'Sent', sortable: true },
         { key: 'delivered', label: 'Delivered', sortable: true },
@@ -86,7 +86,7 @@ const WhatsAppMarketing = () => {
             />
 
             {/* WhatsApp API Status */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <div className="p-2 bg-green-100 rounded-lg">
@@ -95,8 +95,8 @@ const WhatsAppMarketing = () => {
                             </svg>
                         </div>
                         <div>
-                            <p className="font-bold text-gray-900">WhatsApp Business API</p>
-                            <p className="text-sm text-gray-600">Connected & Active</p>
+                            <p className="font-bold text-main">WhatsApp Business API</p>
+                            <p className="text-sm text-secondary">Connected & Active</p>
                         </div>
                     </div>
                     <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
@@ -141,11 +141,11 @@ const WhatsAppMarketing = () => {
                 <div className="lg:col-span-2 space-y-6">
                     {/* Broadcast Form */}
                     {showBroadcastForm && (
-                        <div className="bg-white rounded-xl shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-gray-900 mb-4">Create Broadcast Message</h2>
+                        <div className="bg-card rounded-xl shadow-sm p-6">
+                            <h2 className="text-lg font-bold text-main mb-4">Create Broadcast Message</h2>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Template</label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Select Template</label>
                                     <select
                                         value={selectedTemplate}
                                         onChange={(e) => {
@@ -160,20 +160,20 @@ const WhatsAppMarketing = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Message</label>
                                     <textarea
                                         value={formData.message || messagePreview}
                                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                         rows="4"
-                                        className="w-full px-4 py-2 border rounded-lg"
+                                        className="w-full px-4 py-2 border rounded-lg border-default text-secondary"
                                         placeholder="Type your message..."
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Customer Groups</label>
+                                    <label className="block text-sm font-medium text-secondary mb-2">Customer Groups</label>
                                     <div className="space-y-2">
                                         {customerGroups.map(group => (
-                                            <label key={group.id} className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                            <label key={group.id} className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-surface">
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedGroups.includes(group.id)}
@@ -181,20 +181,20 @@ const WhatsAppMarketing = () => {
                                                     className="w-4 h-4 text-indigo-600 rounded"
                                                 />
                                                 <div className="flex-1">
-                                                    <p className="font-medium text-gray-900">{group.name}</p>
-                                                    <p className="text-sm text-gray-600">{group.count} customers</p>
+                                                    <p className="font-medium text-main">{group.name}</p>
+                                                    <p className="text-sm text-secondary">{group.count} customers</p>
                                                 </div>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Upload Attachment</label>
-                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                                        <svg className="mx-auto w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <label className="block text-sm font-medium text-secondary mb-2">Upload Attachment</label>
+                                    <div className="border-2 border-dashed border-default rounded-lg p-4 text-center">
+                                        <svg className="mx-auto w-10 h-10 text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                         </svg>
-                                        <p className="text-sm text-gray-600">Upload Image or PDF</p>
+                                        <p className="text-sm text-secondary">Upload Image or PDF</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -220,7 +220,7 @@ const WhatsAppMarketing = () => {
                                     </button>
                                     <button
                                         onClick={() => setShowBroadcastForm(false)}
-                                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                                        className="px-6 py-2 border border-default text-secondary rounded-lg hover:bg-surface"
                                     >
                                         Cancel
                                     </button>
@@ -230,24 +230,24 @@ const WhatsAppMarketing = () => {
                     )}
 
                     {/* Campaign History */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Campaigns</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Recent Campaigns</h2>
                         <DataTable columns={columns} data={campaigns} emptyMessage="No campaigns yet" />
                     </div>
                 </div>
 
                 {/* Sidebar - Message Preview */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Message Preview</h2>
-                        <div className="border-2 border-gray-200 rounded-lg p-4 mb-4 min-h-[200px] bg-gray-50">
-                            <div className="bg-white rounded-lg p-3 shadow-sm">
-                                <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Message Preview</h2>
+                        <div className="border-2 border-default rounded-lg p-4 mb-4 min-h-[200px] bg-surface">
+                            <div className="bg-card rounded-lg p-3 shadow-sm">
+                                <p className="text-sm text-main whitespace-pre-wrap">
                                     {formData.message || messagePreview || 'Your message will appear here...'}
                                 </p>
                             </div>
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-secondary">
                             <p className="mb-2">
                                 <strong>Recipients:</strong> {selectedGroups.length > 0
                                     ? customerGroups.filter(g => selectedGroups.includes(g.id)).reduce((sum, g) => sum + g.count, 0)

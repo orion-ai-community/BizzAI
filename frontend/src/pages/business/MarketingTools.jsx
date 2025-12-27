@@ -42,20 +42,20 @@ const MarketingTools = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     {/* Template Gallery */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Template Gallery</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Template Gallery</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {templates.map((template) => (
                                 <div
                                     key={template.id}
                                     onClick={() => setSelectedTemplate(template)}
-                                    className={`border-2 rounded-xl p-4 cursor-pointer transition hover:border-indigo-300 ${selectedTemplate?.id === template.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'
+                                    className={`border-2 rounded-xl p-4 cursor-pointer transition hover:border-indigo-300 ${selectedTemplate?.id === template.id ? 'border-indigo-600 bg-indigo-50' : 'border-default'
                                         }`}
                                 >
                                     <div className="text-4xl mb-3 text-center">{template.thumbnail}</div>
-                                    <h3 className="font-bold text-gray-900 mb-1">{template.name}</h3>
-                                    <p className="text-xs text-gray-600 mb-2">{template.description}</p>
-                                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                                    <h3 className="font-bold text-main mb-1">{template.name}</h3>
+                                    <p className="text-xs text-secondary mb-2">{template.description}</p>
+                                    <span className="px-2 py-1 bg-surface text-secondary text-xs rounded-full">
                                         {template.category}
                                     </span>
                                 </div>
@@ -64,11 +64,11 @@ const MarketingTools = () => {
                     </div>
 
                     {/* Social Media Post Creator */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Social Media Post Creator</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Social Media Post Creator</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Custom Message</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Custom Message</label>
                                 <textarea
                                     value={customMessage}
                                     onChange={(e) => setCustomMessage(e.target.value)}
@@ -78,27 +78,27 @@ const MarketingTools = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Image</label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                    <svg className="mx-auto w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <label className="block text-sm font-medium text-secondary mb-2">Upload Image</label>
+                                <div className="border-2 border-dashed border-default rounded-lg p-6 text-center">
+                                    <svg className="mx-auto w-12 h-12 text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                     </svg>
-                                    <p className="text-sm text-gray-600">Click to upload or drag and drop</p>
-                                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                                    <p className="text-sm text-muted">Click to upload or drag and drop</p>
+                                    <p className="text-xs text-muted">PNG, JPG up to 10MB</p>
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Theme Selector</label>
+                                <label className="block text-sm font-medium text-secondary mb-2">Theme Selector</label>
                                 <div className="flex space-x-3">
                                     {themes.map((theme) => (
                                         <button
                                             key={theme.id}
                                             onClick={() => setSelectedTheme(theme.id)}
-                                            className={`flex flex-col items-center space-y-2 p-3 border-2 rounded-lg transition ${selectedTheme === theme.id ? 'border-indigo-600' : 'border-gray-200'
+                                            className={`flex flex-col items-center space-y-2 p-3 border-2 rounded-lg transition ${selectedTheme === theme.id ? 'border-indigo-600' : 'border-default'
                                                 }`}
                                         >
                                             <div className={`w-8 h-8 rounded-full ${theme.color}`} />
-                                            <span className="text-xs text-gray-700">{theme.name}</span>
+                                            <span className="text-xs text-secondary">{theme.name}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -110,42 +110,42 @@ const MarketingTools = () => {
                 {/* Sidebar */}
                 <div className="lg:col-span-1 space-y-6">
                     {/* Preview Panel */}
-                    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Preview</h2>
-                        <div className="border-2 border-gray-200 rounded-lg p-6 mb-4 min-h-[300px] flex items-center justify-center bg-gray-50">
+                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
+                        <h2 className="text-lg font-bold text-main mb-4">Preview</h2>
+                        <div className="border-2 border-default rounded-lg p-6 mb-4 min-h-[300px] flex items-center justify-center bg-surface">
                             {selectedTemplate ? (
                                 <div className="text-center">
                                     <div className="text-6xl mb-4">{selectedTemplate.thumbnail}</div>
-                                    <p className="font-bold text-gray-900">{selectedTemplate.name}</p>
-                                    <p className="text-sm text-gray-600 mt-2">{customMessage || 'Your message will appear here'}</p>
+                                    <p className="font-bold text-main">{selectedTemplate.name}</p>
+                                    <p className="text-sm text-muted mt-2">{customMessage || 'Your message will appear here'}</p>
                                 </div>
                             ) : (
-                                <p className="text-gray-400">Select a template to preview</p>
+                                <p className="text-muted">Select a template to preview</p>
                             )}
                         </div>
                         <div className="space-y-2">
                             <button className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                                 Download
                             </button>
-                            <button className="w-full py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            <button className="w-full py-2 border border-default text-secondary rounded-lg hover:bg-surface">
                                 Share
                             </button>
-                            <button className="w-full py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                            <button className="w-full py-2 border border-default text-secondary rounded-lg hover:bg-surface">
                                 Preview
                             </button>
                         </div>
                     </div>
 
                     {/* Performance Suggestions */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4">Performance Tips</h2>
+                    <div className="bg-card rounded-xl shadow-sm p-6">
+                        <h2 className="text-lg font-bold text-main mb-4">Performance Tips</h2>
                         <div className="space-y-3">
                             {suggestions.map((suggestion, index) => (
                                 <div key={index} className="flex items-start space-x-2">
                                     <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <p className="text-sm text-gray-700">{suggestion}</p>
+                                    <p className="text-sm text-secondary">{suggestion}</p>
                                 </div>
                             ))}
                         </div>

@@ -34,13 +34,13 @@ const OnlineShop = () => {
             </div>
 
             <div className="mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Features Included</h3>
+                <h3 className="text-2xl font-bold text-main mb-6">Features Included</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {features.map((feature, idx) => (
-                        <div key={idx} className="bg-white rounded-xl shadow-sm p-6 border-2 border-gray-100 hover:border-indigo-300 transition">
+                        <div key={idx} className="bg-card rounded-xl shadow-sm p-6 border-2 border-gray-100 hover:border-indigo-300 transition">
                             <div className="text-4xl mb-3">{feature.icon}</div>
-                            <h4 className="font-bold text-gray-900 mb-2">{feature.title}</h4>
-                            <p className="text-gray-600 text-sm mb-3">{feature.description}</p>
+                            <h4 className="font-bold text-main mb-2">{feature.title}</h4>
+                            <p className="text-secondary text-sm mb-3">{feature.description}</p>
                             <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">{feature.status}</span>
                         </div>
                     ))}
@@ -48,7 +48,7 @@ const OnlineShop = () => {
             </div>
 
             <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Choose Your Plan</h3>
+                <h3 className="text-2xl font-bold text-main mb-6">Choose Your Plan</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {plans.map((plan, idx) => (
                         <div key={idx} className={`relative border-2 rounded-xl p-6 ${plan.color} ${plan.popular ? 'ring-4 ring-indigo-300' : ''}`}>
@@ -57,7 +57,7 @@ const OnlineShop = () => {
                                     <span className="px-4 py-1 bg-indigo-600 text-white text-sm font-bold rounded-full">Most Popular</span>
                                 </div>
                             )}
-                            <h4 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h4>
+                            <h4 className="text-2xl font-bold text-main mb-2">{plan.name}</h4>
                             <div className="text-3xl font-bold text-indigo-600 mb-6">{plan.price}</div>
                             <ul className="space-y-3 mb-6">
                                 {plan.features.map((feature, featureIdx) => (
@@ -65,11 +65,11 @@ const OnlineShop = () => {
                                         <svg className="w-5 h-5 text-green-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span className="text-gray-700">{feature}</span>
+                                        <span className="text-secondary">{feature}</span>
                                     </li>
                                 ))}
                             </ul>
-                            <button className={`w-full py-3 rounded-lg font-medium transition ${plan.popular ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-white border-2 border-gray-300 text-gray-900 hover:border-indigo-600'}`}>
+                            <button className={`w-full py-3 rounded-lg font-medium transition ${plan.popular ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-white border-2 border-defaulttext-main hover:border-indigo-600'}`}>
                                 Get Started
                             </button>
                         </div>
