@@ -75,7 +75,7 @@ const SalesInvoiceDetail = () => {
             case 'unpaid':
                 return 'bg-red-100 text-red-800';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-gray-100  text-secondary';
         }
     };
 
@@ -86,7 +86,7 @@ const SalesInvoiceDetail = () => {
                 <div className="mb-8 print:hidden">
                     <button
                         onClick={() => navigate('/sales/invoice')}
-                        className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+                        className="flex items-center  text-secondary hover: text-main mb-4"
                     >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -95,66 +95,66 @@ const SalesInvoiceDetail = () => {
                     </button>
                     <div className="flex justify-between items-start">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Sales Invoice Details</h1>
-                            <p className="text-gray-600">View and print sales invoice</p>
+                            <h1 className="text-3xl font-bold  text-main mb-2">Sales Invoice Details</h1>
+                            <p className=" text-secondary">View and print sales invoice</p>
                         </div>
-                         <div className="flex space-x-2">
-                             {invoice && invoice.paymentStatus !== 'paid' && (
-                                 <button
-                                     onClick={() => setShowPaymentModal(true)}
-                                     className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                 >
-                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                     </svg>
-                                     <span>Record Payment</span>
-                                 </button>
-                             )}
-                             <button
-                                 onClick={handlePrint}
-                                 className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                             >
-                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                 </svg>
-                                 <span>Print Invoice</span>
-                             </button>
-                             <button
-                                 onClick={() => {
-                                     dispatch(clearSalesInvoice());
-                                     dispatch(reset());
-                                     navigate('/sales/invoice');
-                                 }}
-                                 className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                             >
-                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                 </svg>
-                                 <span>Done - Return to Sales</span>
-                             </button>
-                         </div>
+                        <div className="flex space-x-2">
+                            {invoice && invoice.paymentStatus !== 'paid' && (
+                                <button
+                                    onClick={() => setShowPaymentModal(true)}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span>Record Payment</span>
+                                </button>
+                            )}
+                            <button
+                                onClick={handlePrint}
+                                className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                                <span>Print Invoice</span>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    dispatch(clearSalesInvoice());
+                                    dispatch(reset());
+                                    navigate('/sales/invoice');
+                                }}
+                                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Done - Return to Sales</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Invoice Card */}
-                <div className="bg-white rounded-xl shadow-sm p-8 print:shadow-none">
+                <div className="bg-card rounded-xl shadow-sm p-8 print:shadow-none">
                     {/* Invoice Header */}
                     <div className="border-b pb-6 mb-6">
                         <div className="flex justify-between items-start">
                             <div>
                                 <h2 className="text-3xl font-bold text-indigo-600 mb-2">INVOICE</h2>
-                                <div className="text-lg font-semibold text-gray-900">{invoice.invoiceNo}</div>
+                                <div className="text-lg font-semibold  text-main">{invoice.invoiceNo}</div>
                             </div>
                             <div className="text-right">
-                                <div className="text-sm text-gray-600 mb-1">Invoice Date</div>
-                                <div className="font-medium text-gray-900">
+                                <div className="text-sm  text-secondary mb-1">Invoice Date</div>
+                                <div className="font-medium  text-main">
                                     {new Date(invoice.createdAt).toLocaleDateString('en-IN', {
                                         day: '2-digit',
                                         month: 'short',
                                         year: 'numeric',
                                     })}
                                 </div>
-                                <div className="text-sm text-gray-500 mt-1">
+                                <div className="text-sm  text-muted mt-1">
                                     {new Date(invoice.createdAt).toLocaleTimeString('en-IN', {
                                         hour: '2-digit',
                                         minute: '2-digit',
@@ -167,31 +167,31 @@ const SalesInvoiceDetail = () => {
                     {/* Customer Info & Status */}
                     <div className="grid grid-cols-2 gap-8 mb-8">
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Bill To</h3>
+                            <h3 className="text-sm font-semibold  text-muted uppercase mb-2">Bill To</h3>
                             {invoice.customer ? (
                                 <div>
-                                    <div className="font-bold text-gray-900 text-lg">{invoice.customer.name}</div>
-                                    <div className="text-gray-600 mt-1">{invoice.customer.phone}</div>
+                                    <div className="font-bold  text-main text-lg">{invoice.customer.name}</div>
+                                    <div className=" text-secondary mt-1">{invoice.customer.phone}</div>
                                     {invoice.customer.email && (
-                                        <div className="text-gray-600">{invoice.customer.email}</div>
+                                        <div className=" text-secondary">{invoice.customer.email}</div>
                                     )}
                                     {invoice.customer.address && (
-                                        <div className="text-gray-600 mt-1">{invoice.customer.address}</div>
+                                        <div className=" text-secondary mt-1">{invoice.customer.address}</div>
                                     )}
                                 </div>
                             ) : (
-                                <div className="text-gray-600">Walk-in Customer</div>
+                                <div className=" text-secondary">Walk-in Customer</div>
                             )}
                         </div>
 
                         <div className="text-right">
-                            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Payment Status</h3>
+                            <h3 className="text-sm font-semibold  text-muted uppercase mb-2">Payment Status</h3>
                             <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(invoice.paymentStatus)}`}>
                                 {invoice.paymentStatus.toUpperCase()}
                             </span>
                             <div className="mt-4">
-                                <div className="text-sm text-gray-600">Payment Method</div>
-                                <div className="font-medium text-gray-900 capitalize">{invoice.paymentMethod}</div>
+                                <div className="text-sm  text-secondary">Payment Method</div>
+                                <div className="font-medium  text-main capitalize">{invoice.paymentMethod}</div>
                             </div>
                         </div>
                     </div>
@@ -200,22 +200,22 @@ const SalesInvoiceDetail = () => {
                     <div className="mb-8">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b-2 border-gray-300">
-                                    <th className="text-left py-3 px-2 font-semibold text-gray-700">#</th>
-                                    <th className="text-left py-3 px-2 font-semibold text-gray-700">Item</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-gray-700">Quantity</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-gray-700">Price</th>
-                                    <th className="text-right py-3 px-2 font-semibold text-gray-700">Total</th>
+                                <tr className="border-b-2 border-default">
+                                    <th className="text-left py-3 px-2 font-semibold  text-secondary">#</th>
+                                    <th className="text-left py-3 px-2 font-semibold  text-secondary">Item</th>
+                                    <th className="text-right py-3 px-2 font-semibold  text-secondary">Quantity</th>
+                                    <th className="text-right py-3 px-2 font-semibold  text-secondary">Price</th>
+                                    <th className="text-right py-3 px-2 font-semibold  text-secondary">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {invoice.items.map((item, index) => (
-                                    <tr key={index} className="border-b border-gray-200">
-                                        <td className="py-3 px-2 text-gray-600">{index + 1}</td>
-                                        <td className="py-3 px-2 text-gray-900">{item.name || 'Item'}</td>
-                                        <td className="py-3 px-2 text-right text-gray-900">{item.quantity}</td>
-                                        <td className="py-3 px-2 text-right text-gray-900">₹{item.price.toFixed(2)}</td>
-                                        <td className="py-3 px-2 text-right font-medium text-gray-900">
+                                    <tr key={index} className="border-b border-default">
+                                        <td className="py-3 px-2  text-secondary">{index + 1}</td>
+                                        <td className="py-3 px-2  text-main">{item.name || 'Item'}</td>
+                                        <td className="py-3 px-2 text-right  text-main">{item.quantity}</td>
+                                        <td className="py-3 px-2 text-right  text-main">₹{item.price.toFixed(2)}</td>
+                                        <td className="py-3 px-2 text-right font-medium  text-main">
                                             ₹{item.total.toFixed(2)}
                                         </td>
                                     </tr>
@@ -228,28 +228,28 @@ const SalesInvoiceDetail = () => {
                     <div className="flex justify-end">
                         <div className="w-64">
                             <div className="flex justify-between py-2 border-b">
-                                <span className="text-gray-600">Subtotal:</span>
-                                <span className="font-medium text-gray-900">₹{invoice.subtotal.toFixed(2)}</span>
+                                <span className=" text-secondary">Subtotal:</span>
+                                <span className="font-medium  text-main">₹{invoice.subtotal.toFixed(2)}</span>
                             </div>
                             {invoice.discount > 0 && (
                                 <div className="flex justify-between py-2 border-b">
-                                    <span className="text-gray-600">Discount:</span>
+                                    <span className=" text-secondary">Discount:</span>
                                     <span className="font-medium text-red-600">-₹{invoice.discount.toFixed(2)}</span>
                                 </div>
                             )}
-                            <div className="flex justify-between py-3 border-b-2 border-gray-300">
-                                <span className="text-lg font-bold text-gray-900">Total Amount:</span>
+                            <div className="flex justify-between py-3 border-b-2 border-default">
+                                <span className="text-lg font-bold  text-main">Total Amount:</span>
                                 <span className="text-lg font-bold text-indigo-600">
                                     ₹{invoice.totalAmount.toFixed(2)}
                                 </span>
                             </div>
                             <div className="flex justify-between py-2 border-b">
-                                <span className="text-gray-600">Paid Amount:</span>
+                                <span className=" text-secondary">Paid Amount:</span>
                                 <span className="font-medium text-green-600">₹{invoice.paidAmount.toFixed(2)}</span>
                             </div>
                             {invoice.paidAmount < invoice.totalAmount && (
                                 <div className="flex justify-between py-2">
-                                    <span className="text-gray-600 font-medium">Balance Due:</span>
+                                    <span className=" text-secondary font-medium">Balance Due:</span>
                                     <span className="font-bold text-red-600">
                                         ₹{(invoice.totalAmount - invoice.paidAmount).toFixed(2)}
                                     </span>
@@ -259,7 +259,7 @@ const SalesInvoiceDetail = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-12 pt-6 border-t text-center text-gray-500 text-sm">
+                    <div className="mt-12 pt-6 border-t text-center  text-muted text-sm">
                         <p>Thank you for your business!</p>
                         <p className="mt-2">This is a computer-generated invoice.</p>
                     </div>
