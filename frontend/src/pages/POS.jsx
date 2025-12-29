@@ -1098,83 +1098,53 @@ const POS = () => {
                 </div>
               )}
 
-              {/* Paid Amount */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-secondary mb-2">Amount Paid (₹)</label>
-                <input
-                  type="number"
-                  value={activeTab.paidAmount}
-                  onChange={(e) => updateTabData({ paidAmount: e.target.value })}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="0.00"
-                />
-              </div>
+              {/* Change Returned Input - only show if customer paid MORE than total */}
+              {balance > 0 && (
+                <div className="mt-3 pt-3 border-t border-green-200">
+                  <label className="block text-sm font-medium text-secondary mb-2">
+                    Change Returned:
+                  </label>
+                  <input
+                    type="number"
+                    value={activeTab.changeReturned}
+                    onChange={(e) => updateTabData({ changeReturned: e.target.value })}
+                    min="0"
+                    max={balance}
+                    step="0.01"
+                    className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Enter change returned to customer"
+                  />
 
-              {/* Balance */}
-              {
-                activeTab.paidAmount && (
-                  <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium text-secondary">
-                        {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
-                      </span>
-                      <span className={`text-xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        ₹{Math.abs(balance).toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Change Returned Input - only show if customer paid MORE than total */}
-                    {balance > 0 && (
-                      <div className="mt-3 pt-3 border-t border-green-200">
-                        <label className="block text-sm font-medium text-secondary mb-2">
-                          Change Returned:
-                        </label>
-                        <input
-                          type="number"
-                          value={activeTab.changeReturned}
-                          onChange={(e) => updateTabData({ changeReturned: e.target.value })}
-                          min="0"
-                          max={balance}
-                          step="0.01"
-                          className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder="Enter change returned to customer"
-                        />
-
-                        {/* Remaining Change/Credit */}
-                        {activeTab.changeReturned && parseFloat(activeTab.changeReturned) < balance && (
-                          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-yellow-800 font-medium">
-                                {activeTab.customer ? 'Credit Due to Customer:' : 'Remaining Change (unpaid):'}
-                              </span>
-                              <span className="font-bold text-yellow-900">
-                                ₹{(balance - parseFloat(activeTab.changeReturned || 0)).toFixed(2)}
-                              </span>
-                            </div>
-                            {activeTab.customer && (
-                              <p className="text-xs text-yellow-700 mt-1">
-                                💡 This will be added as credit to customer's account
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Full Change Returned Confirmation */}
-                        {activeTab.changeReturned && parseFloat(activeTab.changeReturned) === balance && (
-                          <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded flex items-center text-sm text-green-800">
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span className="font-medium">Full change returned ✓</span>
-                          </div>
-                        )}
+                  {/* Remaining Change/Credit */}
+                  {activeTab.changeReturned && parseFloat(activeTab.changeReturned) < balance && (
+                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-yellow-800 font-medium">
+                          {activeTab.customer ? 'Credit Due to Customer:' : 'Remaining Change (unpaid):'}
+                        </span>
+                        <span className="font-bold text-yellow-900">
+                          ₹{(balance - parseFloat(activeTab.changeReturned || 0)).toFixed(2)}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )
-              }
+                      {activeTab.customer && (
+                        <p className="text-xs text-yellow-700 mt-1">
+                          💡 This will be added as credit to customer's account
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Full Change Returned Confirmation */}
+                  {activeTab.changeReturned && parseFloat(activeTab.changeReturned) === balance && (
+                    <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded flex items-center text-sm text-green-800">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-medium">Full change returned ✓</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Walk-in Customer Warning */}
               {

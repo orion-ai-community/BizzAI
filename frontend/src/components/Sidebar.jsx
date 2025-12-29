@@ -107,6 +107,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
         { name: 'Sales Invoice', path: '/sales/invoice' },
         { name: 'Estimate / Proforma', path: '/sales/estimate' },
         { name: 'Payment In', path: '/sales/payment-in' },
+        { name: 'Payment In List', path: '/sales/payment-in-list' },
         { name: 'Sales Order', path: '/sales/order' },
         { name: 'Delivery Challan', path: '/sales/delivery-challan' },
         { name: 'Return', path: '/sales/return' },
