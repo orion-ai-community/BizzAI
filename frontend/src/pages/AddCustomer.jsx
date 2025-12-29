@@ -1,31 +1,32 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { addCustomer, reset } from '../redux/slices/customerSlice';
-import Layout from '../components/Layout';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addCustomer, reset } from "../redux/slices/customerSlice";
+import Layout from "../components/Layout";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const { isLoading, isSuccess, isError, message } = useSelector(
     (state) => state.customers
   );
 
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
   });
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
-
+  const [error, setError] = useState("");
   const { name, phone, email, address } = formData;
 
   useEffect(() => {
     // Only navigate if we explicitly set the flag from this component
     if (shouldNavigate && isSuccess) {
-      navigate('/customers');
+      navigate("/customers");
       dispatch(reset());
     }
   }, [shouldNavigate, isSuccess, navigate, dispatch]);
@@ -49,7 +50,7 @@ const AddCustomer = () => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate('/customers')}
+            onClick={() => navigate("/customers")}
             className="flex items-center text-secondary hover:text-main mb-4"
           >
             <svg
@@ -67,7 +68,9 @@ const AddCustomer = () => {
             </svg>
             Back to Customers
           </button>
-          <h1 className="text-3xl font-bold text-main mb-2">Add New Customer</h1>
+          <h1 className="text-3xl font-bold text-main mb-2">
+            Add New Customer
+          </h1>
           <p className="text-secondary">Create a new customer profile</p>
         </div>
 
@@ -113,11 +116,14 @@ const AddCustomer = () => {
                 type="tel"
                 id="phone"
                 name="phone"
+                pattern="[0-9]{10}"
+                minLength={10}
+                maxLength={10}
                 value={phone}
                 onChange={onChange}
                 required
                 className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="+91 9876543210"
+                placeholder="9876543210"
               />
             </div>
 
@@ -163,7 +169,7 @@ const AddCustomer = () => {
             <div className="flex space-x-4 pt-4">
               <button
                 type="button"
-                onClick={() => navigate('/customers')}
+                onClick={() => navigate("/customers")}
                 className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium transition"
               >
                 Cancel
@@ -197,7 +203,7 @@ const AddCustomer = () => {
                     Adding Customer...
                   </span>
                 ) : (
-                  'Add Customer'
+                  "Add Customer"
                 )}
               </button>
             </div>

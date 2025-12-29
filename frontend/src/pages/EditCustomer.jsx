@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
-import { getCustomerById, updateCustomer, reset } from '../redux/slices/customerSlice';
-import Layout from '../components/Layout';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  getCustomerById,
+  updateCustomer,
+  reset,
+} from "../redux/slices/customerSlice";
+import Layout from "../components/Layout";
 
 const EditCustomer = () => {
   const { id } = useParams();
@@ -13,10 +17,10 @@ const EditCustomer = () => {
   );
 
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
   });
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
@@ -33,10 +37,10 @@ const EditCustomer = () => {
   useEffect(() => {
     if (customer) {
       setFormData({
-        name: customer.name || '',
-        phone: customer.phone || '',
-        email: customer.email || '',
-        address: customer.address || '',
+        name: customer.name || "",
+        phone: customer.phone || "",
+        email: customer.email || "",
+        address: customer.address || "",
       });
     }
   }, [customer]);
@@ -44,7 +48,7 @@ const EditCustomer = () => {
   useEffect(() => {
     // Only navigate if we explicitly set the flag from this component
     if (shouldNavigate && isSuccess && !isLoading) {
-      navigate('/customers');
+      navigate("/customers");
       dispatch(reset());
     }
   }, [shouldNavigate, isSuccess, isLoading, navigate, dispatch]);
@@ -78,7 +82,7 @@ const EditCustomer = () => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate('/customers')}
+            onClick={() => navigate("/customers")}
             className="flex items-center text-secondary hover:text-main mb-4"
           >
             <svg
@@ -142,6 +146,9 @@ const EditCustomer = () => {
                 type="tel"
                 id="phone"
                 name="phone"
+                pattern="[0-9]{10}"
+                minLength={10}
+                maxLength={10}
                 value={phone}
                 onChange={onChange}
                 required
@@ -192,7 +199,7 @@ const EditCustomer = () => {
             <div className="flex space-x-4 pt-4">
               <button
                 type="button"
-                onClick={() => navigate('/customers')}
+                onClick={() => navigate("/customers")}
                 className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-surface font-medium transition"
               >
                 Cancel
@@ -226,7 +233,7 @@ const EditCustomer = () => {
                     Updating Customer...
                   </span>
                 ) : (
-                  'Update Customer'
+                  "Update Customer"
                 )}
               </button>
             </div>
