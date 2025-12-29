@@ -33,6 +33,8 @@ import Estimate from './pages/sales/Estimate';
 import EstimateList from './pages/sales/EstimateList';
 import EstimateDetail from './pages/sales/EstimateDetail';
 import PaymentIn from './pages/sales/PaymentIn';
+import PaymentInList from './pages/sales/PaymentInList';
+import PaymentReceiptDetail from './pages/sales/PaymentReceiptDetail';
 import SalesOrder from './pages/sales/SalesOrder';
 import DeliveryChallan from './pages/sales/DeliveryChallan';
 import Return from './pages/sales/Return';
@@ -314,6 +316,8 @@ function App() {
             <Route path="estimates" element={<ProtectedRoute><EstimateList /></ProtectedRoute>} />
             <Route path="estimate/:id" element={<ProtectedRoute><EstimateDetail /></ProtectedRoute>} />
             <Route path="payment-in" element={<ProtectedRoute><PaymentIn /></ProtectedRoute>} />
+            <Route path="payment-in-list" element={<ProtectedRoute><PaymentInList /></ProtectedRoute>} />
+            <Route path="payment-in/:id" element={<ProtectedRoute><PaymentReceiptDetail /></ProtectedRoute>} />
             <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
             <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
             <Route path="return" element={<ProtectedRoute><Return /></ProtectedRoute>} />
