@@ -47,12 +47,25 @@ const Register = () => {
   }, [user, isSuccess, navigate, dispatch]);
 
   const onChange = (e) => {
+    const { name, value } = e.target;
+
+    let updatedValue = value;
+
+    // ✅ Sirf phone ke liye rule
+    if (name === "phone") {
+      updatedValue = value.replace(/\D/g, ""); // only digits
+
+      if (updatedValue.length > 10) return; // 10 se zyada nahi
+    }
+
     setFormData((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.value,
+      [name]: updatedValue,
     }));
+
     setValidationError("");
   };
+
 
   const onSubmit = (e) => {
     e.preventDefault();
