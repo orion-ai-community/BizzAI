@@ -115,10 +115,10 @@ const AddCustomer = () => {
               <input
                 type="tel"
                 id="phone"
+                name="phone"
                 pattern="[0-9]{10}"
                 minLength={10}
                 maxLength={10}
-                name="phone"
                 value={phone}
                 onChange={onChange}
                 required
