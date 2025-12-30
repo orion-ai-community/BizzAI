@@ -196,7 +196,7 @@ const ReturnedItems = () => {
                             <tbody className="bg-card divide-y divide-gray-200">
                                 {filteredReturns.map((returnItem) => (
                                     <>
-                                        <tr key={returnItem._id} className="hover:bg-gray-50">
+                                        <tr key={returnItem._id} className="hover:bg-surface">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <button
                                                     onClick={() => toggleRowExpansion(returnItem._id)}
