@@ -70,15 +70,15 @@ export const getSingleItem = async (req, res) => {
       return res.status(400).json({ message: "Invalid item ID format" });
     }
 
-    const item = await Item.findOne({ 
-      _id: req.params.id, 
-      addedBy: req.user._id 
+    const item = await Item.findOne({
+      _id: req.params.id,
+      addedBy: req.user._id
     });
-    
+
     if (!item) {
       return res.status(404).json({ message: "Item not found or unauthorized" });
     }
-    
+
     res.status(200).json(item);
   } catch (err) {
     error(`Get Single Item Error: ${err.message}`);
@@ -98,23 +98,23 @@ export const updateItem = async (req, res) => {
     }
 
     // First check if item belongs to this owner
-    const item = await Item.findOne({ 
-      _id: req.params.id, 
-      addedBy: req.user._id 
+    const item = await Item.findOne({
+      _id: req.params.id,
+      addedBy: req.user._id
     });
-    
+
     if (!item) {
       return res.status(404).json({ message: "Item not found or unauthorized" });
     }
 
     // Check for duplicate name if name is being updated
     if (req.body.name && req.body.name !== item.name) {
-      const existingName = await Item.findOne({ 
-        name: req.body.name, 
+      const existingName = await Item.findOne({
+        name: req.body.name,
         addedBy: req.user._id,
         _id: { $ne: req.params.id }
       });
-      
+
       if (existingName) {
         return res.status(400).json({ message: "Item name already exists in your inventory" });
       }
@@ -143,11 +143,11 @@ export const deleteItem = async (req, res) => {
       return res.status(400).json({ message: "Invalid item ID format" });
     }
 
-    const item = await Item.findOne({ 
-      _id: req.params.id, 
-      addedBy: req.user._id 
+    const item = await Item.findOne({
+      _id: req.params.id,
+      addedBy: req.user._id
     });
-    
+
     if (!item) {
       return res.status(404).json({ message: "Item not found or unauthorized" });
     }
@@ -168,11 +168,15 @@ export const deleteItem = async (req, res) => {
  */
 export const getLowStockItems = async (req, res) => {
   try {
-    const items = await Item.find({
-      addedBy: req.user._id,
-      $expr: { $lte: ["$stockQty", "$lowStockLimit"] },
+    // Get all items and filter by available stock (stockQty - reservedStock)
+    const allItems = await Item.find({ addedBy: req.user._id });
+
+    const lowStockItems = allItems.filter(item => {
+      const availableStock = item.stockQty - (item.reservedStock || 0);
+      return availableStock <= item.lowStockLimit;
     });
-    res.status(200).json(items);
+
+    res.status(200).json(lowStockItems);
   } catch (err) {
     error(`Low Stock Item Error: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });

@@ -270,7 +270,7 @@ const Inventory = () => {
         <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
+              <div className="animate-spin rounded h-12 w-12 border-b-2 border-indigo-600 dark:border-[rgb(var(--color-primary))]"></div>
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="text-center py-12">
@@ -311,6 +311,12 @@ const Inventory = () => {
                       Stock
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Reserved
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Available
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Cost Price
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -327,48 +333,69 @@ const Inventory = () => {
                 <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                   {filteredItems.map((item) => {
                     const profitMargin = ((item.sellingPrice - item.costPrice) / item.costPrice * 100).toFixed(1);
-                    const isLowStock = item.stockQty <= item.lowStockLimit;
+                    const availableStock = item.stockQty - (item.reservedStock || 0);
+                    const isLowStock = availableStock <= item.lowStockLimit;
 
                     return (
                       <tr key={item._id} className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]">
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-3">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{item.name}</div>
                             {item.sku && (
-                              <div className="text-sm text-gray-500">SKU: {item.sku}</div>
+                              <div className="text-xs text-gray-500">SKU: {item.sku}</div>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 rounded whitespace-nowrap">
                             {item.category || 'Uncategorized'}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center">
-                            {isLowStock ? (
-                              <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                {item.stockQty} {item.unit}
-                              </span>
-                            ) : (
-                              <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {item.stockQty} {item.unit}
-                              </span>
-                            )}
-                          </div>
+                        <td className="px-4 py-3">
+                          {isLowStock ? (
+                            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-800 whitespace-nowrap">
+                              {item.stockQty} {item.unit}
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800 whitespace-nowrap">
+                              {item.stockQty} {item.unit}
+                            </span>
+                          )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
+                        <td className="px-4 py-3">
+                          {item.reservedStock > 0 ? (
+                            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-orange-100 text-orange-800 whitespace-nowrap">
+                              {item.reservedStock} {item.unit}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {(() => {
+                            const available = item.stockQty - (item.reservedStock || 0);
+                            return (
+                              <span className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded ${available <= 0 ? 'bg-red-100 text-red-800' :
+                                available <= item.lowStockLimit ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-blue-100 text-blue-800'
+                                }`}>
+                                {available} {item.unit}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                           ₹{item.costPrice.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
                           ₹{item.sellingPrice.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`text-sm font-medium ${profitMargin > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <td className="px-4 py-3">
+                          <span className={`text-sm font-medium whitespace-nowrap ${profitMargin > 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {profitMargin}%
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -434,3 +461,5 @@ const Inventory = () => {
 };
 
 export default Inventory;
+
+

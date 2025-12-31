@@ -24,6 +24,10 @@ const itemSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    reservedStock: {
+      type: Number,
+      default: 0,
+    },
     lowStockLimit: {
       type: Number,
       default: 5,
@@ -40,6 +44,15 @@ const itemSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Virtual field for available stock
+itemSchema.virtual("availableStock").get(function () {
+  return this.stockQty - this.reservedStock;
+});
+
+// Ensure virtuals are included in JSON
+itemSchema.set("toJSON", { virtuals: true });
+itemSchema.set("toObject", { virtuals: true });
 
 // Compound index to ensure item name is unique per owner
 itemSchema.index({ name: 1, addedBy: 1 }, { unique: true });

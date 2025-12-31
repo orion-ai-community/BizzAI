@@ -21,6 +21,7 @@ import reportRoutes from "./routes/reportRoutes.js";
 // import settingsRoutes from "./routes/settingsRoutes.js";
 import cashbankRoutes from "./routes/cashbankRoutes.js";
 import paymentInRoutes from "./routes/paymentInRoutes.js";
+import salesOrderRoutes from "./routes/salesOrderRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -63,6 +64,7 @@ app.use("/api/due", dueRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/cashbank", cashbankRoutes);
 app.use("/api/payment-in", paymentInRoutes);
+app.use("/api/sales-orders", salesOrderRoutes);
 // app.use("/api/settings", settingsRoutes);
 
 const PORT = process.env.PORT || 5000;

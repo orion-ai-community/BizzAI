@@ -1,0 +1,753 @@
+import mongoose from "mongoose";
+import SalesOrder from "../models/SalesOrder.js";
+import DeliveryChallan from "../models/DeliveryChallan.js";
+import Invoice from "../models/Invoice.js";
+import Item from "../models/Item.js";
+import Customer from "../models/Customer.js";
+import { reserveStock, releaseStock, checkAvailableStock } from "../utils/stockReservation.js";
+import { info, error } from "../utils/logger.js";
+
+/**
+ * @desc Create a new sales order
+ * @route POST /api/sales-orders
+ */
+export const createSalesOrder = async (req, res) => {
+    try {
+        const { customerId, items, orderDate, expectedDeliveryDate, discount = 0, notes = "" } = req.body;
+
+        // Validate customer is provided
+        if (!customerId) {
+            return res.status(400).json({ message: "Customer is required for Sales Order" });
+        }
+
+        // Validate items
+        if (!items || items.length === 0) {
+            return res.status(400).json({ message: "At least one item is required" });
+        }
+
+        // Validate expected delivery date
+        if (!expectedDeliveryDate) {
+            return res.status(400).json({ message: "Expected delivery date is required" });
+        }
+
+        // Validate ObjectId format for customer
+        if (!mongoose.Types.ObjectId.isValid(customerId)) {
+            return res.status(400).json({ message: "Invalid customer ID format" });
+        }
+
+        // Verify customer belongs to current user
+        const customer = await Customer.findOne({
+            _id: customerId,
+            owner: req.user._id,
+        });
+
+        if (!customer) {
+            return res.status(400).json({ message: "Customer not found or unauthorized" });
+        }
+
+        // Verify all items belong to current user and calculate totals
+        let subtotal = 0;
+        let taxTotal = 0;
+        let discountTotal = 0;
+        const processedItems = [];
+
+        for (const it of items) {
+            // Validate ObjectId format
+            if (!mongoose.Types.ObjectId.isValid(it.item)) {
+                return res.status(400).json({ message: `Invalid item ID format: ${it.item}` });
+            }
+
+            const item = await Item.findOne({ _id: it.item, addedBy: req.user._id });
+            if (!item) {
+                return res.status(400).json({ message: `Item not found or unauthorized: ${it.item}` });
+            }
+
+            // Calculate item total
+            const itemSubtotal = it.quantity * it.rate;
+            const itemTax = (itemSubtotal * (it.tax || 0)) / 100;
+            const itemDiscount = it.discount || 0;
+            const itemTotal = itemSubtotal + itemTax - itemDiscount;
+
+            subtotal += itemSubtotal;
+            taxTotal += itemTax;
+            discountTotal += itemDiscount;
+
+            processedItems.push({
+                item: it.item,
+                quantity: it.quantity,
+                rate: it.rate,
+                tax: it.tax || 0,
+                discount: it.discount || 0,
+                reservedQty: 0, // Will be set on confirmation
+                deliveredQty: 0,
+                invoicedQty: 0,
+                total: itemTotal,
+            });
+        }
+
+        const totalAmount = subtotal + taxTotal - discountTotal - discount;
+
+        // Generate unique order number
+        const lastOrder = await SalesOrder.findOne({ createdBy: req.user._id })
+            .sort({ createdAt: -1 })
+            .select("orderNumber");
+
+        let orderNumber = 1;
+        if (lastOrder && lastOrder.orderNumber) {
+            const match = lastOrder.orderNumber.match(/SO-(\d+)/);
+            if (match) {
+                orderNumber = parseInt(match[1]) + 1;
+            }
+        }
+
+        const orderNo = `SO-${String(orderNumber).padStart(5, "0")}`;
+
+        // Create sales order in Draft status
+        const salesOrder = await SalesOrder.create({
+            orderNumber: orderNo,
+            customer: customerId,
+            orderDate: orderDate || new Date(),
+            expectedDeliveryDate,
+            items: processedItems,
+            subtotal,
+            taxTotal,
+            discountTotal: discountTotal + discount,
+            totalAmount,
+            status: "Draft",
+            notes,
+            createdBy: req.user._id,
+        });
+
+        info(`Sales Order created by ${req.user.name}: ${orderNo}`);
+
+        const populatedOrder = await SalesOrder.findById(salesOrder._id)
+            .populate("customer", "name phone email")
+            .populate("items.item", "name sku unit");
+
+        res.status(201).json({
+            message: "Sales Order created successfully",
+            salesOrder: populatedOrder,
+        });
+    } catch (err) {
+        console.error("Create Sales Order Error:", err);
+        error(`Sales Order creation failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc Update a sales order (only if Draft)
+ * @route PUT /api/sales-orders/:id
+ */
+export const updateSalesOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { customerId, items, orderDate, expectedDeliveryDate, discount = 0, notes = "" } = req.body;
+
+        // Validate ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid sales order ID format" });
+        }
+
+        const salesOrder = await SalesOrder.findOne({
+            _id: id,
+            createdBy: req.user._id,
+        });
+
+        if (!salesOrder) {
+            return res.status(404).json({ message: "Sales Order not found or unauthorized" });
+        }
+
+        // Check if order is confirmed (prices locked)
+        if (salesOrder.pricesLocked) {
+            return res.status(400).json({
+                message: "Cannot modify confirmed order. Prices and items are locked.",
+            });
+        }
+
+        // Check if order is cancelled
+        if (salesOrder.isCancelled) {
+            return res.status(400).json({ message: "Cannot modify cancelled order" });
+        }
+
+        // Validate customer if provided
+        if (customerId) {
+            if (!mongoose.Types.ObjectId.isValid(customerId)) {
+                return res.status(400).json({ message: "Invalid customer ID format" });
+            }
+
+            const customer = await Customer.findOne({
+                _id: customerId,
+                owner: req.user._id,
+            });
+
+            if (!customer) {
+                return res.status(400).json({ message: "Customer not found or unauthorized" });
+            }
+        }
+
+        // Recalculate totals if items provided
+        let subtotal = 0;
+        let taxTotal = 0;
+        let discountTotal = 0;
+        const processedItems = [];
+
+        if (items && items.length > 0) {
+            for (const it of items) {
+                if (!mongoose.Types.ObjectId.isValid(it.item)) {
+                    return res.status(400).json({ message: `Invalid item ID format: ${it.item}` });
+                }
+
+                const item = await Item.findOne({ _id: it.item, addedBy: req.user._id });
+                if (!item) {
+                    return res.status(400).json({ message: `Item not found or unauthorized: ${it.item}` });
+                }
+
+                const itemSubtotal = it.quantity * it.rate;
+                const itemTax = (itemSubtotal * (it.tax || 0)) / 100;
+                const itemDiscount = it.discount || 0;
+                const itemTotal = itemSubtotal + itemTax - itemDiscount;
+
+                subtotal += itemSubtotal;
+                taxTotal += itemTax;
+                discountTotal += itemDiscount;
+
+                processedItems.push({
+                    item: it.item,
+                    quantity: it.quantity,
+                    rate: it.rate,
+                    tax: it.tax || 0,
+                    discount: it.discount || 0,
+                    reservedQty: 0,
+                    deliveredQty: 0,
+                    invoicedQty: 0,
+                    total: itemTotal,
+                });
+            }
+        }
+
+        const totalAmount = subtotal + taxTotal - discountTotal - discount;
+
+        // Update sales order
+        const updateData = {
+            ...(customerId && { customer: customerId }),
+            ...(orderDate && { orderDate }),
+            ...(expectedDeliveryDate && { expectedDeliveryDate }),
+            ...(items && items.length > 0 && { items: processedItems }),
+            ...(items && items.length > 0 && { subtotal, taxTotal, discountTotal: discountTotal + discount, totalAmount }),
+            notes,
+        };
+
+        const updatedOrder = await SalesOrder.findByIdAndUpdate(id, updateData, { new: true })
+            .populate("customer", "name phone email")
+            .populate("items.item", "name sku unit");
+
+        info(`Sales Order updated by ${req.user.name}: ${updatedOrder.orderNumber}`);
+
+        res.status(200).json({
+            message: "Sales Order updated successfully",
+            salesOrder: updatedOrder,
+        });
+    } catch (err) {
+        console.error("Update Sales Order Error:", err);
+        error(`Sales Order update failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc Confirm a sales order (reserve stock)
+ * @route POST /api/sales-orders/:id/confirm
+ */
+export const confirmSalesOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid sales order ID format" });
+        }
+
+        const salesOrder = await SalesOrder.findOne({
+            _id: id,
+            createdBy: req.user._id,
+        });
+
+        if (!salesOrder) {
+            return res.status(404).json({ message: "Sales Order not found or unauthorized" });
+        }
+
+        if (salesOrder.isConfirmed) {
+            return res.status(400).json({ message: "Sales Order is already confirmed" });
+        }
+
+        if (salesOrder.isCancelled) {
+            return res.status(400).json({ message: "Cannot confirm cancelled order" });
+        }
+
+        // Check available stock for all items
+        for (const item of salesOrder.items) {
+            const isAvailable = await checkAvailableStock(item.item, item.quantity);
+            if (!isAvailable) {
+                const itemDoc = await Item.findById(item.item);
+                const available = itemDoc.stockQty - itemDoc.reservedStock;
+                return res.status(400).json({
+                    message: `Insufficient available stock for ${itemDoc.name}. Available: ${available}, Required: ${item.quantity}`,
+                });
+            }
+        }
+
+        // Reserve stock for all items
+        for (const item of salesOrder.items) {
+            await reserveStock(item.item, item.quantity);
+            // Update reservedQty in sales order
+            item.reservedQty = item.quantity;
+        }
+
+        // Update sales order status
+        salesOrder.isConfirmed = true;
+        salesOrder.status = "Confirmed";
+        salesOrder.pricesLocked = true;
+        salesOrder.confirmedAt = new Date();
+        salesOrder.confirmedBy = req.user._id;
+        await salesOrder.save();
+
+        info(`Sales Order confirmed by ${req.user.name}: ${salesOrder.orderNumber}`);
+
+        const populatedOrder = await SalesOrder.findById(salesOrder._id)
+            .populate("customer", "name phone email")
+            .populate("items.item", "name sku unit");
+
+        res.status(200).json({
+            message: "Sales Order confirmed successfully. Stock reserved.",
+            salesOrder: populatedOrder,
+        });
+    } catch (err) {
+        console.error("Confirm Sales Order Error:", err);
+        error(`Sales Order confirmation failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc Get sales order by ID
+ * @route GET /api/sales-orders/:id
+ */
+export const getSalesOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid sales order ID format" });
+        }
+
+        const salesOrder = await SalesOrder.findOne({
+            _id: id,
+            createdBy: req.user._id,
+        })
+            .populate("customer", "name phone email address dues")
+            .populate("items.item", "name sku unit stockQty reservedStock")
+            .populate("deliveryChallans")
+            .populate("invoices")
+            .populate("confirmedBy", "name")
+            .populate("cancelledBy", "name");
+
+        if (!salesOrder) {
+            return res.status(404).json({ message: "Sales Order not found or unauthorized" });
+        }
+
+        // Check if overdue
+        const now = new Date();
+        const expectedDate = new Date(salesOrder.expectedDeliveryDate);
+        if (expectedDate < now && salesOrder.status !== "Invoiced" && salesOrder.status !== "Cancelled") {
+            salesOrder.isOverdue = true;
+            await salesOrder.save();
+        }
+
+        res.status(200).json(salesOrder);
+    } catch (err) {
+        console.error("Get Sales Order Error:", err);
+        error(`Get Sales Order failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc List all sales orders
+ * @route GET /api/sales-orders
+ */
+export const listSalesOrders = async (req, res) => {
+    try {
+        const { status, customerId, startDate, endDate, overdue } = req.query;
+
+        const filter = { createdBy: req.user._id };
+
+        if (status) {
+            filter.status = status;
+        }
+
+        if (customerId && mongoose.Types.ObjectId.isValid(customerId)) {
+            filter.customer = customerId;
+        }
+
+        if (startDate || endDate) {
+            filter.orderDate = {};
+            if (startDate) filter.orderDate.$gte = new Date(startDate);
+            if (endDate) filter.orderDate.$lte = new Date(endDate);
+        }
+
+        if (overdue === "true") {
+            filter.isOverdue = true;
+        }
+
+        const salesOrders = await SalesOrder.find(filter)
+            .populate("customer", "name phone")
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(salesOrders);
+    } catch (err) {
+        console.error("List Sales Orders Error:", err);
+        error(`List Sales Orders failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc Cancel a sales order (release stock)
+ * @route POST /api/sales-orders/:id/cancel
+ */
+export const cancelSalesOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid sales order ID format" });
+        }
+
+        const salesOrder = await SalesOrder.findOne({
+            _id: id,
+            createdBy: req.user._id,
+        });
+
+        if (!salesOrder) {
+            return res.status(404).json({ message: "Sales Order not found or unauthorized" });
+        }
+
+        if (salesOrder.isCancelled) {
+            return res.status(400).json({ message: "Sales Order is already cancelled" });
+        }
+
+        if (salesOrder.status === "Invoiced") {
+            return res.status(400).json({ message: "Cannot cancel fully invoiced order" });
+        }
+
+        // Release reserved stock
+        if (salesOrder.isConfirmed) {
+            for (const item of salesOrder.items) {
+                const unreservedQty = item.reservedQty - item.deliveredQty;
+                if (unreservedQty > 0) {
+                    await releaseStock(item.item, unreservedQty);
+                }
+            }
+        }
+
+        // Update sales order status
+        salesOrder.isCancelled = true;
+        salesOrder.status = "Cancelled";
+        salesOrder.cancelledAt = new Date();
+        salesOrder.cancelledBy = req.user._id;
+        await salesOrder.save();
+
+        info(`Sales Order cancelled by ${req.user.name}: ${salesOrder.orderNumber}`);
+
+        const populatedOrder = await SalesOrder.findById(salesOrder._id)
+            .populate("customer", "name phone email")
+            .populate("items.item", "name sku unit");
+
+        res.status(200).json({
+            message: "Sales Order cancelled successfully. Reserved stock released.",
+            salesOrder: populatedOrder,
+        });
+    } catch (err) {
+        console.error("Cancel Sales Order Error:", err);
+        error(`Sales Order cancellation failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc Convert sales order to delivery challan
+ * @route POST /api/sales-orders/:id/convert-to-dc
+ */
+export const convertToDeliveryChallan = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { items, deliveryDate, vehicleNo, driverName, transportMode, notes } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid sales order ID format" });
+        }
+
+        const salesOrder = await SalesOrder.findOne({
+            _id: id,
+            createdBy: req.user._id,
+        });
+
+        if (!salesOrder) {
+            return res.status(404).json({ message: "Sales Order not found or unauthorized" });
+        }
+
+        if (!salesOrder.isConfirmed) {
+            return res.status(400).json({ message: "Only confirmed orders can be converted to Delivery Challan" });
+        }
+
+        if (salesOrder.isCancelled) {
+            return res.status(400).json({ message: "Cannot convert cancelled order" });
+        }
+
+        if (salesOrder.status === "Invoiced") {
+            return res.status(400).json({ message: "Order is already fully invoiced" });
+        }
+
+        // Validate items and quantities
+        const dcItems = [];
+        for (const dcItem of items) {
+            const soItem = salesOrder.items.find((i) => i.item.toString() === dcItem.item);
+            if (!soItem) {
+                return res.status(400).json({ message: `Item ${dcItem.item} not found in sales order` });
+            }
+
+            const remainingQty = soItem.reservedQty - soItem.deliveredQty;
+            if (dcItem.quantity > remainingQty) {
+                return res.status(400).json({
+                    message: `Cannot deliver ${dcItem.quantity} units. Only ${remainingQty} units remaining for delivery.`,
+                });
+            }
+
+            dcItems.push({
+                item: dcItem.item,
+                quantity: soItem.quantity,
+                deliveredQty: dcItem.quantity,
+                unit: dcItem.unit || "pcs",
+                description: dcItem.description || "",
+            });
+
+            // Update delivered quantity in sales order
+            soItem.deliveredQty += dcItem.quantity;
+
+            // Reduce reserved stock and actual stock
+            await Item.findByIdAndUpdate(dcItem.item, {
+                $inc: {
+                    reservedStock: -dcItem.quantity,
+                    stockQty: -dcItem.quantity,
+                },
+            });
+        }
+
+        // Generate unique challan number
+        const lastChallan = await DeliveryChallan.findOne({ createdBy: req.user._id })
+            .sort({ createdAt: -1 })
+            .select("challanNumber");
+
+        let challanNumber = 1;
+        if (lastChallan && lastChallan.challanNumber) {
+            const match = lastChallan.challanNumber.match(/DC-(\d+)/);
+            if (match) {
+                challanNumber = parseInt(match[1]) + 1;
+            }
+        }
+
+        const challanNo = `DC-${String(challanNumber).padStart(5, "0")}`;
+
+        // Create delivery challan
+        const deliveryChallan = await DeliveryChallan.create({
+            challanNumber: challanNo,
+            customer: salesOrder.customer,
+            challanDate: new Date(),
+            deliveryDate: deliveryDate || new Date(),
+            items: dcItems,
+            salesOrder: salesOrder._id,
+            vehicleNo: vehicleNo || "",
+            driverName: driverName || "",
+            transportMode: transportMode || "road",
+            notes: notes || "",
+            createdBy: req.user._id,
+        });
+
+        // Link delivery challan to sales order
+        salesOrder.deliveryChallans.push(deliveryChallan._id);
+
+        // Update sales order status
+        const totalDelivered = salesOrder.items.reduce((sum, item) => sum + item.deliveredQty, 0);
+        const totalReserved = salesOrder.items.reduce((sum, item) => sum + item.reservedQty, 0);
+
+        if (totalDelivered >= totalReserved) {
+            salesOrder.status = "Delivered";
+        } else if (totalDelivered > 0) {
+            salesOrder.status = "Partially Delivered";
+        }
+
+        await salesOrder.save();
+
+        info(`Delivery Challan created from Sales Order ${salesOrder.orderNumber}: ${challanNo}`);
+
+        const populatedChallan = await DeliveryChallan.findById(deliveryChallan._id)
+            .populate("customer", "name phone email")
+            .populate("items.item", "name sku unit")
+            .populate("salesOrder", "orderNumber");
+
+        res.status(201).json({
+            message: "Delivery Challan created successfully",
+            deliveryChallan: populatedChallan,
+            salesOrder: await SalesOrder.findById(salesOrder._id)
+                .populate("customer", "name phone email")
+                .populate("items.item", "name sku unit"),
+        });
+    } catch (err) {
+        console.error("Convert to Delivery Challan Error:", err);
+        error(`Conversion to Delivery Challan failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};
+
+/**
+ * @desc Convert sales order to invoice
+ * @route POST /api/sales-orders/:id/convert-to-invoice
+ */
+export const convertToInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { items, discount = 0, paidAmount = 0, paymentMethod = "cash", bankAccount } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid sales order ID format" });
+        }
+
+        const salesOrder = await SalesOrder.findOne({
+            _id: id,
+            createdBy: req.user._id,
+        });
+
+        if (!salesOrder) {
+            return res.status(404).json({ message: "Sales Order not found or unauthorized" });
+        }
+
+        if (salesOrder.isCancelled) {
+            return res.status(400).json({ message: "Cannot convert cancelled order" });
+        }
+
+        if (salesOrder.status !== "Delivered" && salesOrder.status !== "Partially Invoiced") {
+            return res.status(400).json({
+                message: "Only delivered orders can be converted to Invoice",
+            });
+        }
+
+        // Validate items and quantities
+        const invoiceItems = [];
+        let subtotal = 0;
+
+        for (const invItem of items) {
+            const soItem = salesOrder.items.find((i) => i.item.toString() === invItem.item);
+            if (!soItem) {
+                return res.status(400).json({ message: `Item ${invItem.item} not found in sales order` });
+            }
+
+            const remainingQty = soItem.deliveredQty - soItem.invoicedQty;
+            if (invItem.quantity > remainingQty) {
+                return res.status(400).json({
+                    message: `Cannot invoice ${invItem.quantity} units. Only ${remainingQty} units remaining for invoicing.`,
+                });
+            }
+
+            // Use locked prices from sales order
+            const itemTotal = invItem.quantity * soItem.rate;
+            subtotal += itemTotal;
+
+            invoiceItems.push({
+                item: invItem.item,
+                quantity: invItem.quantity,
+                price: soItem.rate,
+                total: itemTotal,
+            });
+
+            // Update invoiced quantity in sales order
+            soItem.invoicedQty += invItem.quantity;
+        }
+
+        const totalAmount = subtotal - discount;
+
+        // Determine payment status
+        let paymentStatus;
+        if (paidAmount >= totalAmount) {
+            paymentStatus = "paid";
+        } else if (paidAmount > 0) {
+            paymentStatus = "partial";
+        } else {
+            paymentStatus = "unpaid";
+        }
+
+        // Generate unique invoice number
+        const lastInvoice = await Invoice.findOne({ createdBy: req.user._id })
+            .sort({ createdAt: -1 })
+            .select("invoiceNo");
+
+        let invoiceNumber = 1;
+        if (lastInvoice && lastInvoice.invoiceNo) {
+            const match = lastInvoice.invoiceNo.match(/INV-(\d+)/);
+            if (match) {
+                invoiceNumber = parseInt(match[1]) + 1;
+            }
+        }
+
+        const invoiceNo = `INV-${String(invoiceNumber).padStart(5, "0")}`;
+
+        // Create invoice
+        const invoice = await Invoice.create({
+            invoiceNo,
+            customer: salesOrder.customer,
+            salesOrder: salesOrder._id,
+            items: invoiceItems,
+            subtotal,
+            discount,
+            totalAmount,
+            paidAmount,
+            paymentStatus,
+            paymentMethod,
+            bankAccount: paymentMethod === "bank_transfer" ? bankAccount : undefined,
+            createdBy: req.user._id,
+        });
+
+        // Link invoice to sales order
+        salesOrder.invoices.push(invoice._id);
+
+        // Update sales order status
+        const totalInvoiced = salesOrder.items.reduce((sum, item) => sum + item.invoicedQty, 0);
+        const totalDelivered = salesOrder.items.reduce((sum, item) => sum + item.deliveredQty, 0);
+
+        if (totalInvoiced >= totalDelivered) {
+            salesOrder.status = "Invoiced";
+        } else if (totalInvoiced > 0) {
+            salesOrder.status = "Partially Invoiced";
+        }
+
+        await salesOrder.save();
+
+        info(`Invoice created from Sales Order ${salesOrder.orderNumber}: ${invoiceNo}`);
+
+        const populatedInvoice = await Invoice.findById(invoice._id)
+            .populate("customer", "name phone email")
+            .populate("items.item", "name sku")
+            .populate("salesOrder", "orderNumber");
+
+        res.status(201).json({
+            message: "Invoice created successfully",
+            invoice: populatedInvoice,
+            salesOrder: await SalesOrder.findById(salesOrder._id)
+                .populate("customer", "name phone email")
+                .populate("items.item", "name sku unit"),
+        });
+    } catch (err) {
+        console.error("Convert to Invoice Error:", err);
+        error(`Conversion to Invoice failed: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+};

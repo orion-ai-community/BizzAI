@@ -30,6 +30,10 @@ const invoiceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
     },
+    salesOrder: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SalesOrder",
+    },
     items: [invoiceItemSchema],
     subtotal: {
       type: Number,
