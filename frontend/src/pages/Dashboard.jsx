@@ -1,28 +1,40 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import Layout from '../components/Layout';
-import { getAllExpenses } from '../redux/slices/expenseSlice';
-import { getAllBills } from '../redux/slices/billSlice';
-import { getDashboardStats } from '../redux/slices/reportsSlice';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import Layout from "../components/Layout";
+import { getAllExpenses } from "../redux/slices/expenseSlice";
+import { getAllBills } from "../redux/slices/billSlice";
+import { getDashboardStats } from "../redux/slices/reportsSlice";
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  AreaChart, Area
-} from 'recharts';
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { expenses } = useSelector((state) => state.expense);
-  const { bills } = useSelector((state) => state.bill);
+  const { expenses = [] } = useSelector((state) => state.expense);
+  const { bills = [] } = useSelector((state) => state.bill);
   const { dashboardStats } = useSelector((state) => state.reports);
   const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
     } else {
       dispatch(getAllExpenses());
       dispatch(getAllBills());
@@ -36,21 +48,40 @@ const Dashboard = () => {
     return null;
   }
 
-  // Calculate expense metrics
-  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-  const thisMonthExpenses = expenses.filter(exp => {
-    const expenseDate = new Date(exp.date);
-    const now = new Date();
-    return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear();
-  }).reduce((sum, exp) => sum + exp.amount, 0);
+  // Calculate expense metrics - with safety checks
+  const totalExpenses = Array.isArray(expenses)
+    ? expenses.reduce((sum, exp) => sum + exp.amount, 0)
+    : 0;
+  const thisMonthExpenses = Array.isArray(expenses)
+    ? expenses
+        .filter((exp) => {
+          const expenseDate = new Date(exp.date);
+          const now = new Date();
+          return (
+            expenseDate.getMonth() === now.getMonth() &&
+            expenseDate.getFullYear() === now.getFullYear()
+          );
+        })
+        .reduce((sum, exp) => sum + exp.amount, 0)
+    : 0;
 
-  // Calculate bill metrics
-  const totalBillsAmount = bills.reduce((sum, bill) => sum + bill.amount, 0);
-  const totalOutstanding = bills.filter(bill => bill.status === 'unpaid').reduce((sum, bill) => sum + bill.amount, 0);
+  // Calculate bill metrics - with safety checks
+  const totalBillsAmount = Array.isArray(bills)
+    ? bills.reduce((sum, bill) => sum + bill.amount, 0)
+    : 0;
+  const totalOutstanding = Array.isArray(bills)
+    ? bills
+        .filter((bill) => bill.status === "unpaid")
+        .reduce((sum, bill) => sum + bill.amount, 0)
+    : 0;
 
   return (
     <Layout>
-      <div className={`transition-opacity duration-300 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+      <div
+        className={`transition-opacity duration-300 ${
+          fadeIn ? "opacity-100" : "opacity-0"
+        }`}
+      >
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-2xl p-8 mb-8 text-white flex items-center justify-between">
           <div>
@@ -62,7 +93,7 @@ const Dashboard = () => {
             </p>
           </div>
           <button
-            onClick={() => navigate('/profile-settings')}
+            onClick={() => navigate("/profile-settings")}
             className="flex items-center space-x-2 px-4 py-2 bg-white hover:bg-gray-100 dark:bg-white/10 dark:hover:bg-white/20 text-indigo-600 dark:text-white rounded-lg transition-colors duration-150 font-medium whitespace-nowrap"
             title="Edit your Profile"
           >
@@ -92,8 +123,12 @@ const Dashboard = () => {
               </span>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{user.name}</h3>
-              <p className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">{user.email}</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                {user.name}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                {user.email}
+              </p>
             </div>
           </div>
 
@@ -116,9 +151,11 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">Email</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                  Email
+                </p>
                 <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-medium">
-                  {user.email || 'Not provided'}
+                  {user.email || "Not provided"}
                 </p>
               </div>
             </div>
@@ -141,9 +178,11 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">Phone</p>
+                <p className="text-xs font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">
+                  Phone
+                </p>
                 <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-semibold text-sm truncate">
-                  {user.phone || 'Not provided'}
+                  {user.phone || "Not provided"}
                 </p>
               </div>
             </div>
@@ -166,15 +205,17 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 uppercase tracking-wide">Role</p>
+                <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400 uppercase tracking-wide">
+                  Role
+                </p>
                 <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-semibold text-sm capitalize truncate">
-                  {user.role || 'Owner'}
+                  {user.role || "Owner"}
                 </p>
               </div>
             </div>
 
             {/* Shop Name */}
-              <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/20 border border-green-200/50 dark:border-green-700/50">
+            <div className="flex items-start space-x-3 p-3 rounded-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/20 border border-green-200/50 dark:border-green-700/50">
               <div className="p-2 bg-green-600 dark:bg-green-500 rounded-lg shadow-sm">
                 <svg
                   className="w-5 h-5 text-white"
@@ -191,9 +232,11 @@ const Dashboard = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">Shop Name</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                  Shop Name
+                </p>
                 <p className="text-gray-900 dark:text-[rgb(var(--color-text))] font-medium">
-                  {user.shopName || 'Not provided'}
+                  {user.shopName || "Not provided"}
                 </p>
               </div>
             </div>
@@ -221,8 +264,12 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Invoices</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalInvoices || 0}</p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
+              Total Invoices
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              {dashboardStats?.totalInvoices || 0}
+            </p>
           </div>
 
           {/* Total Revenue */}
@@ -244,8 +291,12 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Revenue</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalRevenue || 0).toFixed(2)}</p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
+              Total Revenue
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              ₹{(dashboardStats?.totalRevenue || 0).toFixed(2)}
+            </p>
           </div>
 
           {/* Total Expenses */}
@@ -267,8 +318,12 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Expenses</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totalExpenses.toFixed(0)}</p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
+              Total Expenses
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              ₹{totalExpenses.toFixed(0)}
+            </p>
           </div>
 
           {/* This Month Expenses */}
@@ -290,8 +345,12 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">This Month Expenses</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{thisMonthExpenses.toFixed(0)}</p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
+              This Month Expenses
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              ₹{thisMonthExpenses.toFixed(0)}
+            </p>
           </div>
 
           {/* Total Bills Amount */}
@@ -313,8 +372,12 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Bills Amount</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totalBillsAmount.toFixed(0)}</p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
+              Total Bills Amount
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              ₹{totalBillsAmount.toFixed(0)}
+            </p>
           </div>
 
           {/* Outstanding Bills */}
@@ -336,8 +399,12 @@ const Dashboard = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Outstanding Bills</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{totalOutstanding.toFixed(0)}</p>
+            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
+              Outstanding Bills
+            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              ₹{totalOutstanding.toFixed(0)}
+            </p>
           </div>
 
           {/* Pending Payments */}
@@ -362,7 +429,9 @@ const Dashboard = () => {
             <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
               Pending Payments
             </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalOutstanding || 0).toFixed(2)}</p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+              ₹{(dashboardStats?.totalOutstanding || 0).toFixed(2)}
+            </p>
           </div>
         </div>
 
@@ -372,33 +441,76 @@ const Dashboard = () => {
             {/* Sales Trend */}
             <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
               <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                <svg
+                  className="w-5 h-5 mr-2 text-indigo-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  />
                 </svg>
                 Sales Trend (Last 30 Days)
               </h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={dashboardStats.dailySales}>
+                  <AreaChart data={dashboardStats.dailySales || []}>
                     <defs>
-                      <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                      <linearGradient
+                        id="colorSales"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#6366f1"
+                          stopOpacity={0.1}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#6366f1"
+                          stopOpacity={0}
+                        />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f0f0f0"
+                    />
                     <XAxis
                       dataKey="_id"
                       tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => value.split('-').slice(1).join('/')}
+                      tickFormatter={(value) =>
+                        value.split("-").slice(1).join("/")
+                      }
                       stroke="#94a3b8"
                     />
                     <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
                     <Tooltip
-                      contentStyle={{ backgroundColor: 'rgb(var(--color-card))', border: '1px solid rgb(var(--color-border))', borderRadius: '8px', color: 'rgb(var(--color-text))' }}
-                      itemStyle={{ color: 'rgb(var(--color-primary))' }}
+                      contentStyle={{
+                        backgroundColor: "rgb(var(--color-card))",
+                        border: "1px solid rgb(var(--color-border))",
+                        borderRadius: "8px",
+                        color: "rgb(var(--color-text))",
+                      }}
+                      itemStyle={{ color: "rgb(var(--color-primary))" }}
                     />
-                    <Area type="monotone" dataKey="totalSales" name="Sales" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+                    <Area
+                      type="monotone"
+                      dataKey="totalSales"
+                      name="Sales"
+                      stroke="#6366f1"
+                      strokeWidth={3}
+                      fillOpacity={1}
+                      fill="url(#colorSales)"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -407,15 +519,29 @@ const Dashboard = () => {
             {/* Revenue vs Expenses */}
             <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
               <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
                 </svg>
                 Revenue vs Expenses (Monthly)
               </h3>
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={dashboardStats.revenueVsExpenses}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <BarChart data={dashboardStats.revenueVsExpenses || []}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f0f0f0"
+                    />
                     <XAxis
                       dataKey="month"
                       tick={{ fontSize: 12 }}
@@ -423,12 +549,30 @@ const Dashboard = () => {
                     />
                     <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
                     <Tooltip
-                      cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }}
-                      contentStyle={{ backgroundColor: 'rgb(var(--color-card))', border: '1px solid rgb(var(--color-border))', borderRadius: '8px', color: 'rgb(var(--color-text))' }}
+                      cursor={{ fill: "rgba(99, 102, 241, 0.05)" }}
+                      contentStyle={{
+                        backgroundColor: "rgb(var(--color-card))",
+                        border: "1px solid rgb(var(--color-border))",
+                        borderRadius: "8px",
+                        color: "rgb(var(--color-text))",
+                      }}
                     />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
-                    <Bar dataKey="revenue" name="Revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="expenses" name="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                    <Legend
+                      iconType="circle"
+                      wrapperStyle={{ paddingTop: "10px" }}
+                    />
+                    <Bar
+                      dataKey="revenue"
+                      name="Revenue"
+                      fill="#22c55e"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="expenses"
+                      name="Expenses"
+                      fill="#ef4444"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -437,8 +581,18 @@ const Dashboard = () => {
             {/* Payment Methods */}
             <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
               <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-purple-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 Payment Methods Distribution
               </h3>
@@ -446,7 +600,7 @@ const Dashboard = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={dashboardStats.paymentMethods}
+                      data={dashboardStats.paymentMethods || []}
                       cx="50%"
                       cy="50%"
                       innerRadius={60}
@@ -455,19 +609,37 @@ const Dashboard = () => {
                       dataKey="count"
                       nameKey="_id"
                     >
-                      {dashboardStats.paymentMethods.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={
-                          entry._id === 'cash' ? '#10b981' :
-                            entry._id === 'upi' ? '#6366f1' :
-                              entry._id === 'card' ? '#f59e0b' :
-                                '#94a3b8'
-                        } />
-                      ))}
+                      {(dashboardStats.paymentMethods || []).map(
+                        (entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={
+                              entry._id === "cash"
+                                ? "#10b981"
+                                : entry._id === "upi"
+                                ? "#6366f1"
+                                : entry._id === "card"
+                                ? "#f59e0b"
+                                : "#94a3b8"
+                            }
+                          />
+                        )
+                      )}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ backgroundColor: 'rgb(var(--color-card))', border: '1px solid rgb(var(--color-border))', borderRadius: '8px', color: 'rgb(var(--color-text))' }}
+                      contentStyle={{
+                        backgroundColor: "rgb(var(--color-card))",
+                        border: "1px solid rgb(var(--color-border))",
+                        borderRadius: "8px",
+                        color: "rgb(var(--color-text))",
+                      }}
                     />
-                    <Legend iconType="circle" layout="vertical" align="right" verticalAlign="middle" />
+                    <Legend
+                      iconType="circle"
+                      layout="vertical"
+                      align="right"
+                      verticalAlign="middle"
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -476,24 +648,43 @@ const Dashboard = () => {
             {/* Top Customer Dues */}
             <div className="bg-white dark:bg-[rgb(var(--color-card))] p-6 rounded-xl shadow-md border border-gray-100 dark:border-[rgb(var(--color-border))]">
               <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-orange-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
                 Top Receivables
               </h3>
               <div className="space-y-4">
-                {dashboardStats.topCustomersWithDues.length > 0 ? (
-                  dashboardStats.topCustomersWithDues.map((customer, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
-                          {customer.name.charAt(0).toUpperCase()}
+                {(dashboardStats.topCustomersWithDues || []).length > 0 ? (
+                  (dashboardStats.topCustomersWithDues || []).map(
+                    (customer, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                            {customer.name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">
+                            {customer.name}
+                          </span>
                         </div>
-                        <span className="font-medium text-gray-700 dark:text-gray-300">{customer.name}</span>
+                        <span className="font-bold text-red-500">
+                          ₹{customer.dues.toLocaleString()}
+                        </span>
                       </div>
-                      <span className="font-bold text-red-500">₹{customer.dues.toLocaleString()}</span>
-                    </div>
-                  ))
+                    )
+                  )
                 ) : (
                   <div className="h-48 flex items-center justify-center text-gray-400 italic">
                     No outstanding dues found
@@ -508,8 +699,18 @@ const Dashboard = () => {
         <div className="bg-gradient-to-br from-white to-gray-50 dark:from-[rgb(var(--color-card))] dark:to-[rgb(var(--color-card))] rounded-xl shadow-md dark:shadow-lg p-6 border border-gray-100 dark:border-[rgb(var(--color-border))]">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-indigo-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <div>
@@ -517,7 +718,8 @@ const Dashboard = () => {
                 Quick Tips
               </h3>
               <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-sm">
-                Graphs update in real-time as you add invoices and expenses. Use reports for detailed analysis.
+                Graphs update in real-time as you add invoices and expenses. Use
+                reports for detailed analysis.
               </p>
             </div>
           </div>
@@ -527,4 +729,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard
+export default Dashboard;

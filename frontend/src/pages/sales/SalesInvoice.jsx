@@ -14,9 +14,12 @@ import CustomerSelectionModal from "../../components/CustomerSelectionModal";
 const SalesInvoice = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { invoices, isLoading, isError, message } = useSelector(
-    (state) => state.salesInvoice
-  );
+  const {
+    invoices = [],
+    isLoading,
+    isError,
+    message,
+  } = useSelector((state) => state.salesInvoice);
 
   const [formData, setFormData] = useState({
     invoiceNo: "INV-" + Date.now(),
@@ -55,18 +58,20 @@ const SalesInvoice = () => {
     dispatch(getAllSalesInvoices());
   };
 
-  const filteredInvoices = invoices.filter((invoice) => {
-    const matchesSearch =
-      invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (invoice.customer?.name || "")
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || invoice.paymentStatus === statusFilter;
-    const matchesCustomer =
-      !selectedCustomer || invoice.customer?._id === selectedCustomer._id;
-    return matchesSearch && matchesStatus && matchesCustomer;
-  });
+  const filteredInvoices = Array.isArray(invoices)
+    ? invoices.filter((invoice) => {
+        const matchesSearch =
+          invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (invoice.customer?.name || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        const matchesStatus =
+          statusFilter === "all" || invoice.paymentStatus === statusFilter;
+        const matchesCustomer =
+          !selectedCustomer || invoice.customer?._id === selectedCustomer._id;
+        return matchesSearch && matchesStatus && matchesCustomer;
+      })
+    : [];
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
@@ -87,8 +92,12 @@ const SalesInvoice = () => {
     }
   };
 
-  const totalSales = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
-  const totalPaid = invoices.reduce((sum, inv) => sum + inv.paidAmount, 0);
+  const totalSales = Array.isArray(invoices)
+    ? invoices.reduce((sum, inv) => sum + inv.totalAmount, 0)
+    : 0;
+  const totalPaid = Array.isArray(invoices)
+    ? invoices.reduce((sum, inv) => sum + inv.paidAmount, 0)
+    : 0;
   const totalDue = totalSales - totalPaid;
 
   return (
@@ -315,75 +324,78 @@ const SalesInvoice = () => {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Invoice No
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Date
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Customer
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Items
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Total
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Paid
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Payment
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-[rgb(var(--color-text-secondary))] uppercase">
                         Actions
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                     {paginatedInvoices.map((invoice) => (
-                      <tr key={invoice._id} className="hover:bg-gray-50">
+                      <tr
+                        key={invoice._id}
+                        className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-table-row-hover))]"
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-indigo-600">
+                          <div className="text-sm font-medium text-indigo-600 dark:text-[rgb(var(--color-primary))]">
                             {invoice.invoiceNo}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
                             {new Date(invoice.createdAt).toLocaleDateString(
                               "en-IN"
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
                             {new Date(invoice.createdAt).toLocaleTimeString()}
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
                             {invoice.customer?.name || "Walk-in"}
                           </div>
                           {invoice.customer?.phone && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
                               {invoice.customer.phone}
                             </div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
                             {invoice.items.length} items
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                             ₹{invoice.totalAmount.toFixed(2)}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))]">
                             ₹{invoice.paidAmount.toFixed(2)}
                           </div>
                         </td>
@@ -397,7 +409,7 @@ const SalesInvoice = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900 capitalize">
+                          <span className="text-sm text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">
                             {invoice.paymentMethod}
                           </span>
                         </td>
@@ -406,13 +418,13 @@ const SalesInvoice = () => {
                             onClick={() =>
                               navigate(`/sales/invoice/${invoice._id}`)
                             }
-                            className="text-indigo-600 hover:text-indigo-900 mr-4"
+                            className="text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-900 dark:hover:text-[rgb(var(--color-primary-hover))] mr-4"
                           >
                             View
                           </button>
                           <button
                             onClick={() => setDeleteConfirm(invoice._id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500"
                           >
                             Delete
                           </button>
@@ -427,41 +439,57 @@ const SalesInvoice = () => {
               {totalPages > 1 && (
                 <div className="px-6 py-4 border-t border-gray-200 dark:border-[rgb(var(--color-border))] flex items-center justify-between">
                   <div className="text-sm text-gray-700 dark:text-[rgb(var(--color-text-secondary))]">
-                    Showing {startIndex + 1} to {Math.min(endIndex, filteredInvoices.length)} of {filteredInvoices.length} results
+                    Showing {startIndex + 1} to{" "}
+                    {Math.min(endIndex, filteredInvoices.length)} of{" "}
+                    {filteredInvoices.length} results
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
                       disabled={currentPage === 1}
                       className="px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))]"
                     >
                       Previous
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
-                      if (
-                        page === 1 ||
-                        page === totalPages ||
-                        (page >= currentPage - 1 && page <= currentPage + 1)
-                      ) {
-                        return (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`px-3 py-1 border rounded-md text-sm ${currentPage === page
-                              ? 'bg-indigo-600 text-white border-indigo-600'
-                              : 'border-gray-300 dark:border-[rgb(var(--color-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))]'
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => {
+                        if (
+                          page === 1 ||
+                          page === totalPages ||
+                          (page >= currentPage - 1 && page <= currentPage + 1)
+                        ) {
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
+                              className={`px-3 py-1 border rounded-md text-sm ${
+                                currentPage === page
+                                  ? "bg-indigo-600 text-white border-indigo-600"
+                                  : "border-gray-300 dark:border-[rgb(var(--color-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))]"
                               }`}
-                          >
-                            {page}
-                          </button>
-                        );
-                      } else if (page === currentPage - 2 || page === currentPage + 2) {
-                        return <span key={page} className="px-2 text-gray-500">...</span>;
+                            >
+                              {page}
+                            </button>
+                          );
+                        } else if (
+                          page === currentPage - 2 ||
+                          page === currentPage + 2
+                        ) {
+                          return (
+                            <span key={page} className="px-2 text-gray-500">
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
                       }
-                      return null;
-                    })}
+                    )}
                     <button
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
                       disabled={currentPage === totalPages}
                       className="px-3 py-1 border border-gray-300 dark:border-[rgb(var(--color-border))] rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))]"
                     >
