@@ -45,7 +45,7 @@ const Layout = ({ children }) => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[rgb(var(--color-bg))]">
+    <div className="min-h-screen bg-[rgb(var(--color-bg))]">
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}

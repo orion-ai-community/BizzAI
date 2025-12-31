@@ -104,6 +104,7 @@ function App() {
   console.log(import.meta.env.VITE_BACKEND_URL);
   return (
     <ThemeProvider>
+      <div className="min-h-screen bg-app text-main transition-colors duration-300">
       <ToastContainer />
       <Router>
         <Routes>
@@ -372,6 +373,7 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
+      </div>
     </ThemeProvider>
   );
 }
