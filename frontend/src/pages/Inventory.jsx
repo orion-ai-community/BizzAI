@@ -299,103 +299,110 @@ const Inventory = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-[rgb(var(--color-table-header))] border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
+                <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Item
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Category
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Stock
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Reserved
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Available
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Cost Price
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Selling Price
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Profit Margin
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredItems.map((item) => {
                     const profitMargin = ((item.sellingPrice - item.costPrice) / item.costPrice * 100).toFixed(1);
                     const availableStock = item.stockQty - (item.reservedStock || 0);
                     const isLowStock = availableStock <= item.lowStockLimit;
 
                     return (
-                      <tr key={item._id} className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]">
-                        <td className="px-4 py-3">
+                      <tr key={item._id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td className="px-6 py-4">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
                             {item.sku && (
-                              <div className="text-xs text-gray-500">SKU: {item.sku}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">SKU: {item.sku}</div>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3">
-                          <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-800 rounded whitespace-nowrap">
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded whitespace-nowrap">
                             {item.category || 'Uncategorized'}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-6 py-4">
                           {isLowStock ? (
-                            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-800 whitespace-nowrap">
+                            <span className="px-2 py-1 text-xs font-semibold rounded bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 whitespace-nowrap">
                               {item.stockQty} {item.unit}
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800 whitespace-nowrap">
+                            <span className="px-2 py-1 text-xs font-semibold rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 whitespace-nowrap">
                               {item.stockQty} {item.unit}
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-6 py-4">
                           {item.reservedStock > 0 ? (
-                            <span className="px-2 py-0.5 text-xs font-semibold rounded bg-orange-100 text-orange-800 whitespace-nowrap">
+                            <span className="px-2 py-1 text-xs font-semibold rounded bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 whitespace-nowrap">
                               {item.reservedStock} {item.unit}
                             </span>
                           ) : (
-                            <span className="text-xs text-gray-400">-</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">-</span>
                           )}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-6 py-4">
                           {(() => {
                             const available = item.stockQty - (item.reservedStock || 0);
                             return (
-                              <span className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded ${available <= 0 ? 'bg-red-100 text-red-800' :
-                                available <= item.lowStockLimit ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-blue-100 text-blue-800'
-                                }`}>
+                              <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded ${
+                                available <= 0 
+                                  ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300' 
+                                  : available <= item.lowStockLimit 
+                                  ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300' 
+                                  : 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
+                              }`}>
                                 {available} {item.unit}
                               </span>
                             );
                           })()}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-200 whitespace-nowrap">
                           ₹{item.costPrice.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
                           ₹{item.sellingPrice.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3">
-                          <span className={`text-sm font-medium whitespace-nowrap ${profitMargin > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <td className="px-6 py-4">
+                          <span className={`text-sm font-medium whitespace-nowrap ${
+                            profitMargin > 0 
+                              ? 'text-green-600 dark:text-green-400' 
+                              : 'text-red-600 dark:text-red-400'
+                          }`}>
                             {profitMargin}%
                           </span>
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -403,7 +410,7 @@ const Inventory = () => {
                               e.stopPropagation();
                               navigate(`/inventory/edit/${item._id}`);
                             }}
-                            className="text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-900 dark:hover:text-[rgb(var(--color-primary-hover))] mr-4"
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-4 transition-colors"
                           >
                             Edit
                           </button>
@@ -414,7 +421,7 @@ const Inventory = () => {
                               e.stopPropagation();
                               setDeleteConfirm(item._id);
                             }}
-                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500"
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"
                           >
                             Delete
                           </button>
