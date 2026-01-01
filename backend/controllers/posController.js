@@ -63,11 +63,25 @@ export const createInvoice = async (req, res) => {
         });
       }
 
-      // Check stock availability
-      if (item.stockQty < it.quantity) {
-        console.log('Insufficient stock for', item.name);
+      // Check AVAILABLE stock (not total stock - must account for reserved stock)
+      const availableStock = item.stockQty - (item.reservedStock || 0);
+      if (availableStock < it.quantity) {
+        console.log('Insufficient available stock for', item.name, 'Available:', availableStock, 'Reserved:', item.reservedStock);
+
+        // Check if trying to use reserved stock
+        if (item.stockQty >= it.quantity && item.reservedStock > 0) {
+          return res.status(400).json({
+            message: `Cannot sell ${item.name}. ${item.reservedStock} units are reserved for Sales Orders. Available stock: ${availableStock}`,
+            isReservedStock: true,
+            availableStock: availableStock,
+            reservedStock: item.reservedStock,
+            totalStock: item.stockQty
+          });
+        }
+
         return res.status(400).json({
-          message: `Insufficient stock for ${item.name}. Available: ${item.stockQty}`
+          message: `Insufficient stock for ${item.name}. Available: ${availableStock}`,
+          availableStock: availableStock
         });
       }
     }
