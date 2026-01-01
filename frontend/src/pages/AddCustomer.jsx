@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { addCustomer, reset } from "../redux/slices/customerSlice";
 import Layout from "../components/Layout";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddCustomer = () => {
   const navigate = useNavigate();
@@ -20,7 +22,7 @@ const AddCustomer = () => {
   });
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
-  const [error, setError] = useState("");
+  const [duplicateField, setDuplicateField] = useState(null);
   const { name, phone, email, address } = formData;
 
   useEffect(() => {
@@ -40,8 +42,21 @@ const AddCustomer = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setShouldNavigate(true);
-    await dispatch(addCustomer(formData));
+    setDuplicateField(null);
+    const result = await dispatch(addCustomer(formData));
+    if (result.type === 'customers/add/fulfilled') {
+      toast.success("Customer added successfully!");
+      setShouldNavigate(true);
+    } else if (result.type === 'customers/add/rejected') {
+      const errorMsg = result.payload || "Failed to add customer";
+      toast.error(errorMsg);
+      
+      if (errorMsg.toLowerCase().includes('phone')) {
+        setDuplicateField('phone');
+      } else if (errorMsg.toLowerCase().includes('email')) {
+        setDuplicateField('email');
+      }
+    }
   };
 
   return (
@@ -73,13 +88,6 @@ const AddCustomer = () => {
           </h1>
           <p className="text-secondary">Create a new customer profile</p>
         </div>
-
-        {/* Error Message */}
-        {isError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{message}</p>
-          </div>
-        )}
 
         {/* Form Card */}
         <div className="bg-card rounded-xl shadow-sm p-8">
@@ -120,11 +128,19 @@ const AddCustomer = () => {
                 minLength={10}
                 maxLength={10}
                 value={phone}
-                onChange={onChange}
+                onChange={(e) => {
+                  onChange(e);
+                  if (duplicateField === 'phone') setDuplicateField(null);
+                }}
                 required
-                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${
+                  duplicateField === 'phone' ? 'border-red-500 border-2' : 'border-default'
+                }`}
                 placeholder="9876543210"
               />
+              {duplicateField === 'phone' && (
+                <p className="mt-1 text-sm text-red-600">This phone number already exists</p>
+              )}
             </div>
 
             {/* Email Input */}
@@ -140,10 +156,18 @@ const AddCustomer = () => {
                 id="email"
                 name="email"
                 value={email}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                onChange={(e) => {
+                  onChange(e);
+                  if (duplicateField === 'email') setDuplicateField(null);
+                }}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${
+                  duplicateField === 'email' ? 'border-red-500 border-2' : 'border-default'
+                }`}
                 placeholder="customer@example.com"
               />
+              {duplicateField === 'email' && (
+                <p className="mt-1 text-sm text-red-600">This email already exists</p>
+              )}
             </div>
 
             {/* Address Input */}
