@@ -133,16 +133,16 @@ const PaymentReceiptDetail = () => {
                             </div>
                         </div>
 
-                        <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-right border border-green-100 dark:border-green-800/30">
-                            <h3 className="text-sm font-bold text-green-800 dark:text-green-400 uppercase mb-3 border-b border-green-200 dark:border-green-800/50 pb-2">Payment Summary</h3>
+                        <div className="bg-surface p-4 rounded-lg text-right border border-default">
+                            <h3 className="text-sm font-bold text-muted uppercase mb-3 border-b border-default pb-2">Payment Summary</h3>
                             <div className="space-y-2">
                                 <div>
-                                    <span className="text-sm text-green-700 dark:text-green-500 block mb-1">Amount Received</span>
+                                    <span className="text-sm text-secondary block mb-1">Amount Received</span>
                                     <span className="font-bold text-green-600 dark:text-green-400 text-3xl">₹{payment.totalAmount.toFixed(2)}</span>
                                 </div>
                                 {payment.creditApplied > 0 && (
-                                    <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-800/50">
-                                        <span className="text-xs text-green-700 dark:text-green-500 block mb-1">+ Credit Applied</span>
+                                    <div className="mt-3 pt-3 border-t border-default">
+                                        <span className="text-xs text-secondary block mb-1">+ Credit Applied</span>
                                         <span className="font-semibold text-orange-600 dark:text-orange-400 text-lg">₹{payment.creditApplied.toFixed(2)}</span>
                                     </div>
                                 )}
@@ -290,14 +290,14 @@ const PaymentReceiptDetail = () => {
 
                                     if (Math.abs(effectivePayment - duesBeforePayment) < 0.01 && duesBeforePayment > 0) {
                                         return (
-                                            <div className={`${boxClass} bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50`}>
+                                            <div className="mt-4 p-4 border-2 rounded-lg bg-white dark:bg-blue-900/20 border-gray-300 dark:border-blue-800/50">
                                                 <div className="flex items-start">
-                                                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className="w-5 h-5 text-green-600 dark:text-blue-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                     <div className="flex-1">
-                                                        <div className="font-bold text-blue-800 dark:text-blue-400 mb-1">Dues Repaid - All Dues Cleared</div>
-                                                        <p className="text-xs text-blue-700 dark:text-blue-500/80 leading-relaxed">
+                                                        <div className="font-bold text-gray-800 dark:text-blue-400 mb-1">Dues Repaid - All Dues Cleared</div>
+                                                        <p className="text-xs text-gray-600 dark:text-blue-500/80 leading-relaxed">
                                                             Payment has cleared all pending dues. Customer account is fully settled.
                                                         </p>
                                                     </div>
