@@ -408,7 +408,7 @@ const PaymentIn = () => {
           <button
             key="print"
             onClick={handlePrint}
-            className="px-6 py-2 bg-secondary text-white rounded-lg hover:bg-gray-700"
+            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
           >
             Print Receipt
           </button>,
