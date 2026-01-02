@@ -13,11 +13,30 @@ const getConfig = (token) => ({
 const initialState = {
     invoices: [],
     invoice: null,
+    summary: null,
     isLoading: false,
     isSuccess: false,
     isError: false,
     message: '',
 };
+
+// Get sales invoice summary
+export const getSalesInvoiceSummary = createAsyncThunk(
+    'salesInvoice/getSummary',
+    async (_, thunkAPI) => {
+        try {
+            const token = thunkAPI.getState().auth.user.token;
+            const response = await axios.get(`${API_URL}/summary`, getConfig(token));
+            return response.data;
+        } catch (error) {
+            const message =
+                (error.response && error.response.data && error.response.data.message) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
 
 // Get all sales invoices
 export const getAllSalesInvoices = createAsyncThunk(
@@ -112,6 +131,20 @@ export const salesInvoiceSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Get sales invoice summary
+            .addCase(getSalesInvoiceSummary.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(getSalesInvoiceSummary.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.summary = action.payload;
+            })
+            .addCase(getSalesInvoiceSummary.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
+            })
             // Get all sales invoices
             .addCase(getAllSalesInvoices.pending, (state) => {
                 state.isLoading = true;

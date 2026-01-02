@@ -1,8 +1,42 @@
 import mongoose from "mongoose";
 import Invoice from "../models/Invoice.js";
+import Customer from "../models/Customer.js";
 import CashbankTransaction from "../models/CashbankTransaction.js";
 import BankAccount from "../models/BankAccount.js";
 import { info, error } from "../utils/logger.js";
+
+/**
+ * @desc Get sales invoice summary with actual customer dues
+ * @route GET /api/sales-invoice/summary
+ */
+export const getSalesInvoiceSummary = async (req, res) => {
+  try {
+    // Get all invoices for this user
+    const invoices = await Invoice.find({ createdBy: req.user._id });
+
+    // Calculate invoice totals
+    const totalInvoices = invoices.length;
+    const totalSales = invoices.reduce((sum, inv) => sum + inv.totalAmount, 0);
+    const totalPaid = invoices.reduce((sum, inv) => sum + inv.paidAmount, 0);
+
+    // Get actual customer dues (source of truth)
+    // Sum all positive dues (customers who owe money)
+    const customers = await Customer.find({ owner: req.user._id });
+    const outstandingDues = customers.reduce((sum, customer) => {
+      return sum + (customer.dues > 0 ? customer.dues : 0);
+    }, 0);
+
+    res.status(200).json({
+      totalInvoices,
+      totalSales,
+      totalPaid,
+      outstandingDues
+    });
+  } catch (err) {
+    error(`Get sales invoice summary failed: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
 
 /**
  * @desc Get all sales invoices (only for current owner)
