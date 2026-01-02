@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllSalesInvoices,
+  getSalesInvoiceSummary,
   deleteSalesInvoice,
   reset,
 } from "../../redux/slices/salesInvoiceSlice";
@@ -16,6 +17,7 @@ const SalesInvoice = () => {
   const dispatch = useDispatch();
   const {
     invoices = [],
+    summary = null,
     isLoading,
     isError,
     message,
@@ -43,6 +45,7 @@ const SalesInvoice = () => {
 
   useEffect(() => {
     dispatch(getAllSalesInvoices());
+    dispatch(getSalesInvoiceSummary());
     return () => {
       dispatch(reset());
     };
@@ -60,17 +63,17 @@ const SalesInvoice = () => {
 
   const filteredInvoices = Array.isArray(invoices)
     ? invoices.filter((invoice) => {
-        const matchesSearch =
-          invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (invoice.customer?.name || "")
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-        const matchesStatus =
-          statusFilter === "all" || invoice.paymentStatus === statusFilter;
-        const matchesCustomer =
-          !selectedCustomer || invoice.customer?._id === selectedCustomer._id;
-        return matchesSearch && matchesStatus && matchesCustomer;
-      })
+      const matchesSearch =
+        invoice.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (invoice.customer?.name || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || invoice.paymentStatus === statusFilter;
+      const matchesCustomer =
+        !selectedCustomer || invoice.customer?._id === selectedCustomer._id;
+      return matchesSearch && matchesStatus && matchesCustomer;
+    })
     : [];
 
   // Pagination calculations
@@ -92,13 +95,10 @@ const SalesInvoice = () => {
     }
   };
 
-  const totalSales = Array.isArray(invoices)
-    ? invoices.reduce((sum, inv) => sum + inv.totalAmount, 0)
-    : 0;
-  const totalPaid = Array.isArray(invoices)
-    ? invoices.reduce((sum, inv) => sum + inv.paidAmount, 0)
-    : 0;
-  const totalDue = totalSales - totalPaid;
+  // Get metrics from backend summary (source of truth)
+  const totalInvoices = summary?.totalInvoices || 0;
+  const totalPaid = summary?.totalPaid || 0;
+  const totalDue = summary?.outstandingDues || 0;
 
   return (
     <Layout>
@@ -129,7 +129,7 @@ const SalesInvoice = () => {
                   Total Invoices
                 </p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-2">
-                  {invoices.length}
+                  {totalInvoices}
                 </p>
               </div>
               <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -464,11 +464,10 @@ const SalesInvoice = () => {
                             <button
                               key={page}
                               onClick={() => setCurrentPage(page)}
-                              className={`px-3 py-1 border rounded-md text-sm ${
-                                currentPage === page
-                                  ? "bg-indigo-600 text-white border-indigo-600"
-                                  : "border-gray-300 dark:border-[rgb(var(--color-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))]"
-                              }`}
+                              className={`px-3 py-1 border rounded-md text-sm ${currentPage === page
+                                ? "bg-indigo-600 text-white border-indigo-600"
+                                : "border-gray-300 dark:border-[rgb(var(--color-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))]"
+                                }`}
                             >
                               {page}
                             </button>
