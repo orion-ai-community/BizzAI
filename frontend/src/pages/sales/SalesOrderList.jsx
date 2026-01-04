@@ -172,7 +172,14 @@ const SalesOrderList = () => {
                         <select
                             value={filters.status}
                             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                            className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                            className="
+                              w-full px-4 py-2 rounded-lg border
+                              bg-[rgb(var(--color-input))]
+                              text-[rgb(var(--color-text))]
+                              border-[rgb(var(--color-border))]
+                              focus:outline-none focus:ring-2
+                              focus:ring-[rgb(var(--color-primary))]
+                             "
                         >
                             <option value="">All Status</option>
                             <option value="Draft">Draft</option>
