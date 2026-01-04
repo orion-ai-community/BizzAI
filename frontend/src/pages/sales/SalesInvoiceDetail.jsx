@@ -231,6 +231,12 @@ const SalesInvoiceDetail = () => {
                                 <span className=" text-secondary">Subtotal:</span>
                                 <span className="font-medium  text-main">₹{invoice.subtotal.toFixed(2)}</span>
                             </div>
+                            {invoice.tax > 0 && (
+                                <div className="flex justify-between py-2 border-b">
+                                    <span className=" text-secondary">Tax:</span>
+                                    <span className="font-medium text-green-600">+₹{invoice.tax.toFixed(2)}</span>
+                                </div>
+                            )}
                             {invoice.discount > 0 && (
                                 <div className="flex justify-between py-2 border-b">
                                     <span className=" text-secondary">Discount:</span>

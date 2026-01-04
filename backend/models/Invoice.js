@@ -14,6 +14,14 @@ const invoiceItemSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  tax: {
+    type: Number,
+    default: 0,
+  },
+  discount: {
+    type: Number,
+    default: 0,
+  },
   total: {
     type: Number,
     required: true,
@@ -38,6 +46,10 @@ const invoiceSchema = new mongoose.Schema(
     subtotal: {
       type: Number,
       required: true,
+    },
+    tax: {
+      type: Number,
+      default: 0,
     },
     discount: {
       type: Number,
@@ -85,6 +97,18 @@ const invoiceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    // Soft delete support
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }

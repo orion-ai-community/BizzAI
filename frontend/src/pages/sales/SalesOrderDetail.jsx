@@ -11,10 +11,6 @@ const SalesOrderDetail = () => {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
-    const [showConvertDC, setShowConvertDC] = useState(false);
-    const [showConvertInvoice, setShowConvertInvoice] = useState(false);
-    const [dcItems, setDcItems] = useState([]);
-    const [invoiceItems, setInvoiceItems] = useState([]);
 
     useEffect(() => {
         fetchOrderDetails();
@@ -30,24 +26,6 @@ const SalesOrderDetail = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setOrder(response.data);
-
-            // Initialize DC items with deliverable quantities
-            setDcItems(response.data.items.map(item => ({
-                item: item.item._id,
-                name: item.item.name,
-                quantity: item.reservedQty - item.deliveredQty,
-                maxQty: item.reservedQty - item.deliveredQty,
-                unit: item.item.unit || 'pcs'
-            })));
-
-            // Initialize invoice items with invoiceable quantities
-            setInvoiceItems(response.data.items.map(item => ({
-                item: item.item._id,
-                name: item.item.name,
-                quantity: item.deliveredQty - item.invoicedQty,
-                maxQty: item.deliveredQty - item.invoicedQty,
-                rate: item.rate
-            })));
         } catch (error) {
             console.error('Error fetching order details:', error);
             toast.error('Failed to fetch order details');
@@ -76,77 +54,6 @@ const SalesOrderDetail = () => {
         } catch (error) {
             console.error('Error cancelling order:', error);
             toast.error(error.response?.data?.message || 'Failed to cancel order');
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleConvertToDC = async () => {
-        const itemsToDeliver = dcItems.filter(item => item.quantity > 0);
-
-        if (itemsToDeliver.length === 0) {
-            toast.error('Please select at least one item to deliver');
-            return;
-        }
-
-        setActionLoading(true);
-        try {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user?.token;
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders/${id}/convert-to-dc`,
-                {
-                    items: itemsToDeliver.map(item => ({
-                        item: item.item,
-                        quantity: item.quantity,
-                        unit: item.unit
-                    })),
-                    deliveryDate: new Date().toISOString()
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            toast.success('Delivery Challan created successfully');
-            setShowConvertDC(false);
-            fetchOrderDetails();
-        } catch (error) {
-            console.error('Error converting to DC:', error);
-            toast.error(error.response?.data?.message || 'Failed to create Delivery Challan');
-        } finally {
-            setActionLoading(false);
-        }
-    };
-
-    const handleConvertToInvoice = async () => {
-        const itemsToInvoice = invoiceItems.filter(item => item.quantity > 0);
-
-        if (itemsToInvoice.length === 0) {
-            toast.error('Please select at least one item to invoice');
-            return;
-        }
-
-        setActionLoading(true);
-        try {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user?.token;
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders/${id}/convert-to-invoice`,
-                {
-                    items: itemsToInvoice.map(item => ({
-                        item: item.item,
-                        quantity: item.quantity
-                    })),
-                    discount: 0,
-                    paidAmount: 0,
-                    paymentMethod: 'due'
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            toast.success('Invoice created successfully');
-            setShowConvertInvoice(false);
-            fetchOrderDetails();
-        } catch (error) {
-            console.error('Error converting to invoice:', error);
-            toast.error(error.response?.data?.message || 'Failed to create invoice');
         } finally {
             setActionLoading(false);
         }
@@ -181,8 +88,11 @@ const SalesOrderDetail = () => {
         );
     }
 
-    const canConvertToDC = order.status === 'Confirmed' || order.status === 'Partially Delivered';
-    const canConvertToInvoice = order.status === 'Delivered' || order.status === 'Partially Invoiced';
+    const hasItemsToDeliver = order?.items?.some(item =>
+        (item.reservedQty - item.deliveredQty) > 0
+    );
+
+    const canConvertToDC = hasItemsToDeliver && (order.status === 'Confirmed' || order.status === 'Partially Delivered');
     const canCancel = order.status !== 'Cancelled' && order.status !== 'Invoiced';
 
     return (
@@ -331,20 +241,10 @@ const SalesOrderDetail = () => {
                         <div className="space-y-3">
                             {canConvertToDC && (
                                 <button
-                                    onClick={() => setShowConvertDC(true)}
-                                    disabled={actionLoading}
-                                    className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium disabled:opacity-50"
+                                    onClick={() => navigate(`/sales/delivery-challan?salesOrderId=${order._id}`)}
+                                    className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
                                 >
-                                    Convert to Delivery Challan
-                                </button>
-                            )}
-                            {canConvertToInvoice && (
-                                <button
-                                    onClick={() => setShowConvertInvoice(true)}
-                                    disabled={actionLoading}
-                                    className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50"
-                                >
-                                    Convert to Invoice
+                                    Create Delivery Challan
                                 </button>
                             )}
                             {canCancel && (
@@ -387,124 +287,6 @@ const SalesOrderDetail = () => {
                     )}
                 </div>
             </div>
-
-            {/* Convert to DC Modal */}
-            {showConvertDC && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-card rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
-                        <div className="p-6 border-b border-default">
-                            <h2 className="text-xl font-bold text-main">Convert to Delivery Challan</h2>
-                        </div>
-                        <div className="p-6 overflow-y-auto max-h-96">
-                            <table className="w-full">
-                                <thead className="bg-surface border-b">
-                                    <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Available</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Deliver Qty</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {dcItems.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="px-4 py-3 font-medium text-main">{item.name}</td>
-                                            <td className="px-4 py-3 text-secondary">{item.maxQty}</td>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    max={item.maxQty}
-                                                    value={item.quantity}
-                                                    onChange={(e) => {
-                                                        const newItems = [...dcItems];
-                                                        newItems[index].quantity = Math.min(parseInt(e.target.value) || 0, item.maxQty);
-                                                        setDcItems(newItems);
-                                                    }}
-                                                    className="w-24 px-2 py-1 border rounded"
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="p-6 border-t border-default flex gap-3 justify-end">
-                            <button
-                                onClick={() => setShowConvertDC(false)}
-                                className="px-6 py-2 border border-default text-secondary rounded-lg hover:bg-surface"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleConvertToDC}
-                                disabled={actionLoading}
-                                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
-                            >
-                                {actionLoading ? 'Creating...' : 'Create Delivery Challan'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Convert to Invoice Modal */}
-            {showConvertInvoice && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-card rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
-                        <div className="p-6 border-b border-default">
-                            <h2 className="text-xl font-bold text-main">Convert to Invoice</h2>
-                        </div>
-                        <div className="p-6 overflow-y-auto max-h-96">
-                            <table className="w-full">
-                                <thead className="bg-surface border-b">
-                                    <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Available</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Invoice Qty</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {invoiceItems.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="px-4 py-3 font-medium text-main">{item.name}</td>
-                                            <td className="px-4 py-3 text-secondary">{item.maxQty}</td>
-                                            <td className="px-4 py-3">
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    max={item.maxQty}
-                                                    value={item.quantity}
-                                                    onChange={(e) => {
-                                                        const newItems = [...invoiceItems];
-                                                        newItems[index].quantity = Math.min(parseInt(e.target.value) || 0, item.maxQty);
-                                                        setInvoiceItems(newItems);
-                                                    }}
-                                                    className="w-24 px-2 py-1 border rounded"
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="p-6 border-t border-default flex gap-3 justify-end">
-                            <button
-                                onClick={() => setShowConvertInvoice(false)}
-                                className="px-6 py-2 border border-default text-secondary rounded-lg hover:bg-surface"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleConvertToInvoice}
-                                disabled={actionLoading}
-                                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-                            >
-                                {actionLoading ? 'Creating...' : 'Create Invoice'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </Layout>
     );
 };

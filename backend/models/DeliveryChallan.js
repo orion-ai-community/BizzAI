@@ -69,6 +69,30 @@ const deliveryChallanSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        // Status tracking
+        status: {
+            type: String,
+            enum: ["Draft", "Delivered", "Converted"],
+            default: "Draft",
+        },
+        // Invoice conversion tracking
+        convertedToInvoice: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Invoice",
+        },
+        convertedAt: {
+            type: Date,
+        },
+        // System-generated flag (for SO → Invoice without explicit DC)
+        systemGenerated: {
+            type: Boolean,
+            default: false,
+        },
+        // Soft delete support
+        isDeleted: {
+            type: Boolean,
+            default: false,
+        },
         // Audit fields
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
