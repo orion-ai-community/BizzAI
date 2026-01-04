@@ -13,6 +13,8 @@ const isStrongPassword = (password) => {
   return hasUpper && hasLower && hasNumber && hasSymbol;
 };
 
+const isValidPhone = (phone) => /^\d{10}$/.test((phone || "").trim());
+
 /**
  * @desc Register new user (Shop Owner)
  * @route POST /api/auth/register
@@ -22,8 +24,12 @@ export const registerUser = async (req, res) => {
     const { name, email, password, shopName, phone } = req.body;
 
     // Validate inputs
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
       return res.status(400).json({ message: "Please fill all required fields" });
+    }
+
+    if (!isValidPhone(phone)) {
+      return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
     }
 
     if (!isStrongPassword(password)) {

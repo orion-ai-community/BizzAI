@@ -14,6 +14,8 @@ const isStrongPassword = (password) => {
   return hasUpper && hasLower && hasNumber && hasSymbol;
 };
 
+const isValidPhone = (value) => /^\d{10}$/.test(value);
+
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +37,7 @@ const Register = () => {
   );
 
   const [validationError, setValidationError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     if (isSuccess || user) {
@@ -47,15 +50,34 @@ const Register = () => {
   }, [user, isSuccess, navigate, dispatch]);
 
   const onChange = (e) => {
+    const { name, value } = e.target;
+    const nextValue =
+      name === "phone" ? value.replace(/\D/g, "").slice(0, 10) : value;
+
     setFormData((prevState) => ({
       ...prevState,
-      [e.target.name]: e.target.value,
+      [name]: nextValue,
     }));
+
+    if (name === "phone") {
+      if (nextValue.length > 0 && nextValue.length < 10) {
+        setPhoneError("Mobile number cannot be less than 10 digits.");
+      } else {
+        setPhoneError("");
+      }
+    }
+
     setValidationError("");
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
+
+    if (!isValidPhone(phone)) {
+      setValidationError("Phone number must be exactly 10 digits.");
+      setPhoneError("Mobile number cannot be less than 10 digits.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setValidationError("Passwords do not match");
@@ -189,15 +211,27 @@ const Register = () => {
                 >
                   Phone Number
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={phone}
-                  onChange={onChange}
-                  className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2  focus:ring-primaryfocus:border-transparent transition"
-                  placeholder="+91 9876543210"
-                />
+                <div className="flex overflow-hidden rounded-xl border border-default bg-white dark:bg-slate-900 shadow-md focus-within:ring-2 focus-within:ring-indigo-400/70 focus-within:border-transparent transition">
+                  <span className="px-3 py-3 bg-gradient-to-br from-indigo-600 to-indigo-500 text-white text-sm font-semibold flex items-center border-r border-indigo-500/30">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={phone}
+                    onChange={onChange}
+                    inputMode="numeric"
+                    pattern="\d{10}"
+                    maxLength={10}
+                    required
+                    className="w-full px-4 py-3 bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 border-0 focus:ring-0"
+                    placeholder="9876543210"
+                  />
+                </div>
+                {phoneError && (
+                  <p className="mt-2 text-sm text-red-600">{phoneError}</p>
+                )}
               </div>
             </div>
 
