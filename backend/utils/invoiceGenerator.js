@@ -2,6 +2,61 @@ import { jsPDF } from "jspdf";
 import fs from "fs";
 import path from "path";
 
+const formatPaymentMethodLabel = (method) => {
+  switch (method) {
+    case "cash":
+      return "Cash";
+    case "upi":
+      return "UPI";
+    case "card":
+      return "Card";
+    case "due":
+      return "Due";
+    case "split":
+      return "Split";
+    case "bank_transfer":
+      return "Bank Transfer";
+    case "cheque":
+      return "Cheque";
+    case "credit":
+      return "Customer Credit";
+    default:
+      return method || "Cash";
+  }
+};
+
+const buildPaymentMethodDisplay = (invoiceData) => {
+  const credit = invoiceData.creditApplied || 0;
+  const paid = invoiceData.paidAmount || 0;
+  const splitDetails = invoiceData.splitPaymentDetails || [];
+  const paidVia = invoiceData.paidViaMethod || invoiceData.paymentMethod;
+
+  if (credit > 0 && paid === 0) return "Customer Credit";
+  
+  // If we have split payment details array, use it
+  if (splitDetails.length > 1) {
+    const methods = splitDetails.map(d => formatPaymentMethodLabel(d.method)).join(" + ");
+    if (credit > 0) {
+      return `Split (${methods} + Customer Credit)`;
+    }
+    return `Split (${methods})`;
+  }
+  
+  // Single split detail (shouldn't happen normally, but handle it)
+  if (splitDetails.length === 1) {
+    const method = formatPaymentMethodLabel(splitDetails[0].method);
+    if (credit > 0) {
+      return `Split (${method} + Customer Credit)`;
+    }
+    return method;
+  }
+  
+  // Fallback to paidViaMethod logic (for backward compatibility)
+  const primaryMethod = formatPaymentMethodLabel(paidVia);
+  if (credit > 0 && paid > 0) return `Split (${primaryMethod} + Customer Credit)`;
+  return primaryMethod;
+};
+
 /**
  * Generates professional PDF invoice using jsPDF and saves it to /invoices folder
  * @param {Object} invoiceData - Invoice object from DB
@@ -110,7 +165,8 @@ export const generateInvoicePDF = async (invoiceData) => {
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "normal");
-  doc.text(invoiceData.paymentMethod || "Cash", pageWidth - margin, yPos - 5, { align: "right" });
+  const paymentMethodDisplay = buildPaymentMethodDisplay(invoiceData);
+  doc.text(paymentMethodDisplay, pageWidth - margin, yPos - 5, { align: "right" });
 
   yPos += 10;
 
@@ -215,8 +271,54 @@ export const generateInvoicePDF = async (invoiceData) => {
   // Paid Amount
   yPos += 7;
   doc.setFont("helvetica", "normal");
-  doc.text("Paid Amount:", labelX, yPos);
+  const paidMethod = invoiceData.paidViaMethod || invoiceData.paymentMethod;
+  const paidMethodLabel = invoiceData.paidAmount > 0
+    ? `Paid Amount (${formatPaymentMethodLabel(paidMethod)}):`
+    : "Paid Amount:";
+  doc.text(paidMethodLabel, labelX, yPos);
   doc.text(`Rs. ${(invoiceData.paidAmount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
+
+  // Payment Breakdown (only if credit was involved)
+  const hasCreditPayment = (invoiceData.creditApplied || 0) > 0;
+  if (hasCreditPayment) {
+    yPos += 10;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(labelX, yPos, valueX, yPos);
+
+    yPos += 6;
+    doc.setFontSize(9);
+    doc.setTextColor(...grayColor);
+    doc.setFont("helvetica", "bold");
+    doc.text("Payment Breakdown", labelX, yPos);
+
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+
+    yPos += 6;
+    doc.text("Customer Credit:", labelX, yPos);
+    doc.text(`Rs. ${(invoiceData.creditApplied || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
+
+    if ((invoiceData.paidAmount || 0) > 0) {
+      const splitDetails = invoiceData.splitPaymentDetails || [];
+      
+      if (splitDetails.length > 0) {
+        // Show each split payment method
+        splitDetails.forEach(split => {
+          yPos += 6;
+          doc.text(`${formatPaymentMethodLabel(split.method)}:`, labelX, yPos);
+          doc.text(`Rs. ${(split.amount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
+        });
+      } else {
+        // Fallback for backward compatibility
+        const paidMethod = invoiceData.paidViaMethod || invoiceData.paymentMethod;
+        yPos += 6;
+        doc.text(`${formatPaymentMethodLabel(paidMethod)}:`, labelX, yPos);
+        doc.text(`Rs. ${(invoiceData.paidAmount || 0).toFixed(2)}`, valueX, yPos, { align: "right" });
+      }
+    }
+  }
 
 
 
