@@ -8,6 +8,9 @@ import BankAccount from "../models/BankAccount.js";
 import { generateInvoicePDF } from "../utils/invoiceGenerator.js";
 import { sendEmail } from "../utils/emailService.js";
 import { info, error } from "../utils/logger.js";
+import { logStockMovement } from "../utils/stockMovementLogger.js";
+import { calculatePaymentStatus } from "../utils/paymentStatusCalculator.js";
+import { validateStockLevels } from "../utils/inventoryValidator.js";
 
 /**
  * @desc Create a new invoice (Billing)
@@ -159,15 +162,8 @@ export const createInvoice = async (req, res) => {
     // Cap actualPaidAmount at totalAmount (don't record overpayment)
     const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
-    // Determine payment status based on effective payment (cash + credit)
-    let paymentStatus;
-    if (effectivePaidAmount >= totalAmount) {
-      paymentStatus = "paid";
-    } else if (effectivePaidAmount > 0) {
-      paymentStatus = "partial";
-    } else {
-      paymentStatus = "unpaid";
-    }
+    // Determine payment status based on effective payment (cash + credit) - USE CENTRALIZED FUNCTION
+    const paymentStatus = calculatePaymentStatus(totalAmount, actualPaidAmount, creditApplied);
 
     // Generate unique invoice number - find most recent invoice and increment
     const lastInvoice = await Invoice.findOne({ createdBy: req.user._id })
@@ -219,9 +215,43 @@ export const createInvoice = async (req, res) => {
 
     console.log('Invoice created successfully:', invoice._id);
 
-    // Update stock
+    // Update stock and log movements
     for (const it of items) {
-      await Item.findByIdAndUpdate(it.item, { $inc: { stockQty: -it.quantity } });
+      const item = await Item.findById(it.item);
+
+      // Capture previous state
+      const previousState = {
+        stockQty: item.stockQty,
+        reservedStock: item.reservedStock,
+        inTransitStock: item.inTransitStock || 0,
+      };
+
+      // Update stock
+      item.stockQty -= it.quantity;
+
+      // Validate stock levels
+      validateStockLevels(item);
+
+      await item.save();
+
+      // Capture new state
+      const newState = {
+        stockQty: item.stockQty,
+        reservedStock: item.reservedStock,
+        inTransitStock: item.inTransitStock || 0,
+      };
+
+      // Log stock movement
+      await logStockMovement(
+        item,
+        "POS_SALE",
+        it.quantity,
+        invoice._id,
+        "Invoice",
+        req.user._id,
+        previousState,
+        newState
+      );
     }
 
     // Handle customer credit usage

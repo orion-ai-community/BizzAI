@@ -110,6 +110,7 @@ const Sidebar = ({ isOpen = false, onClose = () => { }, isCollapsed = false, set
         { name: 'Payment In List', path: '/sales/payment-in-list' },
         { name: 'Sales Order', path: '/sales/order' },
         { name: 'Delivery Challan', path: '/sales/delivery-challan' },
+        { name: 'Delivery Challan List', path: '/sales/delivery-challan-list' },
         { name: 'Return', path: '/sales/return' },
         { name: 'Returned Items', path: '/sales/returned-items' }
       ]

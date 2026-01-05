@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
 @tailwind utilities;
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Custom animations */
 @keyframes fade-in {
@@ -211,4 +211,8 @@
   .hover\:bg-primary-hover:hover {
     background-color: rgb(var(--color-primary-hover));
   }
+}
+
+button{
+    cursor: pointer;
 }

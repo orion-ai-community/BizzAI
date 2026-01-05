@@ -1,11 +1,16 @@
 import Item from "../models/Item.js";
+import { logStockMovement } from "./stockMovementLogger.js";
+import { validateStockLevels } from "./inventoryValidator.js";
 
 /**
  * Reserve stock for an item
  * @param {String} itemId - Item ID
  * @param {Number} quantity - Quantity to reserve
+ * @param {ObjectId} sourceId - Source document ID (SalesOrder)
+ * @param {String} sourceType - Source model name
+ * @param {ObjectId} userId - User performing the action
  */
-export const reserveStock = async (itemId, quantity) => {
+export const reserveStock = async (itemId, quantity, sourceId = null, sourceType = "SalesOrder", userId = null) => {
     const item = await Item.findById(itemId);
     if (!item) {
         throw new Error(`Item not found: ${itemId}`);
@@ -18,17 +23,51 @@ export const reserveStock = async (itemId, quantity) => {
         );
     }
 
-    await Item.findByIdAndUpdate(itemId, {
-        $inc: { reservedStock: quantity },
-    });
+    // Capture previous state
+    const previousState = {
+        stockQty: item.stockQty,
+        reservedStock: item.reservedStock,
+        inTransitStock: item.inTransitStock || 0,
+    };
+
+    // Update reserved stock
+    item.reservedStock += quantity;
+
+    // Validate stock levels
+    validateStockLevels(item);
+    await item.save();
+
+    // Capture new state
+    const newState = {
+        stockQty: item.stockQty,
+        reservedStock: item.reservedStock,
+        inTransitStock: item.inTransitStock || 0,
+    };
+
+    // Log stock movement if source info provided
+    if (sourceId && userId) {
+        await logStockMovement(
+            item,
+            "RESERVE",
+            quantity,
+            sourceId,
+            sourceType,
+            userId,
+            previousState,
+            newState
+        );
+    }
 };
 
 /**
  * Release reserved stock for an item
  * @param {String} itemId - Item ID
  * @param {Number} quantity - Quantity to release
+ * @param {ObjectId} sourceId - Source document ID (SalesOrder)
+ * @param {String} sourceType - Source model name
+ * @param {ObjectId} userId - User performing the action
  */
-export const releaseStock = async (itemId, quantity) => {
+export const releaseStock = async (itemId, quantity, sourceId = null, sourceType = "SalesOrder", userId = null) => {
     const item = await Item.findById(itemId);
     if (!item) {
         throw new Error(`Item not found: ${itemId}`);
@@ -40,9 +79,40 @@ export const releaseStock = async (itemId, quantity) => {
         );
     }
 
-    await Item.findByIdAndUpdate(itemId, {
-        $inc: { reservedStock: -quantity },
-    });
+    // Capture previous state
+    const previousState = {
+        stockQty: item.stockQty,
+        reservedStock: item.reservedStock,
+        inTransitStock: item.inTransitStock || 0,
+    };
+
+    // Update reserved stock
+    item.reservedStock -= quantity;
+
+    // Validate stock levels
+    validateStockLevels(item);
+    await item.save();
+
+    // Capture new state
+    const newState = {
+        stockQty: item.stockQty,
+        reservedStock: item.reservedStock,
+        inTransitStock: item.inTransitStock || 0,
+    };
+
+    // Log stock movement if source info provided
+    if (sourceId && userId) {
+        await logStockMovement(
+            item,
+            "RELEASE",
+            quantity,
+            sourceId,
+            sourceType,
+            userId,
+            previousState,
+            newState
+        );
+    }
 };
 
 /**

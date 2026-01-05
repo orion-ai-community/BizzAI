@@ -271,22 +271,22 @@ const Customers = () => {
                             </span>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-gray-900  dark:text-[rgb(var(--color-text))]">
                               {customer.name}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-gray-900  dark:text-[rgb(var(--color-text))]">
                           {customer.phone}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                           {customer.email || "No email"}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-gray-900  dark:text-[rgb(var(--color-text))]">
                           {customer.address || "No address"}
                         </div>
                       </td>

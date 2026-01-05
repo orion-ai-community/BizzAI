@@ -301,7 +301,7 @@ export const confirmSalesOrder = async (req, res) => {
 
         // Reserve stock for all items
         for (const item of salesOrder.items) {
-            await reserveStock(item.item, item.quantity, salesOrder._id, "SalesOrder", req.user._id);
+            await reserveStock(item.item, item.quantity);
             // Update reservedQty in sales order
             item.reservedQty = item.quantity;
         }
@@ -449,7 +449,7 @@ export const cancelSalesOrder = async (req, res) => {
             for (const item of salesOrder.items) {
                 const unreservedQty = item.reservedQty - item.deliveredQty;
                 if (unreservedQty > 0) {
-                    await releaseStock(item.item, unreservedQty, salesOrder._id, "SalesOrder", req.user._id);
+                    await releaseStock(item.item, unreservedQty);
                 }
             }
         }
@@ -538,52 +538,11 @@ export const convertToDeliveryChallan = async (req, res) => {
             // Update delivered quantity in sales order
             soItem.deliveredQty += dcItem.quantity;
 
-            // ERP-GRADE: Update stock with in-transit tracking
-            const item = await Item.findById(dcItem.item);
-
-            const previousState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock,
-                inTransitStock: item.inTransitStock || 0,
-            };
-
-            item.stockQty -= dcItem.quantity;
-            item.inTransitStock = (item.inTransitStock || 0) + dcItem.quantity;
-
-            validateStockLevels(item);
-            await item.save();
-
-            const newState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock,
-                inTransitStock: item.inTransitStock,
-            };
-
-            await logStockMovement(
-                item,
-                "DELIVER",
-                dcItem.quantity,
-                salesOrder._id,
-                "SalesOrder",
-                req.user._id,
-                previousState,
-                { ...previousState, stockQty: item.stockQty }
-            );
-
-            await logStockMovement(
-                item,
-                "IN_TRANSIT",
-                dcItem.quantity,
-                salesOrder._id,
-                "SalesOrder",
-                req.user._id,
-                { ...previousState, stockQty: item.stockQty },
-                newState
-            );
+            // Reduce ONLY actual stock (reserved stock released on invoice)
+            await Item.findByIdAndUpdate(dcItem.item, {
+                $inc: { stockQty: -dcItem.quantity },
+            });
         }
-
-        // Validate Sales Order quantities
-        validateSalesOrderQuantities(salesOrder);
 
         // Generate unique challan number
         const lastChallan = await DeliveryChallan.findOne({ createdBy: req.user._id })
@@ -713,47 +672,19 @@ export const convertToInvoice = async (req, res) => {
 
             // Update invoiced quantity in sales order
             soItem.invoicedQty += invItem.quantity;
-
-            // ERP-GRADE: Release reserved stock and reduce in-transit
-            const item = await Item.findById(invItem.item);
-
-            const previousState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock,
-                inTransitStock: item.inTransitStock || 0,
-            };
-
-            item.reservedStock -= invItem.quantity;
-
-            if (item.inTransitStock > 0) {
-                item.inTransitStock = Math.max(0, item.inTransitStock - invItem.quantity);
-            }
-
-            validateStockLevels(item);
-            await item.save();
-
-            const newState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock,
-                inTransitStock: item.inTransitStock,
-            };
-
-            await logStockMovement(
-                item,
-                "INVOICE",
-                invItem.quantity,
-                salesOrder._id,
-                "SalesOrder",
-                req.user._id,
-                previousState,
-                newState
-            );
         }
 
         const totalAmount = subtotal - discount;
 
-        // Determine payment status - USE CENTRALIZED FUNCTION
-        const paymentStatus = calculatePaymentStatus(totalAmount, paidAmount, 0);
+        // Determine payment status
+        let paymentStatus;
+        if (paidAmount >= totalAmount) {
+            paymentStatus = "paid";
+        } else if (paidAmount > 0) {
+            paymentStatus = "partial";
+        } else {
+            paymentStatus = "unpaid";
+        }
 
         // Generate unique invoice number
         const lastInvoice = await Invoice.findOne({ createdBy: req.user._id })
@@ -798,9 +729,6 @@ export const convertToInvoice = async (req, res) => {
         } else if (totalInvoiced > 0) {
             salesOrder.status = "Partially Invoiced";
         }
-
-        // Validate Sales Order quantities
-        validateSalesOrderQuantities(salesOrder);
 
         await salesOrder.save();
 

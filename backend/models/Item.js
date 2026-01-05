@@ -23,10 +23,17 @@ const itemSchema = new mongoose.Schema(
     stockQty: {
       type: Number,
       default: 0,
+      min: 0,
     },
     reservedStock: {
       type: Number,
       default: 0,
+      min: 0,
+    },
+    inTransitStock: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     lowStockLimit: {
       type: Number,
@@ -45,9 +52,14 @@ const itemSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Virtual field for available stock
+// Virtual field for available stock (never negative)
 itemSchema.virtual("availableStock").get(function () {
-  return this.stockQty - this.reservedStock;
+  return Math.max(this.stockQty - this.reservedStock, 0);
+});
+
+// Virtual field for over-committed stock
+itemSchema.virtual("overCommittedStock").get(function () {
+  return Math.max(this.reservedStock - this.stockQty, 0);
 });
 
 // Ensure virtuals are included in JSON
