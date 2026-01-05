@@ -439,9 +439,18 @@ const POS = () => {
 
   const applySplitPayment = () => {
     const total = calculateSplitTotal();
+    // Convert string amounts to numbers and filter out zero/empty amounts
+    const validSplitPayments = splitPayments
+      .map(p => ({
+        method: p.method,
+        amount: parseFloat(p.amount) || 0
+      }))
+      .filter(p => p.amount > 0);
+    
     updateTabData({
       paidAmount: total.toString(),
-      paymentMethod: 'split'
+      paymentMethod: 'split',
+      splitPaymentDetails: validSplitPayments
     });
     setShowSplitPayment(false);
   };
@@ -640,6 +649,7 @@ const POS = () => {
       paymentMethod: activeTab.paymentMethod,
       bankAccount: activeTab.paymentMethod === 'bank_transfer' ? activeTab.bankAccount : null,
       changeReturned: parseFloat(activeTab.changeReturned) || 0,
+      splitPaymentDetails: activeTab.splitPaymentDetails || [],
     };
 
     console.log('Sending invoice data:', invoiceData);
@@ -1028,6 +1038,25 @@ const POS = () => {
                   <div className="flex justify-between text-lg font-bold text-indigo-600 border-t pt-2">
                     <span>Amount to Pay:</span>
                     <span>₹{total.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {/* Payment Method Display with Split Info */}
+                {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
+                  <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="text-xs font-semibold text-purple-700 mb-2">Payment Breakdown</div>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-purple-700">Customer Credit:</span>
+                        <span className="font-medium text-purple-900">₹{getCreditApplied().toFixed(2)}</span>
+                      </div>
+                      {paid > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-purple-700">{activeTab.paymentMethod.charAt(0).toUpperCase() + activeTab.paymentMethod.slice(1)}:</span>
+                          <span className="font-medium text-purple-900">₹{paid.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1451,6 +1480,23 @@ const POS = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Payment Methods Summary */}
+                {splitPayments.some(p => p.amount) && (
+                  <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="text-xs font-semibold text-purple-700 mb-2">Payment Methods</div>
+                    <div className="space-y-1">
+                      {splitPayments.map((payment, index) => (
+                        payment.amount && (
+                          <div key={index} className="flex justify-between text-sm">
+                            <span className="text-purple-700">{payment.method.charAt(0).toUpperCase() + payment.method.slice(1)}:</span>
+                            <span className="font-medium text-purple-900">₹{parseFloat(payment.amount || 0).toFixed(2)}</span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex space-x-2">
                   <button
