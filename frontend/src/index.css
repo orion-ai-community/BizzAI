@@ -211,4 +211,19 @@
   .hover\:bg-primary-hover:hover {
     background-color: rgb(var(--color-primary-hover));
   }
+
+  /* Dark mode select/dropdown styling */
+  .dark select {
+    background-color: rgb(var(--color-input));
+    color: rgb(var(--color-text));
+  }
+
+  .dark select option {
+    background-color: rgb(var(--color-card));
+    color: rgb(var(--color-text));
+  }
+
+  .dark select:focus {
+    outline: none;
+  }
 }
