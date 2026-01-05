@@ -18,7 +18,7 @@ import { validateStockLevels } from "../utils/inventoryValidator.js";
  */
 export const createInvoice = async (req, res) => {
   try {
-    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditApplied = 0, previousDueAmount = 0 } = req.body;
+    const { customerId, items, discount = 0, paidAmount = 0, paymentMethod, creditApplied = 0, previousDueAmount = 0, splitPaymentDetails = [] } = req.body;
 
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
@@ -162,6 +162,17 @@ export const createInvoice = async (req, res) => {
     // Cap actualPaidAmount at totalAmount (don't record overpayment)
     const actualPaidAmount = Math.min(paidAmount, totalAmount - creditApplied);
 
+    // Resolve payment method for invoice display/storage
+    const hasCredit = creditApplied > 0;
+    const hasCashOrOnline = actualPaidAmount > 0;
+    let resolvedPaymentMethod = paymentMethod || "cash";
+    const paidViaMethod = hasCashOrOnline ? (paymentMethod || "cash") : (hasCredit ? "credit" : paymentMethod || "cash");
+    if (hasCredit && hasCashOrOnline) {
+      resolvedPaymentMethod = "split";
+    } else if (hasCredit && !hasCashOrOnline) {
+      resolvedPaymentMethod = "credit"; // Fully paid by customer credit
+    }
+
     // Determine payment status based on effective payment (cash + credit) - USE CENTRALIZED FUNCTION
     const paymentStatus = calculatePaymentStatus(totalAmount, actualPaidAmount, creditApplied);
 
@@ -191,7 +202,10 @@ export const createInvoice = async (req, res) => {
       totalAmount,
       previousDueAmount,
       paidAmount: actualPaidAmount,
-      paymentMethod,
+      creditApplied,
+      paymentMethodOriginal: paymentMethod,
+      paymentMethodResolved: resolvedPaymentMethod,
+      paidViaMethod,
       paymentStatus,
       bankAccount: paymentMethod === 'bank_transfer' ? bankAccount : undefined,
       createdBy: req.user._id,
@@ -207,7 +221,9 @@ export const createInvoice = async (req, res) => {
       previousDueAmount,
       paidAmount: actualPaidAmount,
       creditApplied,
-      paymentMethod,
+      paymentMethod: resolvedPaymentMethod,
+      paidViaMethod,
+      splitPaymentDetails: splitPaymentDetails.length > 0 ? splitPaymentDetails : undefined,
       paymentStatus,
       bankAccount: paymentMethod === 'bank_transfer' ? bankAccount : undefined,
       createdBy: req.user._id,
@@ -599,10 +615,25 @@ export const markInvoiceAsPaid = async (req, res) => {
       });
     }
 
-    // Update invoice
+    // Update invoice and resolve payment method for display
     invoice.paidAmount = newPaidAmount;
     invoice.paymentStatus = paymentStatus;
-    invoice.paymentMethod = paymentMethod;
+    
+    // Resolve payment method based on existing credit + new payment method
+    const hasExistingCredit = (invoice.creditApplied || 0) > 0;
+    const hasNewPayment = newPaidAmount > 0;
+    const hasBoth = hasExistingCredit && hasNewPayment;
+    
+    if (hasBoth) {
+      invoice.paymentMethod = 'split';
+      invoice.paidViaMethod = paymentMethod; // Store the actual non-credit method
+    } else if (hasExistingCredit && !hasNewPayment) {
+      invoice.paymentMethod = 'credit';
+      invoice.paidViaMethod = 'credit';
+    } else {
+      invoice.paymentMethod = paymentMethod;
+      invoice.paidViaMethod = paymentMethod;
+    }
     await invoice.save();
 
     res.status(200).json({
