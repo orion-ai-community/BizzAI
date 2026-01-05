@@ -213,10 +213,10 @@ const CustomerDetail = () => {
               </span>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900  dark:text-[rgb(var(--color-text))]">
                 {customer.name}
               </h2>
-              <p className="text-gray-500">
+              <p className="text-gray-500  dark:text-[rgb(var(--color-text-secondary))]">
                 Customer since{" "}
                 {new Date(customer.createdAt).toLocaleDateString()}
               </p>
@@ -243,7 +243,7 @@ const CustomerDetail = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Phone</p>
-                <p className="text-gray-900 font-medium">{customer.phone}</p>
+                <p className="text-gray-900 font-medium  dark:text-[rgb(var(--color-text))]">{customer.phone}</p>
               </div>
             </div>
 
@@ -265,8 +265,8 @@ const CustomerDetail = () => {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Email</p>
-                <p className="text-gray-900 font-medium">
+                <p className="text-sm font-medium text-gray-500 ">Email</p>
+                <p className="text-gray-900 font-medium  dark:text-[rgb(var(--color-text))]">
                   {customer.email || "Not provided"}
                 </p>
               </div>
@@ -297,7 +297,7 @@ const CustomerDetail = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Address</p>
-                <p className="text-gray-900 font-medium">
+                <p className="text-gray-900 font-medium  dark:text-[rgb(var(--color-text))]">
                   {customer.address || "Not provided"}
                 </p>
               </div>
@@ -371,10 +371,10 @@ const CustomerDetail = () => {
         {/* Transaction History */}
         <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-sm dark:shadow-lg border dark:border-[rgb(var(--color-border))] overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
               Transaction History
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
               {transactions.length} transaction
               {transactions.length !== 1 ? "s" : ""} found
             </p>
@@ -429,12 +429,12 @@ const CustomerDetail = () => {
                 <tbody className="bg-white dark:bg-[rgb(var(--color-table-row))] divide-y divide-gray-200 dark:divide-[rgb(var(--color-border))]">
                   {transactions.map((transaction) => (
                     <tr key={transaction._id} className="hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900  dark:text-[rgb(var(--color-text))]">
                         {new Date(transaction.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getTransactionTypeColor(
+                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full capitalize ${getTransactionTypeColor(
                             transaction.type,
                             transaction.amount?.toFixed(2)
                           )}`}
@@ -444,13 +444,13 @@ const CustomerDetail = () => {
                             : transaction.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900  dark:text-[rgb(var(--color-text))]">
                         ₹{Math.abs(transaction.amount?.toFixed(2))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
                           {getPaymentMethodIcon(transaction.paymentMethod)}
-                          <span className="text-sm text-gray-900 capitalize">
+                          <span className="text-sm text-gray-900 capitalize  dark:text-[rgb(var(--color-text))]">
                             {transaction.paymentMethod}
                           </span>
                         </div>

@@ -4,6 +4,7 @@ import Invoice from "../models/Invoice.js";
 import Item from "../models/Item.js";
 import Customer from "../models/Customer.js";
 import Transaction from "../models/Transaction.js";
+import CashbankTransaction from "../models/CashbankTransaction.js";
 import { info, error } from "../utils/logger.js";
 
 /**

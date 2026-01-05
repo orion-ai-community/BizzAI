@@ -39,6 +39,8 @@ import SalesOrder from './pages/sales/SalesOrder';
 import SalesOrderList from './pages/sales/SalesOrderList';
 import SalesOrderDetail from './pages/sales/SalesOrderDetail';
 import DeliveryChallan from './pages/sales/DeliveryChallan';
+import DeliveryChallanList from './pages/sales/DeliveryChallanList';
+import DeliveryChallanDetail from './pages/sales/DeliveryChallanDetail';
 import Return from './pages/sales/Return';
 import ReturnedItems from './pages/sales/ReturnedItems';
 
@@ -326,6 +328,8 @@ function App() {
               <Route path="sales-order/:id" element={<ProtectedRoute><SalesOrderDetail /></ProtectedRoute>} />
               <Route path="order" element={<ProtectedRoute><SalesOrder /></ProtectedRoute>} />
               <Route path="delivery-challan" element={<ProtectedRoute><DeliveryChallan /></ProtectedRoute>} />
+              <Route path="delivery-challan-list" element={<ProtectedRoute><DeliveryChallanList /></ProtectedRoute>} />
+              <Route path="delivery-challan/:id" element={<ProtectedRoute><DeliveryChallanDetail /></ProtectedRoute>} />
               <Route path="return" element={<ProtectedRoute><Return /></ProtectedRoute>} />
               <Route path="returned-items" element={<ProtectedRoute><ReturnedItems /></ProtectedRoute>} />
             </Route>

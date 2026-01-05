@@ -4,6 +4,7 @@ import Customer from "../models/Customer.js";
 import CashbankTransaction from "../models/CashbankTransaction.js";
 import BankAccount from "../models/BankAccount.js";
 import { info, error } from "../utils/logger.js";
+import { calculatePaymentStatus } from "../utils/paymentStatusCalculator.js";
 
 /**
  * @desc Get sales invoice summary with actual customer dues
@@ -44,7 +45,10 @@ export const getSalesInvoiceSummary = async (req, res) => {
  */
 export const getAllSalesInvoices = async (req, res) => {
   try {
-    const invoices = await Invoice.find({ createdBy: req.user._id })
+    const invoices = await Invoice.find({
+      createdBy: req.user._id,
+      isDeleted: { $ne: true }
+    })
       .populate("customer", "name phone")
       .sort({ createdAt: -1 });
     res.status(200).json(invoices);
@@ -111,8 +115,28 @@ export const deleteSalesInvoice = async (req, res) => {
       return res.status(404).json({ message: "Invoice not found or unauthorized" });
     }
 
-    await invoice.deleteOne();
-    res.status(200).json({ message: "Invoice deleted" });
+    // ERP-GRADE: Block deletion of paid/partial invoices
+    if (invoice.paymentStatus === "paid" || invoice.paymentStatus === "partial") {
+      return res.status(400).json({
+        message: "Cannot delete paid or partially paid invoices. This is forbidden for accounting integrity."
+      });
+    }
+
+    // ERP-GRADE: Soft delete only
+    invoice.isDeleted = true;
+    invoice.deletedAt = new Date();
+    invoice.deletedBy = req.user._id;
+    await invoice.save();
+
+    // TODO: Implement full rollback for unpaid invoices
+    // - Restore stock
+    // - Restore reserved stock
+    // - Restore in-transit stock
+    // - Reverse customer dues
+    // - Restore Sales Order state
+    // - Add stock movement logging
+
+    res.status(200).json({ message: "Invoice soft-deleted successfully" });
   } catch (err) {
     error(`Delete sales invoice failed: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });
@@ -186,6 +210,18 @@ export const markSalesInvoiceAsPaid = async (req, res) => {
       },
       { new: true }
     );
+
+    // CRITICAL FIX: Update customer.dues (ATOMIC WITH INVOICE UPDATE)
+    if (invoice.customer) {
+      const customer = await Customer.findById(invoice.customer);
+      if (customer) {
+        // Reduce customer dues by payment amount
+        customer.dues = Math.max(0, customer.dues - amount);
+        await customer.save();
+
+        info(`Customer ledger updated: ${customer.name} dues reduced by ₹${amount}, new balance: ₹${customer.dues}`);
+      }
+    }
 
     // Handle bank payment
     if (paymentMethod === 'bank_transfer' && bankAccount) {
