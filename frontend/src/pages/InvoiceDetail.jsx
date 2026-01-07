@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getInvoiceById, reset, clearInvoice } from '../redux/slices/posSlice';
@@ -20,6 +20,78 @@ const InvoiceDetail = () => {
   const handlePrint = () => {
     window.print();
   };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'paid':
+        return 'bg-green-100 text-green-800';
+      case 'partial':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'unpaid':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatPaymentMethodLabel = useMemo(
+    () => (method) => {
+      switch (method) {
+        case 'cash':
+          return 'Cash';
+        case 'upi':
+          return 'UPI';
+        case 'card':
+          return 'Card';
+        case 'due':
+          return 'Due';
+        case 'split':
+          return 'Split';
+        case 'bank_transfer':
+          return 'Bank Transfer';
+        case 'cheque':
+          return 'Cheque';
+        case 'credit':
+          return 'Customer Credit';
+        default:
+          return method || 'Cash';
+      }
+    },
+    []
+  );
+
+  const paymentMethodDisplay = useMemo(() => {
+    if (!invoice) return '';
+    const credit = invoice.creditApplied || 0;
+    const paid = invoice.paidAmount || 0;
+    const splitDetails = invoice.splitPaymentDetails || [];
+    const paidVia = invoice.paidViaMethod || invoice.paymentMethod;
+
+    if (credit > 0 && paid === 0) return 'Customer Credit';
+    
+    // If we have split payment details array, use it
+    if (splitDetails.length > 1) {
+      const methods = splitDetails.map(d => formatPaymentMethodLabel(d.method)).join(" + ");
+      if (credit > 0) {
+        return `Split (${methods} + Customer Credit)`;
+      }
+      return `Split (${methods})`;
+    }
+    
+    // Single split detail (shouldn't happen normally, but handle it)
+    if (splitDetails.length === 1) {
+      const method = formatPaymentMethodLabel(splitDetails[0].method);
+      if (credit > 0) {
+        return `Split (${method} + Customer Credit)`;
+      }
+      return method;
+    }
+    
+    // Fallback to paidViaMethod logic (for backward compatibility)
+    const primaryLabel = formatPaymentMethodLabel(paidVia);
+    if (credit > 0 && paid > 0) return `Split (${primaryLabel} + Customer Credit)`;
+    return primaryLabel;
+  }, [invoice, formatPaymentMethodLabel]);
 
   if (isLoading || !invoice) {
     return (
@@ -49,18 +121,8 @@ const InvoiceDetail = () => {
     );
   }
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'paid':
-        return 'bg-green-100 text-green-800';
-      case 'partial':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'unpaid':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const fmt = (value) => Number(value || 0).toFixed(2);
+  const items = Array.isArray(invoice.items) ? invoice.items : [];
 
   return (
     <Layout>
@@ -163,7 +225,7 @@ const InvoiceDetail = () => {
               </span>
               <div className="mt-4">
                 <div className="text-sm text-gray-600">Payment Method</div>
-                <div className="font-medium text-gray-900 capitalize">{invoice.paymentMethod}</div>
+                <div className="font-medium text-gray-900 capitalize">{paymentMethodDisplay}</div>
               </div>
             </div>
           </div>
@@ -181,14 +243,14 @@ const InvoiceDetail = () => {
                 </tr>
               </thead>
               <tbody>
-                {invoice.items.map((item, index) => (
+                {items.map((item, index) => (
                   <tr key={index} className="border-b border-gray-200">
                     <td className="py-3 px-2 text-gray-600">{index + 1}</td>
                     <td className="py-3 px-2 text-gray-900">{item.name || 'Item'}</td>
                     <td className="py-3 px-2 text-right text-gray-900">{item.quantity}</td>
-                    <td className="py-3 px-2 text-right text-gray-900">₹{item.price.toFixed(2)}</td>
+                    <td className="py-3 px-2 text-right text-gray-900">₹{fmt(item.price)}</td>
                     <td className="py-3 px-2 text-right font-medium text-gray-900">
-                      ₹{item.total.toFixed(2)}
+                      ₹{fmt(item.total)}
                     </td>
                   </tr>
                 ))}
@@ -201,36 +263,66 @@ const InvoiceDetail = () => {
             <div className="w-64">
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Subtotal:</span>
-                <span className="font-medium text-gray-900">₹{invoice.subtotal.toFixed(2)}</span>
+                <span className="font-medium text-gray-900">₹{fmt(invoice.subtotal)}</span>
               </div>
               {invoice.discount > 0 && (
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Discount:</span>
-                  <span className="font-medium text-red-600">-₹{invoice.discount.toFixed(2)}</span>
+                  <span className="font-medium text-red-600">-₹{fmt(invoice.discount)}</span>
                 </div>
               )}
               {invoice.previousDueAmount > 0 && (
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Previous Due Added:</span>
-                  <span className="font-medium text-amber-600">+₹{invoice.previousDueAmount.toFixed(2)}</span>
+                  <span className="font-medium text-amber-600">+₹{fmt(invoice.previousDueAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between py-3 border-b-2 border-gray-300">
                 <span className="text-lg font-bold text-gray-900">Total Amount:</span>
                 <span className="text-lg font-bold text-indigo-600">
-                  ₹{invoice.totalAmount.toFixed(2)}
+                  ₹{fmt(invoice.totalAmount)}
                 </span>
               </div>
               {invoice.creditApplied > 0 && (
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Credit Applied:</span>
-                  <span className="font-medium text-green-600">-₹{invoice.creditApplied.toFixed(2)}</span>
+                  <span className="font-medium text-green-600">-₹{fmt(invoice.creditApplied)}</span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-b">
-                <span className="text-gray-600">Paid Amount:</span>
-                <span className="font-medium text-green-600">₹{invoice.paidAmount.toFixed(2)}</span>
+                <span className="text-gray-600">
+                  {invoice.paidAmount > 0
+                    ? `Paid Amount (${formatPaymentMethodLabel(invoice.paidViaMethod || invoice.paymentMethod)}):`
+                    : 'Paid Amount:'}
+                </span>
+                <span className="font-medium text-green-600">₹{fmt(invoice.paidAmount)}</span>
               </div>
+              {invoice.creditApplied > 0 && (
+                <div className="mt-2 pt-3 border-t border-gray-200 space-y-2">
+                  <div className="text-sm font-semibold text-gray-600">Payment Breakdown</div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Customer Credit:</span>
+                    <span className="font-medium text-gray-900">₹{fmt(invoice.creditApplied)}</span>
+                  </div>
+                  {invoice.paidAmount > 0 && (
+                    <>
+                      {invoice.splitPaymentDetails && invoice.splitPaymentDetails.length > 0 ? (
+                        invoice.splitPaymentDetails.map((split, idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-600">{formatPaymentMethodLabel(split.method)}:</span>
+                            <span className="font-medium text-gray-900">₹{fmt(split.amount)}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">{formatPaymentMethodLabel(invoice.paidViaMethod || invoice.paymentMethod)}:</span>
+                          <span className="font-medium text-gray-900">₹{fmt(invoice.paidAmount)}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
               {(() => {
                 const effectivePayment = invoice.paidAmount + (invoice.creditApplied || 0);
                 const balanceDue = invoice.totalAmount - effectivePayment;
@@ -259,7 +351,7 @@ const InvoiceDetail = () => {
                     {invoice.customer.dues < 0 ? 'Available Credit Balance:' : invoice.customer.dues > 0 ? 'Customer Outstanding Due:' : 'Account Balance:'}
                   </span>
                   <span className={`text-sm font-bold ${invoice.customer.dues < 0 ? 'text-green-700' : invoice.customer.dues > 0 ? 'text-red-700' : 'text-gray-700'}`}>
-                    ₹{Math.abs(invoice.customer.dues).toFixed(2)}
+                    ₹{fmt(Math.abs(invoice.customer.dues))}
                   </span>
                 </div>
               )}

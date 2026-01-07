@@ -165,7 +165,7 @@ const ReturnedItems = () => {
                             placeholder="Search by Return ID, Invoice, or Customer..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg"
+                            className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
                     <div>
@@ -173,12 +173,12 @@ const ReturnedItems = () => {
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg"
+                            className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="all">All Statuses</option>
-                            <option value="processed">Processed</option>
-                            <option value="pending">Pending</option>
-                            <option value="refunded">Refunded</option>
+                            <option value="all" className="bg-input text-main">All Statuses</option>
+                            <option value="processed" className="bg-input text-main">Processed</option>
+                            <option value="pending" className="bg-input text-main">Pending</option>
+                            <option value="refunded" className="bg-input text-main">Refunded</option>
                         </select>
                     </div>
                     <div>
@@ -186,13 +186,13 @@ const ReturnedItems = () => {
                         <select
                             value={refundMethodFilter}
                             onChange={(e) => setRefundMethodFilter(e.target.value)}
-                            className="w-full px-4 py-2 border rounded-lg"
+                            className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="all">All Methods</option>
-                            <option value="credit">Credit</option>
-                            <option value="cash">Cash</option>
-                            <option value="bank">Bank</option>
-                            <option value="original_payment">Original Payment</option>
+                            <option value="all" className="bg-input text-main">All Methods</option>
+                            <option value="credit" className="bg-input text-main">Credit</option>
+                            <option value="cash" className="bg-input text-main">Cash</option>
+                            <option value="bank" className="bg-input text-main">Bank</option>
+                            <option value="original_payment" className="bg-input text-main">Original Payment</option>
                         </select>
                     </div>
                 </div>

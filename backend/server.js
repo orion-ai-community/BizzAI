@@ -4,6 +4,7 @@ import cors from "cors";
 import morgan from "morgan";
 import connectDB from "./config/db.js";
 
+// Routes imports remain SAME
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
@@ -18,31 +19,58 @@ import returnRoutes from "./routes/returnRoutes.js";
 import estimateRoutes from "./routes/estimateRoutes.js";
 import dueRoutes from "./routes/dueRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
-// import settingsRoutes from "./routes/settingsRoutes.js";
 import cashbankRoutes from "./routes/cashbankRoutes.js";
 import paymentInRoutes from "./routes/paymentInRoutes.js";
 import salesOrderRoutes from "./routes/salesOrderRoutes.js";
 import deliveryChallanRoutes from "./routes/deliveryChallanRoutes.js";
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
+// =======================
 // Middleware
+// =======================
 app.use(express.json());
+
+const allowedOrigins = [
+  "http://localhost:5174",
+  process.env.FRONTEND_URL,      // production frontend
+  /\.vercel\.app$/               // ✅ ALL Vercel preview URLs
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow server-to-server / Postman / curl
+      if (!origin) return callback(null, true);
+
+      const isAllowed = allowedOrigins.some((allowed) =>
+        allowed instanceof RegExp
+          ? allowed.test(origin)
+          : allowed === origin
+      );
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed from this origin"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(morgan("dev"));
 
-// DB Connection
+// =======================
+// DB
+// =======================
 connectDB();
 
-// Default route
+// =======================
+// Routes
+// =======================
 app.get("/", (req, res) => {
   res.send("🧾 Grocery Billing Software Backend is running...");
 });
@@ -60,14 +88,16 @@ app.use("/api/returns", returnRoutes);
 app.use("/api/purchase-returns", purchaseReturnRoutes);
 app.use("/api/estimates", estimateRoutes);
 app.use("/api/due", dueRoutes);
-app.use("/api/estimates", estimateRoutes);
-app.use("/api/due", dueRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/cashbank", cashbankRoutes);
 app.use("/api/payment-in", paymentInRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
 app.use("/api/delivery-challan", deliveryChallanRoutes);
-// app.use("/api/settings", settingsRoutes);
 
+// =======================
+// Server
+// =======================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`✅ Server running on port ${PORT}`)
+);

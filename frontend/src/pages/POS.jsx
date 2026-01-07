@@ -439,9 +439,18 @@ const POS = () => {
 
   const applySplitPayment = () => {
     const total = calculateSplitTotal();
+    // Convert string amounts to numbers and filter out zero/empty amounts
+    const validSplitPayments = splitPayments
+      .map(p => ({
+        method: p.method,
+        amount: parseFloat(p.amount) || 0
+      }))
+      .filter(p => p.amount > 0);
+
     updateTabData({
       paidAmount: total.toString(),
-      paymentMethod: 'split'
+      paymentMethod: 'split',
+      splitPaymentDetails: validSplitPayments
     });
     setShowSplitPayment(false);
   };
@@ -640,6 +649,7 @@ const POS = () => {
       paymentMethod: activeTab.paymentMethod,
       bankAccount: activeTab.paymentMethod === 'bank_transfer' ? activeTab.bankAccount : null,
       changeReturned: parseFloat(activeTab.changeReturned) || 0,
+      splitPaymentDetails: activeTab.splitPaymentDetails || [],
     };
 
     console.log('Sending invoice data:', invoiceData);
@@ -690,8 +700,8 @@ const POS = () => {
 
         {/* Error Message */}
         {isError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{message}</p>
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-lg">
+            <p className="text-red-600 dark:text-red-400 text-sm">{message}</p>
           </div>
         )}
 
@@ -706,8 +716,8 @@ const POS = () => {
                 onDragOver={(e) => handleDragOver(e, tab.id)}
                 onDragEnd={handleDragEnd}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg cursor-grab transition select-none ${activeTabId === tab.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-secondary hover:bg-gray-200'
+                  ? 'bg-primary text-white'
+                  : 'bg-surface text-secondary hover:bg-gray-200 dark:hover:bg-gray-700'
                   } ${draggedTabId === tab.id ? 'opacity-50' : ''}`}
               >
                 <button
@@ -716,7 +726,7 @@ const POS = () => {
                 >
                   <span className="font-medium">{tab.name}</span>
                   {tab.cart.length > 0 && (
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${activeTabId === tab.id ? 'bg-white text-indigo-600' : 'bg-indigo-100 text-indigo-600'
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${activeTabId === tab.id ? 'bg-white text-primary dark:text-indigo-600' : 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300'
                       }`}>
                       {tab.cart.length}
                     </span>
@@ -805,15 +815,15 @@ const POS = () => {
               {/* Credit Balance Display */}
               {
                 activeTab.customer && activeTab.availableCredit > 0 && (
-                  <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="mt-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span className="text-sm font-medium text-green-800">Available Credit</span>
+                        <span className="text-sm font-medium text-green-800 dark:text-green-300">Available Credit</span>
                       </div>
-                      <span className="text-lg font-bold text-green-600">₹{activeTab.availableCredit.toFixed(2)}</span>
+                      <span className="text-lg font-bold text-green-600 dark:text-green-400">₹{activeTab.availableCredit.toFixed(2)}</span>
                     </div>
                   </div>
                 )
@@ -822,15 +832,15 @@ const POS = () => {
               {/* Pending Dues Display */}
               {
                 activeTab.customer && activeTab.customer.dues > 0 && (
-                  <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        <span className="text-sm font-medium text-red-800">Pending Dues</span>
+                        <span className="text-sm font-medium text-red-800 dark:text-red-300">Pending Dues</span>
                       </div>
-                      <span className="text-lg font-bold text-red-600">₹{activeTab.customer.dues.toFixed(2)}</span>
+                      <span className="text-lg font-bold text-red-600 dark:text-red-400">₹{activeTab.customer.dues.toFixed(2)}</span>
                     </div>
                   </div>
                 )
@@ -850,7 +860,7 @@ const POS = () => {
                   onChange={(e) => setBarcodeInput(e.target.value)}
                   onKeyPress={handleBarcodeInput}
                   placeholder="Scan barcode or type SKU and press Enter..."
-                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div >
 
@@ -860,7 +870,7 @@ const POS = () => {
                   placeholder="Search products by name or SKU..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 <svg className="absolute left-3 top-2.5 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -876,7 +886,7 @@ const POS = () => {
                     disabled={item.stockQty === 0}
                     className={`p-4 border-2 rounded-lg text-left transition ${item.stockQty === 0
                       ? 'border-default bg-surface cursor-not-allowed opacity-50'
-                      : 'border-default hover:border-primary hover:shadow-md'
+                      : 'border-default hover:border-primary hover:shadow-md dark:hover:bg-[rgb(var(--color-card))]'
                       }`}
                   >
                     <div className="font-medium text-main mb-1 truncate">{item.name}</div>
@@ -908,14 +918,14 @@ const POS = () => {
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => updateQuantity(item.item, item.quantity - 1)}
-                          className="w-7 h-7 bg-surface rounded hover:bg-gray-300"
+                          className="w-7 h-7 bg-surface rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-main"
                         >
                           -
                         </button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
+                        <span className="w-8 text-center font-medium text-main">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.item, item.quantity + 1)}
-                          className="w-7 h-7 bg-surface rounded hover:bg-gray-300"
+                          className="w-7 h-7 bg-surface rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-main"
                         >
                           +
                         </button>
@@ -943,7 +953,7 @@ const POS = () => {
                   onChange={(e) => updateTabData({ discount: parseFloat(e.target.value) || 0 })}
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
@@ -963,7 +973,7 @@ const POS = () => {
                     </span>
                   </label>
                   {activeTab.applyCreditEnabled && (
-                    <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-800">
+                    <div className="mt-2 p-2 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/50 rounded text-sm text-green-800 dark:text-green-300">
                       ✓ Credit of ₹{getCreditApplied().toFixed(2)} will be applied
                     </div>
                   )}
@@ -1030,6 +1040,25 @@ const POS = () => {
                     <span>₹{total.toFixed(2)}</span>
                   </div>
                 )}
+
+                {/* Payment Method Display with Split Info */}
+                {activeTab.applyCreditEnabled && getCreditApplied() > 0 && (
+                  <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="text-xs font-semibold text-purple-700 mb-2">Payment Breakdown</div>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-purple-700">Customer Credit:</span>
+                        <span className="font-medium text-purple-900">₹{getCreditApplied().toFixed(2)}</span>
+                      </div>
+                      {paid > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-purple-700">{activeTab.paymentMethod.charAt(0).toUpperCase() + activeTab.paymentMethod.slice(1)}:</span>
+                          <span className="font-medium text-purple-900">₹{paid.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Payment Method */}
@@ -1038,7 +1067,7 @@ const POS = () => {
                 <select
                   value={activeTab.paymentMethod}
                   onChange={(e) => updateTabData({ paymentMethod: e.target.value })}
-                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value="cash">Cash</option>
                   <option value="upi">UPI</option>
@@ -1057,7 +1086,7 @@ const POS = () => {
                   onChange={(e) => updateTabData({ paidAmount: e.target.value })}
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="0.00"
                 />
               </div >
@@ -1065,7 +1094,7 @@ const POS = () => {
               {/* Balance */}
               {
                 activeTab.paidAmount && (
-                  <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
+                  <div className={`mb-4 p-3 rounded-lg ${balance >= 0 ? 'bg-green-50 dark:bg-green-950/30' : 'bg-red-50 dark:bg-red-950/30'}`}>
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-secondary">
                         {balance >= 0 ? 'Change to Return:' : 'Balance Due:'}
@@ -1085,7 +1114,7 @@ const POS = () => {
                   <select
                     value={activeTab.bankAccount}
                     onChange={(e) => updateTabData({ bankAccount: e.target.value })}
-                    className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
                   >
                     <option value="">Choose account</option>
@@ -1149,8 +1178,8 @@ const POS = () => {
               {/* Walk-in Customer Warning */}
               {
                 !activeTab.customer && paid < total && (
-                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-xs text-yellow-800">
+                  <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800/50 rounded-lg">
+                    <p className="text-xs text-yellow-800 dark:text-yellow-300">
                       ⚠️ Walk-in customers must pay full amount. Add customer for credit.
                     </p>
                   </div>
@@ -1161,7 +1190,7 @@ const POS = () => {
               <button
                 onClick={handleCheckout}
                 disabled={activeTab.cart.length === 0 || isLoading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {isLoading ? 'Processing...' : 'Complete Sale'}
               </button>
@@ -1171,21 +1200,21 @@ const POS = () => {
                 <button
                   onClick={holdCurrentOrder}
                   disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-yellow-600 text-yellow-600 rounded-lg hover:bg-yellow-50 disabled:opacity-50 text-sm"
+                  className="py-2 border border-yellow-600 text-yellow-600 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-950/30 disabled:opacity-50 text-sm"
                 >
                   Hold
                 </button>
                 <button
                   onClick={() => setShowSplitPayment(true)}
                   disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 disabled:opacity-50 text-sm"
+                  className="py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-950/30 disabled:opacity-50 text-sm"
                 >
                   Split Pay
                 </button>
                 <button
                   onClick={printReceipt}
                   disabled={activeTab.cart.length === 0}
-                  className="py-2 border border-gray-600 text-secondary rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm"
+                  className="py-2 border border-gray-600 text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 text-sm"
                 >
                   Print
                 </button>
@@ -1196,7 +1225,7 @@ const POS = () => {
                 activeTab.cart.length > 0 && (
                   <button
                     onClick={() => updateTabData({ cart: [] })}
-                    className="w-full mt-2 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
+                    className="w-full mt-2 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
                     Clear Cart
                   </button>
@@ -1209,7 +1238,7 @@ const POS = () => {
         {/* Add Customer Modal */}
         {
           showAddCustomer && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-gray-500 z-50">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
               <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
                 <h3 className="text-lg font-bold text-main mb-4">Add New Customer</h3>
                 <form onSubmit={handleAddCustomer} className="space-y-4">
@@ -1220,7 +1249,7 @@ const POS = () => {
                       value={newCustomer.name}
                       onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -1230,7 +1259,7 @@ const POS = () => {
                       value={newCustomer.phone}
                       onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -1239,7 +1268,7 @@ const POS = () => {
                       type="email"
                       value={newCustomer.email}
                       onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -1248,7 +1277,7 @@ const POS = () => {
                       value={newCustomer.address}
                       onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
                       rows={2}
-                      className="w-full px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div className="flex space-x-4 pt-2">
@@ -1258,13 +1287,13 @@ const POS = () => {
                         setShowAddCustomer(false);
                         setNewCustomer({ name: '', phone: '', email: '', address: '' });
                       }}
-                      className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
+                      className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover"
                     >
                       Add Customer
                     </button>
@@ -1278,8 +1307,8 @@ const POS = () => {
         {/* Customer Select Modal */}
         {
           showCustomerSelect && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-white z-50">
-              <div className="bg-card rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-card rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto border border-default">
                 <h3 className="text-lg font-bold text-main mb-4">Select Customer</h3>
 
                 {/* Customer Search */}
@@ -1289,7 +1318,7 @@ const POS = () => {
                     placeholder="Search by name or phone..."
                     value={customerSearchTerm}
                     onChange={(e) => setCustomerSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary"
                     autoFocus
                   />
                 </div>
@@ -1302,12 +1331,12 @@ const POS = () => {
                       <button
                         key={customer._id}
                         onClick={() => selectCustomer(customer)}
-                        className="w-full p-4 border border-default rounded-lg hover:border-indigo-500 hover:bg-indigo-50 text-left transition"
+                        className="w-full p-4 border border-default rounded-lg hover:border-primary hover:bg-indigo-50 dark:hover:bg-[rgb(var(--color-input))] text-left transition"
                       >
                         <div className="font-medium text-main">{customer.name}</div>
                         <div className="text-sm text-secondary">{customer.phone}</div>
                         {customer.dues > 0 && (
-                          <div className="text-sm text-red-600 mt-1">Outstanding: ₹{customer.dues.toFixed(2)}</div>
+                          <div className="text-sm text-red-600 dark:text-red-400 mt-1">Outstanding: ₹{customer.dues.toFixed(2)}</div>
                         )}
                       </button>
                     ))
@@ -1318,7 +1347,7 @@ const POS = () => {
                     setShowCustomerSelect(false);
                     setCustomerSearchTerm('');
                   }}
-                  className="w-full mt-4 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-surface"
+                  className="w-full mt-4 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-surface dark:hover:bg-[rgb(var(--color-input))]"
                 >
                   Cancel
                 </button>
@@ -1330,8 +1359,8 @@ const POS = () => {
         {/* Hold Orders Modal */}
         {
           showHoldOrders && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-whitez-50">
-              <div className="bg-card rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-card rounded-xl p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto border border-default">
                 <h3 className="text-lg font-bold text-main mb-4">
                   Parked Orders ({holdOrders.length})
                 </h3>
@@ -1359,7 +1388,7 @@ const POS = () => {
                         <div className="flex space-x-2 mt-3">
                           <button
                             onClick={() => retrieveHoldOrder(order)}
-                            className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                            className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover"
                           >
                             Retrieve
                           </button>
@@ -1377,7 +1406,7 @@ const POS = () => {
 
                 <button
                   onClick={() => setShowHoldOrders(false)}
-                  className="w-full mt-4 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
+                  className="w-full mt-4 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
                 >
                   Close
                 </button>
@@ -1389,13 +1418,13 @@ const POS = () => {
         {/* Split Payment Modal */}
         {
           showSplitPayment && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-white z-50">
-              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4 border border-default">
                 <h3 className="text-lg font-bold text-main mb-4">Split Payment</h3>
-                <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
+                <div className="mb-4 p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg">
                   <div className="flex justify-between text-sm">
                     <span className="text-secondary">Total Amount:</span>
-                    <span className="font-bold text-indigo-600">₹{total.toFixed(2)}</span>
+                    <span className="font-bold text-primary">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -1405,7 +1434,7 @@ const POS = () => {
                       <select
                         value={payment.method}
                         onChange={(e) => updateSplitPayment(index, 'method', e.target.value)}
-                        className="flex-1 px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                        className="flex-1 px-3 py-2 border border-default rounded-lg bg-input text-main focus:ring-2 focus:ring-primary"
                       >
                         <option value="cash">Cash</option>
                         <option value="upi">UPI</option>
@@ -1416,7 +1445,7 @@ const POS = () => {
                         value={payment.amount}
                         onChange={(e) => updateSplitPayment(index, 'amount', e.target.value)}
                         placeholder="Amount"
-                        className="flex-1 px-3 py-2 border border-default rounded-lg focus:ring-2 focus:ring-primary"
+                        className="flex-1 px-3 py-2 border border-default rounded-lg bg-input text-main placeholder-muted focus:ring-2 focus:ring-primary"
                       />
                       {splitPayments.length > 1 && (
                         <button
@@ -1432,12 +1461,12 @@ const POS = () => {
 
                 <button
                   onClick={addSplitPayment}
-                  className="w-full mb-4 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50"
+                  className="w-full mb-4 px-4 py-2 border border-primary text-primary rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/30"
                 >
                   + Add Payment Method
                 </button>
 
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                <div className="mb-4 p-3 bg-gray-50 dark:bg-[rgb(var(--color-input))] rounded-lg">
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-secondary">Total Paid:</span>
                     <span className={`font-bold ${calculateSplitTotal() >= total ? 'text-green-600' : 'text-red-600'}`}>
@@ -1452,20 +1481,37 @@ const POS = () => {
                   </div>
                 </div>
 
+                {/* Payment Methods Summary */}
+                {splitPayments.some(p => p.amount) && (
+                  <div className="mb-4 p-3 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50 rounded-lg">
+                    <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">Payment Methods</div>
+                    <div className="space-y-1">
+                      {splitPayments.map((payment, index) => (
+                        payment.amount && (
+                          <div key={index} className="flex justify-between text-sm">
+                            <span className="text-purple-700 dark:text-purple-300">{payment.method.charAt(0).toUpperCase() + payment.method.slice(1)}:</span>
+                            <span className="font-medium text-purple-900 dark:text-purple-200">₹{parseFloat(payment.amount || 0).toFixed(2)}</span>
+                          </div>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex space-x-2">
                   <button
                     onClick={() => {
                       setShowSplitPayment(false);
                       setSplitPayments([{ method: 'cash', amount: '' }]);
                     }}
-                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50"
+                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={applySplitPayment}
                     disabled={calculateSplitTotal() !== total}
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover disabled:opacity-50"
                   >
                     Apply
                   </button>
@@ -1478,8 +1524,8 @@ const POS = () => {
         {/* Unpaid Invoice Confirmation Modal */}
         {
           showUnpaidConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center dark:bg-whitez-50 p-4">
-              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4 border border-default">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
                     <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1520,13 +1566,13 @@ const POS = () => {
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowUnpaidConfirm(false)}
-                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium"
+                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={proceedWithCheckout}
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-medium"
                   >
                     Confirm & Create Invoice
                   </button>
@@ -1539,8 +1585,8 @@ const POS = () => {
         {/* Overpayment Confirmation Modal - for saved customers */}
         {
           showOverpaymentConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center  dark:bg-white z-50 p-4">
-              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4 border border-default">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1554,7 +1600,7 @@ const POS = () => {
                   <p className="text-secondary mb-3">
                     The customer overpaid but you are not returning the full change:
                   </p>
-                  <div className="bg-blue-50 p-4 rounded-lg space-y-2 border border-blue-200">
+                  <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg space-y-2 border border-blue-200 dark:border-blue-800/50">
                     <div className="flex justify-between text-sm">
                       <span className="text-secondary">Customer:</span>
                       <span className="font-medium text-main">{activeTab.customer?.name}</span>
@@ -1582,9 +1628,9 @@ const POS = () => {
                   </div>
                 </div>
 
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 font-medium mb-1">💡 What happens next:</p>
-                  <p className="text-sm text-green-700">
+                <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/50 rounded-lg">
+                  <p className="text-sm text-green-800 dark:text-green-300 font-medium mb-1">💡 What happens next:</p>
+                  <p className="text-sm text-green-700 dark:text-green-400">
                     The remaining amount of ₹{((paid - total) - (parseFloat(activeTab.changeReturned) || 0)).toFixed(2)} will be saved as credit to the customer's account. They can use this for future purchases.
                   </p>
                 </div>
@@ -1596,7 +1642,7 @@ const POS = () => {
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowOverpaymentConfirm(false)}
-                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 font-medium"
+                    className="flex-1 px-4 py-2 border border-default text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium"
                   >
                     Cancel
                   </button>
@@ -1605,7 +1651,7 @@ const POS = () => {
                       setShowOverpaymentConfirm(false);
                       proceedWithCheckout();
                     }}
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-medium"
                   >
                     Proceed
                   </button>
@@ -1618,8 +1664,8 @@ const POS = () => {
         {/* Walk-in Overpayment Modal (must return full change) */}
         {
           showWalkinChangeConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center  dark:bg-white z-50 p-4">
-              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4 border border-default">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
                     <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1633,7 +1679,7 @@ const POS = () => {
                   <p className="text-secondary mb-3">
                     Walk-in customers must receive the full change. Please return all change before continuing:
                   </p>
-                  <div className="bg-yellow-50 p-4 rounded-lg space-y-2 border border-yellow-200">
+                  <div className="bg-yellow-50 dark:bg-yellow-950/30 p-4 rounded-lg space-y-2 border border-yellow-200 dark:border-yellow-800/50">
                     <div className="flex justify-between text-sm">
                       <span className="text-secondary">Total Amount:</span>
                       <span className="font-bold text-main">₹{total.toFixed(2)}</span>
@@ -1664,7 +1710,7 @@ const POS = () => {
                 <div className="flex">
                   <button
                     onClick={() => setShowWalkinChangeConfirm(false)}
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover font-medium"
                   >
                     Got it
                   </button>

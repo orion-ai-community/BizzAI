@@ -91,6 +91,8 @@ export const performPasswordReset = createAsyncThunk(
 // Logout user
 export const logout = createAsyncThunk('auth/logout', async () => {
   localStorage.removeItem('user');
+  // Clear Return page draft to prevent state leakage across sessions
+  localStorage.removeItem('returnDraft');
 });
 
 // Get user profile

@@ -184,10 +184,8 @@ const Return = () => {
     for (const item of itemsWithQty) {
       if (item.returnedQty > item.remainingQty) {
         alert(
-          `Return quantity for ${
-            item.productName
-          } cannot exceed remaining quantity (${
-            item.remainingQty
+          `Return quantity for ${item.productName
+          } cannot exceed remaining quantity (${item.remainingQty
           }). Already returned: ${item.alreadyReturned || 0}`
         );
         return false;
@@ -384,45 +382,45 @@ const Return = () => {
                 )}
               </div>
               {/* Credit Balance Display */}
-             {formData && formData.customer.dues < 0 && (
-  <div className="mt-3 p-3 bg-card border border-default rounded-lg">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center space-x-2">
-        {/* Icon matches theme primary color (Indigo/Amber) */}
-        <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        
-        {/* Uses text-secondary to stand out but not distract */}
-        <span className="text-sm font-medium text-secondary">
-          Available Credit
-        </span>
-      </div>
+              {formData && formData.customer.dues < 0 && (
+                <div className="mt-3 p-3 bg-card border border-default rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {/* Icon matches theme primary color (Indigo/Amber) */}
+                      <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
 
-      {/* Uses text-main for maximum brightness in Dark Mode */}
-      <span className="text-lg font-bold text-main">
-        ₹{Math.abs(formData.customer.dues).toFixed(2)}
-      </span>
-    </div>
-  </div>
-)}
+                      {/* Uses text-secondary to stand out but not distract */}
+                      <span className="text-sm font-medium text-secondary">
+                        Available Credit
+                      </span>
+                    </div>
+
+                    {/* Uses text-main for maximum brightness in Dark Mode */}
+                    <span className="text-lg font-bold text-main">
+                      ₹{Math.abs(formData.customer.dues).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
               {/* Pending Dues Display */}
               {formData.customer && formData.customer?.dues > 0 && (
                 <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30">
                   <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  <span className="text-sm font-medium text-red-800 dark:text-red-200">
-                     Pending Dues
-                  </span>
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <span className="text-sm font-medium text-red-800 dark:text-red-200">
+                        Pending Dues
+                      </span>
+                    </div>
+                    <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                      ₹{formData.customer.dues.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                    ₹{formData.customer.dues.toFixed(2)}
-                </span>
-              </div>
-              </div>
               )}
             </div>
           )}
@@ -558,11 +556,10 @@ const Return = () => {
                           onClick={() =>
                             setFormData({ ...formData, refundMethod: method })
                           }
-                          className={`p-3 border-2 rounded-lg transition ${
-                            formData.refundMethod === method
-                              ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40"
-                              : "border-default hover:border-indigo-300"
-                          }`}
+                          className={`p-3 border-2 rounded-lg transition ${formData.refundMethod === method
+                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40"
+                            : "border-default hover:border-indigo-300"
+                            }`}
                         >
                           <div className="text-sm font-medium text-main capitalize">
                             {method.replace("_", " ")}
@@ -615,16 +612,16 @@ const Return = () => {
                 <span className="text-2xl font-bold text-red-600 dark:text-red-400">
                   ₹{calculateTotal().toFixed(2)}
                 </span>
-            </div>
+              </div>
             </div>
             <div className="p-4 bg-amber-100/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg mb-6">
-  <p className="text-sm text-main"> 
-    <strong className="text-primary font-bold">Note:</strong> 
-    <span className="ml-1">
-      This amount will be credited to the customer's account or refunded via the selected method.
-    </span>
-  </p>
-</div>
+              <p className="text-sm text-main">
+                <strong className="text-primary font-bold">Note:</strong>
+                <span className="ml-1">
+                  This amount will be credited to the customer's account or refunded via the selected method.
+                </span>
+              </p>
+            </div>
             <div className="space-y-3">
               <button
                 onClick={handleSubmit}
@@ -708,16 +705,15 @@ const Return = () => {
                             ₹{invoice.totalAmount.toFixed(2)}
                           </p>
                           <span
-                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                              invoice.paymentStatus === "paid"
+                            className={`inline-block px-2 py-1 rounded text-xs font-medium ${invoice.paymentStatus === "paid"
                               ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                               : invoice.paymentStatus === "partial"
-                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                          }`}
-                        >
-                          {invoice.paymentStatus}
-                        </span>
+                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                              }`}
+                          >
+                            {invoice.paymentStatus}
+                          </span>
                         </div>
                       </div>
                     </div>
