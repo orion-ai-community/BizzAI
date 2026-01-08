@@ -73,7 +73,6 @@ const corsOptions = {
 
 // Apply CORS and handle preflight across all routes
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 app.use(morgan("dev"));
 
