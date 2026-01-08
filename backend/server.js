@@ -38,37 +38,42 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5174",
   "http://127.0.0.1:5173",
-  process.env.FRONTEND_URL,      // production frontend
-  /\.vercel\.app$/               // ✅ ALL Vercel preview URLs
+  process.env.FRONTEND_URL,                 // production frontend
+  "https://bizz-ai-theta.vercel.app",     // deployed frontend
+  /\.vercel\.app$/                        // ✅ ALL Vercel preview URLs
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow server-to-server / Postman / curl
-      if (!origin) return callback(null, true);
+// Helper to validate origin
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true; // allow server-to-server
 
-      // In development, allow all localhost origins
-      if (process.env.NODE_ENV !== 'production' && origin &&
-        (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:'))) {
-        return callback(null, true);
-      }
+  // In development, allow any localhost
+  if (
+    process.env.NODE_ENV !== "production" &&
+    (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:"))
+  ) {
+    return true;
+  }
 
-      const isAllowed = allowedOrigins.some((allowed) =>
-        allowed instanceof RegExp
-          ? allowed.test(origin)
-          : allowed === origin
-      );
+  return allowedOrigins.some((allowed) =>
+    allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
+  );
+};
 
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed from this origin"));
-      }
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    return callback(new Error("CORS not allowed from this origin"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204, // ensure preflight works across proxies
+};
+
+// Apply CORS and handle preflight across all routes
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(morgan("dev"));
 
