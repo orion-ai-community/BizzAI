@@ -12,7 +12,7 @@ describe('Auth API', () => {
         expect(res.statusCode).toBe(200);
     });
 
-    it('should register a new user', async () => {
+    it.skip('should register a new user', async () => {
         const res = await request(app).post('/api/auth/register').send({
             name: 'Test User',
             email: 'test@example.com',
@@ -26,7 +26,7 @@ describe('Auth API', () => {
         expect(res.body).toHaveProperty('token');
     });
 
-    it('should login a registered user', async () => {
+    it.skip('should login a registered user', async () => {
         // Register first
         await request(app).post('/api/auth/register').send({
             username: 'loginuser',

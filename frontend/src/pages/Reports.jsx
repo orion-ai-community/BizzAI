@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getSalesReport, getStockReport, getCustomerReport, reset } from '../redux/slices/reportsSlice';
 import { getAllInvoices } from '../redux/slices/posSlice';
 import Layout from '../components/Layout';
@@ -26,6 +27,7 @@ const Reports = () => {
   );
   const { invoices } = useSelector((state) => state.pos);
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getSalesReport());
