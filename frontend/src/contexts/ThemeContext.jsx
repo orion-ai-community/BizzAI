@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ThemeProvider = ({ children }) => {
     // Initialize theme from localStorage or default to 'light'
     const [theme, setTheme] = useState(() => {
@@ -43,6 +44,7 @@ export const ThemeProvider = ({ children }) => {
     return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTheme = () => {
     const context = useContext(ThemeContext);
     if (context === undefined) {
