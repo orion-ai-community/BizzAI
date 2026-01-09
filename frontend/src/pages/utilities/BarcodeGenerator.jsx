@@ -104,22 +104,26 @@ const BarcodeGenerator = () => {
                 {
                     const upperValue = value.toUpperCase();
                     // Allow A-Z, 0-9, space, and - . $ / + % characters
-                    const code39Allowed = /^[A-Z0-9 \-\.\$\/\+%]+$/;
+                    const code39Allowed = /^[A-Z0-9 \-.$/+%]+$/;
                     if (!code39Allowed.test(upperValue)) {
                         return 'CODE39 only supports letters, numbers, spaces and - . $ / + %';
                     }
                 }
                 break;
             case 'EAN13':
-                const ean = value.replace(/\s/g, '');
-                if (!/^\d{12,13}$/.test(ean)) {
-                    return 'EAN13 requires 12 or 13 digits';
+                {
+                    const ean = value.replace(/\s/g, '');
+                    if (!/^\d{12,13}$/.test(ean)) {
+                        return 'EAN13 requires 12 or 13 digits';
+                    }
                 }
                 break;
             case 'UPC':
-                const upc = value.replace(/\s/g, '');
-                if (!/^\d{11,12}$/.test(upc)) {
-                    return 'UPC requires 11 or 12 digits';
+                {
+                    const upc = value.replace(/\s/g, '');
+                    if (!/^\d{11,12}$/.test(upc)) {
+                        return 'UPC requires 11 or 12 digits';
+                    }
                 }
                 break;
             case 'CODE128':
