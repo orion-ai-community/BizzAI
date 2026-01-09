@@ -205,6 +205,19 @@ npm install
 cp .env.example .env
 ```
 
+### 🐳 Running with Docker (Recommended)
+
+1. Ensure you have Docker and Docker Compose installed.
+2. Build and start the containers:
+
+```bash
+docker-compose up --build
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:80
+- **Backend**: http://localhost:5000
+
 ### Running the Application
 
 #### Development Mode
