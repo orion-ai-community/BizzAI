@@ -332,10 +332,11 @@ const BarcodeGenerator = () => {
 
             const placeLabels = (items, qrCanvases) => {
                 let col = 0, row = 0;
+                const qrCount = qrCanvases ? qrCanvases.length : 0;
                 items.forEach((it, idx) => {
                     const x = spec.margin.x + col * (spec.labelW + spec.gap.x);
                     const y = spec.margin.y + row * (spec.labelH + spec.gap.y);
-                    const qrCanvas = qrCanvases ? qrCanvases[idx] : undefined;
+                    const qrCanvas = qrCount ? qrCanvases[idx % qrCount] : undefined;
                     drawLabel(x, y, it.price, it.name, it.code, it.type, qrCanvas);
                     col++;
                     if (col >= cols) { col = 0; row++; }
@@ -402,7 +403,7 @@ const BarcodeGenerator = () => {
             const cols = Math.max(1, Math.floor((pageW - 2 * spec.margin.x + spec.gap.x) / (spec.labelW + spec.gap.x)));
             const rows = Math.max(1, Math.floor((pageH - 2 * spec.margin.y + spec.gap.y) / (spec.labelH + spec.gap.y)));
 
-            const drawLabel = (x, y, price, name, value, type) => {
+            const drawLabel = (x, y, price, name, value, type, qrCanvasOverride) => {
                 if (formData.includePrice && price) {
                     pdf.setFontSize(16);
                     pdf.setFont(undefined, 'bold');
@@ -410,7 +411,7 @@ const BarcodeGenerator = () => {
                 }
 
                 if (type === 'QR Code') {
-                    const qrCanvas = qrRef.current?.querySelector('canvas');
+                    const qrCanvas = qrCanvasOverride || qrRef.current?.querySelector('canvas');
                     if (!qrCanvas) throw new Error('QR preview not available. Click Generate first.');
                     const imgData = qrCanvas.toDataURL('image/png');
                     const availH = spec.labelH - (formData.includePrice ? 14 : 6) - (formData.includeName ? 10 : 0);
@@ -443,10 +444,11 @@ const BarcodeGenerator = () => {
 
             const placeLabels = (items, qrCanvases) => {
                 let col = 0, row = 0;
+                const qrCount = qrCanvases ? qrCanvases.length : 0;
                 items.forEach((it, idx) => {
                     const x = spec.margin.x + col * (spec.labelW + spec.gap.x);
                     const y = spec.margin.y + row * (spec.labelH + spec.gap.y);
-                    const qrCanvas = qrCanvases ? qrCanvases[idx] : undefined;
+                    const qrCanvas = qrCount ? qrCanvases[idx % qrCount] : undefined;
                     drawLabel(x, y, it.price, it.name, it.code, it.type, qrCanvas);
                     col++;
                     if (col >= cols) { col = 0; row++; }
