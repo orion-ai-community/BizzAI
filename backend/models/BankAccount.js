@@ -70,6 +70,10 @@ bankAccountSchema.pre("save", function (next) {
   next();
 });
 
+/**
+ * Decrypts the account number using AES-256-CBC.
+ * Requires ENCRYPTION_KEY environment variable.
+ */
 // Decrypt account number
 bankAccountSchema.methods.getDecryptedAccountNumber = function () {
   const parts = this.accountNumber.split(":");
