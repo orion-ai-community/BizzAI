@@ -549,7 +549,7 @@ const Return = () => {
                     Refund Method <span className="text-red-600">*</span>
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {["credit", "cash", "bank", "original_payment"].map(
+                    {["credit", "cash", "bank", "upi", "original_payment"].map(
                       (method) => (
                         <button
                           key={method}
