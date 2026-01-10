@@ -182,3 +182,78 @@ export const getLowStockItems = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+/**
+ * @desc Bulk import items from file
+ * @route POST /api/inventory/import
+ */
+export const importItems = async (req, res) => {
+  try {
+    const { items } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "No items provided for import" });
+    }
+
+    const results = {
+      imported: 0,
+      skipped: 0,
+      errors: []
+    };
+
+    for (let i = 0; i < items.length; i++) {
+      try {
+        const item = items[i];
+
+        // Validate required fields
+        if (!item.name || !item.costPrice || !item.sellingPrice) {
+          results.errors.push(`Row ${i + 1}: Missing required fields (name, cost price, or selling price)`);
+          results.skipped++;
+          continue;
+        }
+
+        // Check if item already exists
+        const existing = await Item.findOne({
+          name: item.name,
+          addedBy: req.user._id
+        });
+
+        if (existing) {
+          results.errors.push(`Row ${i + 1}: Item "${item.name}" already exists`);
+          results.skipped++;
+          continue;
+        }
+
+        // Create new item
+        await Item.create({
+          name: item.name,
+          sku: item.sku || undefined,
+          category: item.category || undefined,
+          costPrice: item.costPrice,
+          sellingPrice: item.sellingPrice,
+          stockQty: item.stockQty || 0,
+          unit: item.unit || undefined,
+          addedBy: req.user._id
+        });
+
+        results.imported++;
+      } catch (itemError) {
+        results.errors.push(`Row ${i + 1}: ${itemError.message}`);
+        results.skipped++;
+      }
+    }
+
+    info(`Items imported by ${req.user.name}: ${results.imported} imported, ${results.skipped} skipped`);
+    const alerts = await checkStockAlerts(req.user._id);
+
+    res.status(200).json({
+      message: `Import completed: ${results.imported} items imported, ${results.skipped} skipped`,
+      ...results,
+      alerts
+    });
+  } catch (err) {
+    console.error("Bulk Import Error:", err);
+    error(`Bulk Import Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};

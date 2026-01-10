@@ -1,30 +1,187 @@
 import { useState } from 'react';
+import * as XLSX from 'xlsx';
 import Layout from '../../components/Layout';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 const ImportItems = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [mappingData, setMappingData] = useState([]);
     const [columnMapping, setColumnMapping] = useState({});
     const [showPreview, setShowPreview] = useState(false);
+    const [importing, setImporting] = useState(false);
+    const [errors, setErrors] = useState([]);
 
-    const handleFileSelect = (e) => {
+    const validateRow = (row, rowIndex) => {
+        const errors = [];
+        
+        // Check required fields
+        if (!row.name || row.name.toString().trim() === '') {
+            errors.push('Item name is required');
+        }
+        if (!row.costPrice || row.costPrice === '') {
+            errors.push('Cost price is required');
+        } else if (isNaN(row.costPrice) || parseFloat(row.costPrice) <= 0) {
+            errors.push('Cost price must be a positive number');
+        }
+        if (!row.sellingPrice || row.sellingPrice === '') {
+            errors.push('Selling price is required');
+        } else if (isNaN(row.sellingPrice) || parseFloat(row.sellingPrice) <= 0) {
+            errors.push('Selling price must be a positive number');
+        }
+        
+        // Warnings
+        if (!row.sku || row.sku.toString().trim() === '') {
+            return { status: 'warning', errors: ['SKU is empty'] };
+        }
+        
+        return { status: errors.length === 0 ? 'valid' : 'error', errors };
+    };
+
+    const handleFileSelect = async (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if (!file) return;
+
+        try {
             setSelectedFile(file);
-            // Simulate file preview data
-            setMappingData([
-                { row: 1, name: 'Rice Bag 25kg', sku: 'RICE-001', category: 'Grocery', costPrice: '450', sellingPrice: '500', stock: '100', status: 'valid' },
-                { row: 2, name: 'Wheat Flour 10kg', sku: 'WHEAT-001', category: 'Grocery', costPrice: '280', sellingPrice: '320', stock: '150', status: 'valid' },
-                { row: 3, name: 'Sugar 1kg', sku: '', category: 'Grocery', costPrice: '45', sellingPrice: '50', stock: '200', status: 'warning' },
-                { row: 4, name: '', sku: 'INVALID', category: 'Grocery', costPrice: '-10', sellingPrice: '50', stock: '50', status: 'error' },
-            ]);
+            const fileData = await file.arrayBuffer();
+            const workbook = XLSX.read(fileData, { type: 'array' });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const data = XLSX.utils.sheet_to_json(worksheet);
+
+            if (data.length === 0) {
+                toast.error('No data found in the file');
+                return;
+            }
+
+            // Process and validate rows
+            const processedData = data.map((row, index) => {
+                const processedRow = {
+                    row: index + 1,
+                    name: row['Name'] || row['Item Name'] || row['Product Name'] || '',
+                    sku: row['SKU'] || row['Product Code'] || '',
+                    category: row['Category'] || '',
+                    costPrice: row['Cost Price'] || row['Cost'] || '',
+                    sellingPrice: row['Selling Price'] || row['Price'] || row['Unit Price'] || '',
+                    stock: row['Stock Quantity'] || row['Stock'] || row['Quantity'] || '0',
+                    unit: row['Unit'] || '',
+                };
+                
+                const validation = validateRow(processedRow, index);
+                processedRow.status = validation.status;
+                processedRow.validationErrors = validation.errors;
+                
+                return processedRow;
+            });
+
+            setMappingData(processedData);
             setShowPreview(true);
+            toast.success(`Loaded ${data.length} rows from file`);
+        } catch (error) {
+            console.error('Error reading file:', error);
+            toast.error('Error reading file. Please ensure it is a valid Excel or CSV file');
+        }
+    };
+
+    const handleImport = async () => {
+        try {
+            setImporting(true);
+            const validRows = mappingData.filter(row => row.status === 'valid');
+            
+            if (validRows.length === 0) {
+                toast.error('No valid rows to import');
+                return;
+            }
+
+            // Prepare data for batch import
+            const itemsToImport = validRows.map(row => ({
+                name: row.name,
+                sku: row.sku || undefined,
+                category: row.category || undefined,
+                costPrice: parseFloat(row.costPrice),
+                sellingPrice: parseFloat(row.sellingPrice),
+                stockQty: parseInt(row.stock) || 0,
+                unit: row.unit || undefined,
+            }));
+
+            // Get token from localStorage
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.token) {
+                toast.error('Please login to import items');
+                return;
+            }
+
+            // Send to backend for bulk import
+            const response = await axios.post(`${API_URL}/api/inventory/import`, {
+                items: itemsToImport
+            }, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`
+                }
+            });
+
+            toast.success(`Successfully imported ${response.data.imported} items`);
+            
+            // Reset form
+            setShowPreview(false);
+            setSelectedFile(null);
+            setMappingData([]);
+            setErrors([]);
+        } catch (error) {
+            console.error('Import error:', error);
+            const errorMsg = error.response?.data?.message || 'Failed to import items';
+            toast.error(errorMsg);
+            
+            if (error.response?.data?.errors) {
+                setErrors(error.response.data.errors);
+            }
+        } finally {
+            setImporting(false);
         }
     };
 
     const validRows = mappingData.filter(row => row.status === 'valid').length;
     const warningRows = mappingData.filter(row => row.status === 'warning').length;
     const errorRows = mappingData.filter(row => row.status === 'error').length;
+
+    const downloadSampleFile = () => {
+        const sampleData = [
+            {
+                'Name': 'Rice Bag 25kg',
+                'SKU': 'RICE-001',
+                'Category': 'Grocery',
+                'Cost Price': 450,
+                'Selling Price': 500,
+                'Stock Quantity': 100,
+                'Unit': 'Bag'
+            },
+            {
+                'Name': 'Wheat Flour 10kg',
+                'SKU': 'WHEAT-001',
+                'Category': 'Grocery',
+                'Cost Price': 280,
+                'Selling Price': 320,
+                'Stock Quantity': 150,
+                'Unit': 'Kg'
+            },
+            {
+                'Name': 'Sugar 1kg',
+                'SKU': 'SUGAR-001',
+                'Category': 'Grocery',
+                'Cost Price': 45,
+                'Selling Price': 50,
+                'Stock Quantity': 200,
+                'Unit': 'Kg'
+            },
+        ];
+
+        const worksheet = XLSX.utils.json_to_sheet(sampleData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Items');
+        XLSX.writeFile(workbook, 'sample_import_items.xlsx');
+    };
 
     return (
         <Layout>
@@ -62,6 +219,7 @@ const ImportItems = () => {
                         <h3 className="text-lg font-semibold text-main">Upload File</h3>
                         <button
                             type="button"
+                            onClick={downloadSampleFile}
                             className="flex items-center space-x-2 px-4 py-2 text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-50 transition"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,9 +322,12 @@ const ImportItems = () => {
                                     <label className="block text-sm font-medium text-secondary mb-2">
                                         {field} {['Name', 'Cost Price', 'Selling Price'].includes(field) && <span className="text-red-500">*</span>}
                                     </label>
-                                    <select className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <select 
+                                        className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                        defaultValue={field.toLowerCase().replace(' ', '_')}
+                                    >
                                         <option value="">Select column...</option>
-                                        <option value={field.toLowerCase().replace(' ', '_')} selected>{field}</option>
+                                        <option value={field.toLowerCase().replace(' ', '_')}>{field}</option>
                                     </select>
                                 </div>
                             ))}
@@ -248,8 +409,30 @@ const ImportItems = () => {
                             Validation Errors
                         </h3>
                         <ul className="space-y-2 text-sm text-red-800">
-                            <li>• Row 4: Item name is required</li>
-                            <li>• Row 4: Cost price must be greater than 0</li>
+                            {mappingData
+                                .filter(row => row.status === 'error')
+                                .map(row => (
+                                    <li key={row.row}>
+                                        <strong>Row {row.row}:</strong>
+                                        <ul className="ml-4">
+                                            {row.validationErrors?.map((err, idx) => (
+                                                <li key={idx}>• {err}</li>
+                                            ))}
+                                        </ul>
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
+                )}
+
+                {/* API Errors */}
+                {errors.length > 0 && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+                        <h3 className="text-red-900 font-semibold mb-3">Import Errors</h3>
+                        <ul className="space-y-2 text-sm text-red-800">
+                            {errors.map((err, idx) => (
+                                <li key={idx}>• {err}</li>
+                            ))}
                         </ul>
                     </div>
                 )}
@@ -263,17 +446,29 @@ const ImportItems = () => {
                                 setShowPreview(false);
                                 setSelectedFile(null);
                                 setMappingData([]);
+                                setErrors([]);
                             }}
-                            className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-surface font-medium transition"
+                            className="flex-1 px-6 py-3 border border-default text-secondary rounded-lg hover:bg-surface font-medium transition disabled:opacity-50"
+                            disabled={importing}
                         >
                             Clear / Reset
                         </button>
                         <button
                             type="button"
-                            disabled={errorRows > 0}
-                            className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={handleImport}
+                            disabled={errorRows > 0 || importing}
+                            className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                         >
-                            Import {validRows} Items
+                            {importing ? (
+                                <>
+                                    <svg className="animate-spin h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span>Importing...</span>
+                                </>
+                            ) : (
+                                <span>Import {validRows} Item{validRows !== 1 ? 's' : ''}</span>
+                            )}
                         </button>
                     </div>
                 )}
