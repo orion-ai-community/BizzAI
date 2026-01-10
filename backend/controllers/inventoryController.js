@@ -198,47 +198,137 @@ export const importItems = async (req, res) => {
     const results = {
       imported: 0,
       skipped: 0,
-      errors: []
+      errors: [],
+      validationErrors: []
     };
+
+    // Valid unit labels
+    const validUnits = [
+      'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle', 
+      'can', 'dozen', 'm', 'cm', 'ft', 'unit', 'pair', 'set'
+    ];
+
+    // Pre-fetch all existing items for this user to optimize duplicate checks
+    const existingItems = await Item.find({ addedBy: req.user._id }).select('name sku');
+    const existingNames = new Set(existingItems.map(item => item.name.toLowerCase()));
+    const existingSKUs = new Map();
+    existingItems.forEach(item => {
+      if (item.sku) {
+        existingSKUs.set(item.sku.toLowerCase(), item.name);
+      }
+    });
+
+    // Check for duplicate SKUs within the import batch
+    const importSKUs = new Map();
+    items.forEach((item, index) => {
+      if (item.sku) {
+        const skuLower = item.sku.toLowerCase();
+        if (importSKUs.has(skuLower)) {
+          importSKUs.get(skuLower).push(index + 1);
+        } else {
+          importSKUs.set(skuLower, [index + 1]);
+        }
+      }
+    });
 
     for (let i = 0; i < items.length; i++) {
       try {
         const item = items[i];
+        const rowNum = i + 1;
+        const rowErrors = [];
 
         // Validate required fields
-        if (!item.name || !item.costPrice || !item.sellingPrice) {
-          results.errors.push(`Row ${i + 1}: Missing required fields (name, cost price, or selling price)`);
-          results.skipped++;
-          continue;
+        if (!item.name || item.name.toString().trim() === '') {
+          rowErrors.push('Item name is required and cannot be blank');
         }
 
-        // Check if item already exists
-        const existing = await Item.findOne({
-          name: item.name,
-          addedBy: req.user._id
-        });
+        if (!item.costPrice || item.costPrice === '') {
+          rowErrors.push('Cost price is required');
+        } else if (isNaN(item.costPrice) || parseFloat(item.costPrice) <= 0) {
+          rowErrors.push('Cost price must be a positive number');
+        }
 
-        if (existing) {
-          results.errors.push(`Row ${i + 1}: Item "${item.name}" already exists`);
+        if (!item.sellingPrice || item.sellingPrice === '') {
+          rowErrors.push('Selling price is required');
+        } else if (isNaN(item.sellingPrice) || parseFloat(item.sellingPrice) <= 0) {
+          rowErrors.push('Selling price must be a positive number');
+        }
+
+        // Validate category - must not be blank
+        if (!item.category || item.category.toString().trim() === '') {
+          rowErrors.push('Category is required and cannot be left blank');
+        }
+
+        // Validate unit label
+        if (item.unit && item.unit.toString().trim() !== '') {
+          const unitLower = item.unit.toLowerCase().trim();
+          if (!validUnits.includes(unitLower)) {
+            rowErrors.push(
+              `Invalid unit "${item.unit}". Valid units: ${validUnits.join(', ')}`
+            );
+          }
+        }
+
+        // Check for duplicate SKU with existing products
+        if (item.sku && item.sku.toString().trim() !== '') {
+          const skuLower = item.sku.toLowerCase().trim();
+          
+          // Check against existing database items
+          if (existingSKUs.has(skuLower)) {
+            const existingProductName = existingSKUs.get(skuLower);
+            rowErrors.push(
+              `SKU "${item.sku}" already exists in product "${existingProductName}". Duplicate SKUs can cause order confusion and reduce efficiency`
+            );
+          }
+
+          // Check for duplicates within the import batch
+          const duplicateRows = importSKUs.get(skuLower);
+          if (duplicateRows && duplicateRows.length > 1) {
+            const otherRows = duplicateRows.filter(r => r !== rowNum);
+            if (otherRows.length > 0) {
+              rowErrors.push(
+                `SKU "${item.sku}" is duplicated in this import file (rows: ${duplicateRows.join(', ')}). Each SKU must be unique`
+              );
+            }
+          }
+        }
+
+        // Check for duplicate item name
+        if (item.name && existingNames.has(item.name.toLowerCase().trim())) {
+          rowErrors.push(`Item "${item.name}" already exists in your inventory`);
+        }
+
+        // If there are validation errors, skip this item
+        if (rowErrors.length > 0) {
+          results.validationErrors.push({
+            row: rowNum,
+            itemName: item.name || 'Unknown',
+            sku: item.sku || 'N/A',
+            errors: rowErrors
+          });
           results.skipped++;
           continue;
         }
 
         // Create new item
         await Item.create({
-          name: item.name,
-          sku: item.sku || undefined,
-          category: item.category || undefined,
-          costPrice: item.costPrice,
-          sellingPrice: item.sellingPrice,
-          stockQty: item.stockQty || 0,
-          unit: item.unit || undefined,
+          name: item.name.trim(),
+          sku: item.sku ? item.sku.trim() : undefined,
+          category: item.category.trim(),
+          costPrice: parseFloat(item.costPrice),
+          sellingPrice: parseFloat(item.sellingPrice),
+          stockQty: item.stockQty ? parseInt(item.stockQty) : 0,
+          unit: item.unit ? item.unit.toLowerCase().trim() : 'pcs',
           addedBy: req.user._id
         });
 
         results.imported++;
       } catch (itemError) {
-        results.errors.push(`Row ${i + 1}: ${itemError.message}`);
+        results.errors.push({
+          row: i + 1,
+          itemName: items[i].name || 'Unknown',
+          error: itemError.message
+        });
         results.skipped++;
       }
     }
