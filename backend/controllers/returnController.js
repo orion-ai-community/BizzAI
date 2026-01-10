@@ -285,25 +285,25 @@ export const createReturn = async (req, res) => {
 
             info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
         }
-    }
+
 
         info(
-        `Return created by ${req.user.name}: ${returnId} for invoice ${invoice.invoiceNo}`
-    );
+            `Return created by ${req.user.name}: ${returnId} for invoice ${invoice.invoiceNo}`
+        );
 
-    // Populate and return the created return
-    const populatedReturn = await Return.findById(returnRecord._id)
-        .populate("invoice", "invoiceNo")
-        .populate("customer", "name phone email");
+        // Populate and return the created return
+        const populatedReturn = await Return.findById(returnRecord._id)
+            .populate("invoice", "invoiceNo")
+            .populate("customer", "name phone email");
 
-    res.status(201).json({
-        message: "Return created successfully",
-        return: populatedReturn,
-    });
-} catch (err) {
-    error(`Create Return Error: ${err.message}`);
-    res.status(500).json({ message: "Server Error", error: err.message });
-}
+        res.status(201).json({
+            message: "Return created successfully",
+            return: populatedReturn,
+        });
+    } catch (err) {
+        error(`Create Return Error: ${err.message}`);
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
 };
 
 /**
