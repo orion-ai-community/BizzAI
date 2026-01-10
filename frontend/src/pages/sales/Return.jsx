@@ -145,7 +145,7 @@ const Return = () => {
       alert("Failed to fetch invoice details");
     }
   };
-  console.log("formData", formData);
+
   const updateItem = (index, field, value) => {
     const newItems = [...formData.items];
     newItems[index][field] = value;
