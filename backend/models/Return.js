@@ -79,7 +79,7 @@ const returnSchema = new mongoose.Schema(
         },
         refundMethod: {
             type: String,
-            enum: ["credit", "cash", "bank", "original_payment"],
+            enum: ["credit", "cash", "bank", "upi", "original_payment"],
             default: "credit",
         },
         bankAccount: {
