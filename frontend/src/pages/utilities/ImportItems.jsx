@@ -14,30 +14,68 @@ const ImportItems = () => {
     const [importing, setImporting] = useState(false);
     const [errors, setErrors] = useState([]);
 
-    const validateRow = (row, rowIndex) => {
+    const validateRow = (row, rowIndex, allRows) => {
         const errors = [];
+        const validUnits = [
+            'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle', 
+            'can', 'dozen', 'm', 'cm', 'ft', 'unit', 'pair', 'set'
+        ];
         
         // Check required fields
         if (!row.name || row.name.toString().trim() === '') {
-            errors.push('Item name is required');
+            errors.push('Item name is required and cannot be blank');
         }
+        
         if (!row.costPrice || row.costPrice === '') {
             errors.push('Cost price is required');
         } else if (isNaN(row.costPrice) || parseFloat(row.costPrice) <= 0) {
             errors.push('Cost price must be a positive number');
         }
+        
         if (!row.sellingPrice || row.sellingPrice === '') {
             errors.push('Selling price is required');
         } else if (isNaN(row.sellingPrice) || parseFloat(row.sellingPrice) <= 0) {
             errors.push('Selling price must be a positive number');
         }
-        
-        // Warnings
-        if (!row.sku || row.sku.toString().trim() === '') {
-            return { status: 'warning', errors: ['SKU is empty'] };
+
+        // Validate category - cannot be blank
+        if (!row.category || row.category.toString().trim() === '') {
+            errors.push('Category is required and cannot be left blank');
+        }
+
+        // Validate unit label
+        if (row.unit && row.unit.toString().trim() !== '') {
+            const unitLower = row.unit.toLowerCase().trim();
+            if (!validUnits.includes(unitLower)) {
+                errors.push(`Invalid unit "${row.unit}". Valid units: ${validUnits.join(', ')}`);
+            }
+        }
+
+        // Check for duplicate SKU within the file
+        if (row.sku && row.sku.toString().trim() !== '') {
+            const skuLower = row.sku.toLowerCase().trim();
+            const duplicateRows = allRows
+                .map((r, idx) => ({ ...r, originalIndex: idx }))
+                .filter(r => r.sku && r.sku.toLowerCase().trim() === skuLower && r.originalIndex !== rowIndex);
+            
+            if (duplicateRows.length > 0) {
+                const rowNumbers = [rowIndex + 1, ...duplicateRows.map(r => r.originalIndex + 1)].sort((a, b) => a - b);
+                errors.push(
+                    `SKU "${row.sku}" is duplicated in rows ${rowNumbers.join(', ')}. Each SKU must be unique to prevent order confusion`
+                );
+            }
         }
         
-        return { status: errors.length === 0 ? 'valid' : 'error', errors };
+        // Return status based on errors
+        if (errors.length === 0) {
+            // Check for warnings (optional fields)
+            if (!row.sku || row.sku.toString().trim() === '') {
+                return { status: 'warning', errors: ['SKU is empty - recommended for better tracking'] };
+            }
+            return { status: 'valid', errors: [] };
+        }
+        
+        return { status: 'error', errors };
     };
 
     const handleFileSelect = async (e) => {
@@ -69,11 +107,14 @@ const ImportItems = () => {
                     unit: row['Unit'] || '',
                 };
                 
-                const validation = validateRow(processedRow, index);
-                processedRow.status = validation.status;
-                processedRow.validationErrors = validation.errors;
-                
                 return processedRow;
+            });
+
+            // Validate all rows with context of full dataset
+            processedData.forEach((row, index) => {
+                const validation = validateRow(row, index, processedData);
+                row.status = validation.status;
+                row.validationErrors = validation.errors;
             });
 
             setMappingData(processedData);
@@ -124,17 +165,27 @@ const ImportItems = () => {
 
             toast.success(`Successfully imported ${response.data.imported} items`);
             
-            // Reset form
-            setShowPreview(false);
-            setSelectedFile(null);
-            setMappingData([]);
-            setErrors([]);
+            // Show detailed errors if any
+            if (response.data.validationErrors && response.data.validationErrors.length > 0) {
+                setErrors(response.data.validationErrors);
+                toast.warning(`${response.data.skipped} items were skipped due to validation errors`);
+            }
+            
+            // Reset form if all imported successfully
+            if (response.data.skipped === 0) {
+                setShowPreview(false);
+                setSelectedFile(null);
+                setMappingData([]);
+                setErrors([]);
+            }
         } catch (error) {
             console.error('Import error:', error);
             const errorMsg = error.response?.data?.message || 'Failed to import items';
             toast.error(errorMsg);
             
-            if (error.response?.data?.errors) {
+            if (error.response?.data?.validationErrors) {
+                setErrors(error.response.data.validationErrors);
+            } else if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             }
         } finally {
@@ -155,7 +206,7 @@ const ImportItems = () => {
                 'Cost Price': 450,
                 'Selling Price': 500,
                 'Stock Quantity': 100,
-                'Unit': 'Bag'
+                'Unit': 'bag'
             },
             {
                 'Name': 'Wheat Flour 10kg',
@@ -164,7 +215,7 @@ const ImportItems = () => {
                 'Cost Price': 280,
                 'Selling Price': 320,
                 'Stock Quantity': 150,
-                'Unit': 'Kg'
+                'Unit': 'kg'
             },
             {
                 'Name': 'Sugar 1kg',
@@ -173,14 +224,36 @@ const ImportItems = () => {
                 'Cost Price': 45,
                 'Selling Price': 50,
                 'Stock Quantity': 200,
-                'Unit': 'Kg'
+                'Unit': 'kg'
+            },
+            {
+                'Name': 'Cooking Oil 1L',
+                'SKU': 'OIL-001',
+                'Category': 'Grocery',
+                'Cost Price': 120,
+                'Selling Price': 140,
+                'Stock Quantity': 80,
+                'Unit': 'l'
             },
         ];
 
         const worksheet = XLSX.utils.json_to_sheet(sampleData);
+        
+        // Set column widths
+        worksheet['!cols'] = [
+            { wch: 20 }, // Name
+            { wch: 12 }, // SKU
+            { wch: 15 }, // Category
+            { wch: 12 }, // Cost Price
+            { wch: 14 }, // Selling Price
+            { wch: 15 }, // Stock Quantity
+            { wch: 10 }  // Unit
+        ];
+        
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Items');
         XLSX.writeFile(workbook, 'sample_import_items.xlsx');
+        toast.success('Sample file downloaded successfully');
     };
 
     return (
@@ -203,11 +276,15 @@ const ImportItems = () => {
                         <div className="flex-1">
                             <h3 className="text-blue-900 font-semibold mb-2">How to Format Your File</h3>
                             <ul className="text-blue-800 text-sm space-y-1">
-                                <li>• Include headers: Name, SKU, Category, Cost Price, Selling Price, Stock Quantity, Unit</li>
-                                <li>• Use CSV or Excel (.xlsx) format</li>
-                                <li>• Ensure all required fields (Name, Cost Price, Selling Price) are filled</li>
-                                <li>• Prices should be numeric values without currency symbols</li>
-                                <li>• Download our sample file below for reference</li>
+                                <li>• <strong>Required headers:</strong> Name, Cost Price, Selling Price, Category</li>
+                                <li>• <strong>Optional headers:</strong> SKU, Stock Quantity, Unit</li>
+                                <li>• <strong>File format:</strong> CSV or Excel (.xlsx)</li>
+                                <li>• <strong>Name:</strong> Must be unique and cannot be blank</li>
+                                <li>• <strong>SKU:</strong> Must be unique across all products (prevents order confusion)</li>
+                                <li>• <strong>Category:</strong> Required and cannot be left blank</li>
+                                <li>• <strong>Unit:</strong> Must be valid (pcs, kg, g, l, ml, box, pack, bag, bottle, etc.)</li>
+                                <li>• <strong>Prices:</strong> Must be numeric values without currency symbols</li>
+                                <li>• Download our sample file below for proper formatting reference</li>
                             </ul>
                         </div>
                     </div>
@@ -406,34 +483,82 @@ const ImportItems = () => {
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Validation Errors
+                            Validation Errors - Please Fix Before Import
                         </h3>
-                        <ul className="space-y-2 text-sm text-red-800">
+                        <div className="space-y-4 text-sm text-red-800">
                             {mappingData
                                 .filter(row => row.status === 'error')
                                 .map(row => (
-                                    <li key={row.row}>
-                                        <strong>Row {row.row}:</strong>
-                                        <ul className="ml-4">
-                                            {row.validationErrors?.map((err, idx) => (
-                                                <li key={idx}>• {err}</li>
-                                            ))}
-                                        </ul>
-                                    </li>
+                                    <div key={row.row} className="bg-white p-4 rounded-lg border border-red-300">
+                                        <div className="flex items-start">
+                                            <div className="flex-shrink-0 mt-0.5">
+                                                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                                                    <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div className="ml-3 flex-1">
+                                                <div className="font-semibold text-red-900 mb-1">
+                                                    Row {row.row}: {row.name || 'Unknown Item'} {row.sku && `(SKU: ${row.sku})`}
+                                                </div>
+                                                <ul className="space-y-1">
+                                                    {row.validationErrors?.map((err, idx) => (
+                                                        <li key={idx} className="flex items-start">
+                                                            <span className="text-red-600 mr-2">•</span>
+                                                            <span className="flex-1">{err}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
-                        </ul>
+                        </div>
                     </div>
                 )}
 
                 {/* API Errors */}
                 {errors.length > 0 && (
                     <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
-                        <h3 className="text-red-900 font-semibold mb-3">Import Errors</h3>
-                        <ul className="space-y-2 text-sm text-red-800">
+                        <h3 className="text-red-900 font-semibold mb-3 flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Import Errors From Server
+                        </h3>
+                        <div className="space-y-3 text-sm text-red-800">
                             {errors.map((err, idx) => (
-                                <li key={idx}>• {err}</li>
+                                <div key={idx} className="bg-white p-4 rounded-lg border border-red-300">
+                                    <div className="flex items-start">
+                                        <div className="flex-shrink-0 mt-0.5">
+                                            <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center" title="Detailed error information">
+                                                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div className="ml-3 flex-1">
+                                            <div className="font-semibold text-red-900 mb-1">
+                                                Row {err.row}: {err.itemName} {err.sku && `(SKU: ${err.sku})`}
+                                            </div>
+                                            {err.errors ? (
+                                                <ul className="space-y-1">
+                                                    {err.errors.map((error, errorIdx) => (
+                                                        <li key={errorIdx} className="flex items-start">
+                                                            <span className="text-red-600 mr-2">•</span>
+                                                            <span className="flex-1">{error}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p>{err.error}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     </div>
                 )}
 
