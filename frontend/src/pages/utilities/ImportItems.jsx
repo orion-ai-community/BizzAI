@@ -163,7 +163,7 @@ const ImportItems = () => {
                 }
             });
 
-            toast.success(`Successfully imported ${response.data.imported} items`);
+            toast.success(`Successfully imported ${response.data.imported} items and updated ${response.data.updated} items`);
             
             // Show detailed errors if any
             if (response.data.validationErrors && response.data.validationErrors.length > 0) {
@@ -171,7 +171,7 @@ const ImportItems = () => {
                 toast.warning(`${response.data.skipped} items were skipped due to validation errors`);
             }
             
-            // Reset form if all imported successfully
+            // Reset form if all imported/updated successfully
             if (response.data.skipped === 0) {
                 setShowPreview(false);
                 setSelectedFile(null);
