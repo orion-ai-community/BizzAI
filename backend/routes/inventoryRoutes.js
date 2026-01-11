@@ -6,12 +6,14 @@ import {
   updateItem,
   deleteItem,
   getLowStockItems,
+  importItems,
 } from "../controllers/inventoryController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", protect, addItem);
+router.post("/import", protect, importItems);
 router.get("/", protect, getAllItems);
 router.get("/low-stock", protect, getLowStockItems);
 router.get("/:id", protect, getSingleItem);
