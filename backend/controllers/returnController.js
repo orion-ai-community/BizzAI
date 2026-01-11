@@ -207,12 +207,22 @@ export const createReturn = async (req, res) => {
         });
 
         // Update customer ledger (reduce dues or create credit)
-        if (invoice.customer) {
+        // ONLY if refund method is 'credit' (or 'original_payment' which defaults to credit for unpaid invoices logic usually,
+        // but let's be strict: if we refund via Bank/Cash, we don't adjust Dues unless it was an unpaid invoice... logic gets complex.
+        // Simplified Logic: 
+        // 1. If 'credit', we reduce Dues (giving them store credit or reducing debt).
+        // 2. If 'cash'/'bank', we pay them out. Dues remains unchanged (assuming they paid for the item originally).
+        //    If they hadn't paid (Dues > 0), they shouldn't be getting Cash refund anyway.
+        //    So, conditional update is safer.
+
+        if (invoice.customer && (refundMethod === 'credit' || refundMethod === 'original_payment')) {
             await Customer.findByIdAndUpdate(invoice.customer._id, {
                 $inc: { dues: -totalReturnAmount },
             });
+        }
 
-            // Create transaction record
+        // Create transaction record
+        if (invoice.customer) {
             await Transaction.create({
                 type: "return",
                 customer: invoice.customer._id,
@@ -222,59 +232,60 @@ export const createReturn = async (req, res) => {
                 paymentMethod: refundMethod,
                 description: `Return processed for invoice ${invoice.invoiceNo} - Return ID: ${returnId}`,
             });
+        }
 
-            // Handle Bank Refund (Money OUT)
-            if (refundMethod === 'bank' && req.body.bankAccount) {
-                const BankAccount = (await import("../models/BankAccount.js")).default;
-                const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
+        // Handle Bank Refund (Money OUT)
+        if (refundMethod === 'bank' && req.body.bankAccount) {
+            const BankAccount = (await import("../models/BankAccount.js")).default;
+            const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
 
-                const bankAcc = await BankAccount.findOne({
-                    _id: req.body.bankAccount,
-                    userId: req.user._id
-                });
+            const bankAcc = await BankAccount.findOne({
+                _id: req.body.bankAccount,
+                userId: req.user._id
+            });
 
-                if (bankAcc) {
-                    // Create cashbank transaction (money OUT - refund to customer)
-                    const cashbankTxn = await CashbankTransaction.create({
-                        type: 'out',
-                        amount: totalReturnAmount,
-                        fromAccount: req.body.bankAccount,
-                        toAccount: 'sale_return',
-                        description: `Refund for sales return ${returnId}`,
-                        date: new Date(),
-                        userId: req.user._id,
-                    });
-
-                    // Update bank balance (deduct)
-                    await BankAccount.updateOne(
-                        { _id: req.body.bankAccount, userId: req.user._id },
-                        {
-                            $inc: { currentBalance: -totalReturnAmount },
-                            $push: { transactions: cashbankTxn._id }
-                        }
-                    );
-
-                    // Update return record
-                    returnRecord.bankAccount = req.body.bankAccount;
-                    returnRecord.refundProcessed = true;
-                    await returnRecord.save();
-
-                    info(`Bank refund for return ${returnId}: -₹${totalReturnAmount} from ${bankAcc.bankName}`);
-                }
-            } else if (refundMethod === 'cash') {
-                // Record cash refund transaction
-                await CashbankTransaction.create({
+            if (bankAcc) {
+                // Create cashbank transaction (money OUT - refund to customer)
+                const cashbankTxn = await CashbankTransaction.create({
                     type: 'out',
                     amount: totalReturnAmount,
-                    fromAccount: 'cash',
+                    fromAccount: req.body.bankAccount,
                     toAccount: 'sale_return',
-                    description: `Cash refund for sales return ${returnId}`,
+                    description: `Refund for sales return ${returnId}`,
+                    date: new Date(),
                     userId: req.user._id,
                 });
 
-                info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
+                // Update bank balance (deduct)
+                await BankAccount.updateOne(
+                    { _id: req.body.bankAccount, userId: req.user._id },
+                    {
+                        $inc: { currentBalance: -totalReturnAmount },
+                        $push: { transactions: cashbankTxn._id }
+                    }
+                );
+
+                // Update return record
+                returnRecord.bankAccount = req.body.bankAccount;
+                returnRecord.refundProcessed = true;
+                await returnRecord.save();
+
+                info(`Bank refund for return ${returnId}: -₹${totalReturnAmount} from ${bankAcc.bankName}`);
             }
+        } else if (refundMethod === 'cash') {
+            // Record cash refund transaction
+            await CashbankTransaction.create({
+                type: 'out',
+                amount: totalReturnAmount,
+                fromAccount: 'cash',
+                toAccount: 'sale_return',
+                description: `Cash refund for sales return ${returnId}`,
+                userId: req.user._id,
+            });
+
+            info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
         }
+
 
         info(
             `Return created by ${req.user.name}: ${returnId} for invoice ${invoice.invoiceNo}`
