@@ -182,3 +182,191 @@ export const getLowStockItems = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+/**
+ * @desc Bulk import items from file
+ * @route POST /api/inventory/import
+ */
+export const importItems = async (req, res) => {
+  try {
+    const { items } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "No items provided for import" });
+    }
+
+    const results = {
+      imported: 0,
+      updated: 0,
+      skipped: 0,
+      errors: [],
+      validationErrors: []
+    };
+
+    // Valid unit labels
+    const validUnits = [
+      'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle', 
+      'can', 'dozen', 'm', 'cm', 'ft', 'unit', 'pair', 'set'
+    ];
+
+    // Pre-fetch all existing items for this user to optimize duplicate checks
+    const existingItems = await Item.find({ addedBy: req.user._id }).select('name sku stockQty');
+    const existingItemsMap = new Map();
+    const existingSKUs = new Map();
+    
+    existingItems.forEach(item => {
+      existingItemsMap.set(item.name.toLowerCase(), item);
+      if (item.sku) {
+        existingSKUs.set(item.sku.toLowerCase(), item);
+      }
+    });
+
+    // Check for duplicate SKUs within the import batch
+    const importSKUs = new Map();
+    items.forEach((item, index) => {
+      if (item.sku) {
+        const skuLower = item.sku.toLowerCase();
+        if (importSKUs.has(skuLower)) {
+          importSKUs.get(skuLower).push(index + 1);
+        } else {
+          importSKUs.set(skuLower, [index + 1]);
+        }
+      }
+    });
+
+    for (let i = 0; i < items.length; i++) {
+      try {
+        const item = items[i];
+        const rowNum = i + 1;
+        const rowErrors = [];
+
+        // Validate required fields
+        if (!item.name || item.name.toString().trim() === '') {
+          rowErrors.push('Item name is required and cannot be blank');
+        }
+
+        if (!item.costPrice || item.costPrice === '') {
+          rowErrors.push('Cost price is required');
+        } else if (isNaN(item.costPrice) || parseFloat(item.costPrice) <= 0) {
+          rowErrors.push('Cost price must be a positive number');
+        }
+
+        if (!item.sellingPrice || item.sellingPrice === '') {
+          rowErrors.push('Selling price is required');
+        } else if (isNaN(item.sellingPrice) || parseFloat(item.sellingPrice) <= 0) {
+          rowErrors.push('Selling price must be a positive number');
+        }
+
+        // Validate category - must not be blank
+        if (!item.category || item.category.toString().trim() === '') {
+          rowErrors.push('Category is required and cannot be left blank');
+        }
+
+        // Validate unit label
+        if (item.unit && item.unit.toString().trim() !== '') {
+          const unitLower = item.unit.toLowerCase().trim();
+          if (!validUnits.includes(unitLower)) {
+            rowErrors.push(
+              `Invalid unit "${item.unit}". Valid units: ${validUnits.join(', ')}`
+            );
+          }
+        }
+
+        // Check for duplicate SKU within the import batch only if stock is being added
+        if (item.sku && item.sku.toString().trim() !== '') {
+          const skuLower = item.sku.toLowerCase().trim();
+          const duplicateRows = importSKUs.get(skuLower);
+          if (duplicateRows && duplicateRows.length > 1) {
+            const otherRows = duplicateRows.filter(r => r !== rowNum);
+            if (otherRows.length > 0) {
+              rowErrors.push(
+                `SKU "${item.sku}" is duplicated in this import file (rows: ${duplicateRows.join(', ')}). Each SKU must be unique within the import`
+              );
+            }
+          }
+        }
+
+        // If there are validation errors, skip this item
+        if (rowErrors.length > 0) {
+          results.validationErrors.push({
+            row: rowNum,
+            itemName: item.name || 'Unknown',
+            sku: item.sku || 'N/A',
+            errors: rowErrors
+          });
+          results.skipped++;
+          continue;
+        }
+
+        // Check if item already exists by SKU (if SKU provided) or by name
+        let existingItem = null;
+        if (item.sku && item.sku.toString().trim() !== '') {
+          const skuLower = item.sku.toLowerCase().trim();
+          existingItem = existingSKUs.get(skuLower);
+        }
+        
+        // Fallback to name if no SKU match
+        if (!existingItem && item.name) {
+          const nameLower = item.name.toLowerCase().trim();
+          existingItem = existingItemsMap.get(nameLower);
+        }
+
+        if (existingItem) {
+          // Item exists - UPDATE stock quantity by adding new quantity to existing
+          const newStockQty = (existingItem.stockQty || 0) + (item.stockQty ? parseInt(item.stockQty) : 0);
+          
+          await Item.findByIdAndUpdate(
+            existingItem._id,
+            {
+              stockQty: newStockQty,
+              // Update other fields if they are better/more recent
+              category: item.category.trim() || existingItem.category,
+              unit: item.unit ? item.unit.toLowerCase().trim() : existingItem.unit,
+              costPrice: item.costPrice || existingItem.costPrice,
+              sellingPrice: item.sellingPrice || existingItem.sellingPrice,
+            },
+            { new: true }
+          );
+
+          info(`Item stock updated by ${req.user.name}: ${existingItem.name} - Added ${item.stockQty || 0} units (Total: ${newStockQty})`);
+          results.updated++;
+        } else {
+          // Item doesn't exist - CREATE new item
+          await Item.create({
+            name: item.name.trim(),
+            sku: item.sku ? item.sku.trim() : undefined,
+            category: item.category.trim(),
+            costPrice: parseFloat(item.costPrice),
+            sellingPrice: parseFloat(item.sellingPrice),
+            stockQty: item.stockQty ? parseInt(item.stockQty) : 0,
+            unit: item.unit ? item.unit.toLowerCase().trim() : 'pcs',
+            addedBy: req.user._id
+          });
+
+          info(`Item created by ${req.user.name}: ${item.name}`);
+          results.imported++;
+        }
+      } catch (itemError) {
+        results.errors.push({
+          row: i + 1,
+          itemName: items[i].name || 'Unknown',
+          error: itemError.message
+        });
+        results.skipped++;
+      }
+    }
+
+    info(`Items imported by ${req.user.name}: ${results.imported} created, ${results.updated} updated, ${results.skipped} skipped`);
+    const alerts = await checkStockAlerts(req.user._id);
+
+    res.status(200).json({
+      message: `Import completed: ${results.imported} items created, ${results.updated} items updated, ${results.skipped} skipped`,
+      ...results,
+      alerts
+    });
+  } catch (err) {
+    console.error("Bulk Import Error:", err);
+    error(`Bulk Import Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
