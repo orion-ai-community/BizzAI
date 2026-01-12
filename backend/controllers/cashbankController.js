@@ -28,6 +28,7 @@ export const getAccounts = async (req, res) => {
  * @desc Create new bank account
  * @route POST /api/cashbank/accounts
  */
+//xcvxdfgdf
 export const createAccount = async (req, res) => {
   try {
     const { bankName, accountNumber, accountType, branch, ifsc, openingBalance } = req.body;
