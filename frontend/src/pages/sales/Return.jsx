@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
 import PageHeader from "../../components/PageHeader";
 import FormInput from "../../components/FormInput";
@@ -36,6 +37,11 @@ const Return = () => {
   const token = user?.token;
   const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
+  // Debug: Check if token exists
+  if (!token) {
+    console.warn("⚠️ Auth token missing. User object:", user);
+  }
+
   // Save draft to localStorage whenever formData changes
   useEffect(() => {
     if (formData.selectedInvoice || formData.items.length > 0) {
@@ -51,14 +57,25 @@ const Return = () => {
   }, [showInvoiceModal]);
 
   const fetchInvoices = async () => {
+    if (!token) {
+      toast.error("Authentication error: Token missing. Please log in again.");
+      console.error("Token is missing:", { user, token });
+      return;
+    }
     try {
       const response = await axios.get(`${API_URL}/api/pos/invoices`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setInvoices(response.data);
+      toast.success("Invoices loaded successfully");
     } catch (error) {
       console.error("Error fetching invoices:", error);
-      alert("Failed to fetch invoices");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("user");
+      } else {
+        toast.error(error.response?.data?.message || "Failed to fetch invoices");
+      }
     }
   };
 
@@ -71,8 +88,10 @@ const Return = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      const fullInvoice = response.data;
+      const fullInvoice = response.data || {};
+      if (!fullInvoice.items || !Array.isArray(fullInvoice.items)) {
+        throw new Error("Invalid invoice data: items missing");
+      }
 
       // Fetch existing returns for this invoice
       let existingReturns = [];
@@ -90,12 +109,16 @@ const Return = () => {
       // Calculate already returned quantities per product
       const returnedQuantities = {};
       existingReturns.forEach((returnRecord) => {
-        returnRecord.items.forEach((item) => {
-          const productId = item.product;
+        (returnRecord.items || []).forEach((item) => {
+          const productId =
+            typeof item.product === "object" && item.product?._id
+              ? item.product._id
+              : item.product;
+          if (!productId) return;
           if (!returnedQuantities[productId]) {
             returnedQuantities[productId] = 0;
           }
-          returnedQuantities[productId] += item.returnedQty;
+          returnedQuantities[productId] += Number(item.returnedQty) || 0;
         });
       });
 
@@ -108,8 +131,8 @@ const Return = () => {
             typeof itemData === "object" ? itemData.name : "Item";
           const itemId = typeof itemData === "object" ? itemData._id : itemData;
 
-          const alreadyReturned = returnedQuantities[itemId] || 0;
-          const remainingQty = item.quantity - alreadyReturned;
+          const alreadyReturned = Number(returnedQuantities[itemId]) || 0;
+          const remainingQty = Number(item.quantity || 0) - alreadyReturned;
 
           return {
             productId: itemId,
@@ -117,7 +140,7 @@ const Return = () => {
             originalQty: item.quantity,
             alreadyReturned: alreadyReturned,
             remainingQty: remainingQty,
-            returnedQty: Math.min(remainingQty, item.quantity), // Default to remaining quantity
+            returnedQty: Math.min(Math.max(remainingQty, 0), Number(item.quantity || 0)), // Default to remaining quantity, clamped
             rate: item.price,
             taxPercent: 0,
             condition: "not_damaged",
@@ -127,7 +150,7 @@ const Return = () => {
         .filter((item) => item.remainingQty > 0); // Only show items that can still be returned
 
       if (returnItems.length === 0) {
-        alert("All items from this invoice have already been returned.");
+        toast.warning("All items from this invoice have already been returned.");
         return;
       }
 
@@ -140,9 +163,12 @@ const Return = () => {
       });
 
       setShowInvoiceModal(false);
+      toast.success("Invoice selected successfully");
     } catch (error) {
       console.error("Error fetching invoice details:", error);
-      alert("Failed to fetch invoice details");
+      const msg =
+        (error.response?.data?.message || error.message || "Failed to fetch invoice details");
+      toast.error(msg);
     }
   };
 
@@ -171,19 +197,19 @@ const Return = () => {
 
   const validateForm = () => {
     if (!formData.selectedInvoice) {
-      alert("Please select an invoice");
+      toast.warning("Please select an invoice");
       return false;
     }
 
     const itemsWithQty = formData.items.filter((item) => item.returnedQty > 0);
     if (itemsWithQty.length === 0) {
-      alert("Please add at least one item with quantity greater than 0");
+      toast.warning("Please add at least one item with quantity greater than 0");
       return false;
     }
 
     for (const item of itemsWithQty) {
       if (item.returnedQty > item.remainingQty) {
-        alert(
+        toast.error(
           `Return quantity for ${item.productName
           } cannot exceed remaining quantity (${item.remainingQty
           }). Already returned: ${item.alreadyReturned || 0}`
@@ -192,19 +218,19 @@ const Return = () => {
       }
 
       if (!item.condition) {
-        alert(`Please select condition for ${item.productName}`);
+        toast.warning(`Please select condition for ${item.productName}`);
         return false;
       }
 
       if (!item.reason) {
-        alert(`Please select reason for ${item.productName}`);
+        toast.warning(`Please select reason for ${item.productName}`);
         return false;
       }
     }
 
     // Validate refund method is selected
     if (!formData.refundMethod) {
-      alert("Please select a refund method before completing the return");
+      toast.warning("Please select a refund method before completing the return");
       return false;
     }
 
@@ -236,11 +262,13 @@ const Return = () => {
       // Clear draft from localStorage on successful completion
       localStorage.removeItem("returnDraft");
 
-      alert("Items returned successfully!");
-      navigate("/sales/returned-items");
+      toast.success("Items returned successfully!");
+      setTimeout(() => {
+        navigate("/sales/returned-items");
+      }, 1500);
     } catch (error) {
       console.error("Error creating return:", error);
-      alert(error.response?.data?.message || "Failed to create return");
+      toast.error(error.response?.data?.message || "Failed to create return");
     } finally {
       setLoading(false);
     }
@@ -257,6 +285,7 @@ const Return = () => {
         refundMethod: "",
         notes: "",
       });
+      toast.info("Return draft cleared");
     }
   };
 
