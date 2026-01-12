@@ -53,7 +53,7 @@ const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50">
             <div className="bg-card rounded-xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
                 <div className="p-6 border-b border-default">
                     <div className="flex items-center justify-between mb-4">
