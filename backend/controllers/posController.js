@@ -406,7 +406,7 @@ export const createInvoice = async (req, res) => {
     const populatedInvoice = await Invoice.findById(invoice._id)
       .populate("customer")
       .populate("items.item")
-      .populate({ path: "createdBy", select: "shopName name" });
+      .populate({ path: "createdBy", select: "shopName name gstNumber shopAddress" });
     const pdfPath = await generateInvoicePDF(populatedInvoice);
 
     if (populatedInvoice.customer?.email) {
@@ -460,7 +460,8 @@ export const getInvoiceById = async (req, res) => {
       createdBy: req.user._id
     })
       .populate("customer")
-      .populate("items.item", "name sku");
+      .populate("items.item", "name sku")
+      .populate({ path: "createdBy", select: "shopName name gstNumber shopAddress" });
 
     if (!invoice) {
       return res.status(404).json({ message: "Invoice not found or unauthorized" });
@@ -618,12 +619,12 @@ export const markInvoiceAsPaid = async (req, res) => {
     // Update invoice and resolve payment method for display
     invoice.paidAmount = newPaidAmount;
     invoice.paymentStatus = paymentStatus;
-    
+
     // Resolve payment method based on existing credit + new payment method
     const hasExistingCredit = (invoice.creditApplied || 0) > 0;
     const hasNewPayment = newPaidAmount > 0;
     const hasBoth = hasExistingCredit && hasNewPayment;
-    
+
     if (hasBoth) {
       invoice.paymentMethod = 'split';
       invoice.paidViaMethod = paymentMethod; // Store the actual non-credit method

@@ -99,6 +99,8 @@ export const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       shopName: user.shopName,
+      gstNumber: user.gstNumber,
+      shopAddress: user.shopAddress,
       phone: user.phone,
       token: generateToken(user._id),
     });

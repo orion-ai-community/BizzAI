@@ -17,12 +17,14 @@ const ProfileSettings = () => {
     email: '',
     phone: '',
     shopName: '',
+    gstNumber: '',
+    shopAddress: '',
   });
 
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const { name, email, phone, shopName } = formData;
+  const { name, email, phone, shopName, gstNumber, shopAddress } = formData;
 
   // Initialize form with user data
   useEffect(() => {
@@ -32,6 +34,8 @@ const ProfileSettings = () => {
         email: user.email || '',
         phone: user.phone || '',
         shopName: user.shopName || '',
+        gstNumber: user.gstNumber || '',
+        shopAddress: user.shopAddress || '',
       });
     }
   }, [user]);
@@ -263,6 +267,44 @@ const ProfileSettings = () => {
               />
             </div>
 
+            {/* GST Number Input */}
+            <div>
+              <label
+                htmlFor="gstNumber"
+                className="block text-sm font-medium text-secondary mb-2"
+              >
+                GST Number (GSTIN)
+              </label>
+              <input
+                type="text"
+                id="gstNumber"
+                name="gstNumber"
+                value={gstNumber}
+                onChange={onChange}
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition"
+                placeholder="e.g., 27AABCU9603R1ZM"
+              />
+            </div>
+
+            {/* Shop Address Input */}
+            <div>
+              <label
+                htmlFor="shopAddress"
+                className="block text-sm font-medium text-secondary mb-2"
+              >
+                Shop Address
+              </label>
+              <textarea
+                id="shopAddress"
+                name="shopAddress"
+                value={shopAddress}
+                onChange={onChange}
+                rows={3}
+                className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primaryfocus:border-transparent transition resize-none"
+                placeholder="Enter complete shop address (Street, City, State, PIN Code)"
+              />
+            </div>
+
             {/* Additional Info Section */}
             <div className="pt-4 border-t  border-default">
               <h3 className="text-sm font-medium text-main mb-4">Account Information</h3>
@@ -288,6 +330,8 @@ const ProfileSettings = () => {
                     email: user.email || '',
                     phone: user.phone || '',
                     shopName: user.shopName || '',
+                    gstNumber: user.gstNumber || '',
+                    shopAddress: user.shopAddress || '',
                   });
                   setErrors({});
                 }}

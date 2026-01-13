@@ -21,6 +21,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    gstNumber: {
+      type: String,
+      default: "",
+    },
+    shopAddress: {
+      type: String,
+      default: "",
+    },
     phone: {
       type: String,
       default: "",

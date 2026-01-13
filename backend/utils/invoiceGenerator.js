@@ -32,7 +32,7 @@ const buildPaymentMethodDisplay = (invoiceData) => {
   const paidVia = invoiceData.paidViaMethod || invoiceData.paymentMethod;
 
   if (credit > 0 && paid === 0) return "Customer Credit";
-  
+
   // If we have split payment details array, use it
   if (splitDetails.length > 1) {
     const methods = splitDetails.map(d => formatPaymentMethodLabel(d.method)).join(" + ");
@@ -41,7 +41,7 @@ const buildPaymentMethodDisplay = (invoiceData) => {
     }
     return `Split (${methods})`;
   }
-  
+
   // Single split detail (shouldn't happen normally, but handle it)
   if (splitDetails.length === 1) {
     const method = formatPaymentMethodLabel(splitDetails[0].method);
@@ -50,7 +50,7 @@ const buildPaymentMethodDisplay = (invoiceData) => {
     }
     return method;
   }
-  
+
   // Fallback to paidViaMethod logic (for backward compatibility)
   const primaryMethod = formatPaymentMethodLabel(paidVia);
   if (credit > 0 && paid > 0) return `Split (${primaryMethod} + Customer Credit)`;
@@ -79,16 +79,27 @@ export const generateInvoicePDF = async (invoiceData) => {
   // === HEADER SECTION ===
   // Shop Name as Heading
   const shopName = invoiceData.createdBy?.shopName || invoiceData.createdBy?.name || "INVOICE";
+  const gstNumber = invoiceData.createdBy?.gstNumber || "";
   doc.setFontSize(22);
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "bold");
   doc.text(shopName, margin, 20);
 
+  // GST Number (if available)
+  let headerYPos = 28;
+  if (gstNumber) {
+    doc.setFontSize(9);
+    doc.setTextColor(...grayColor);
+    doc.setFont("helvetica", "normal");
+    doc.text(`GSTIN: ${gstNumber}`, margin, headerYPos);
+    headerYPos += 6;
+  }
+
   // Invoice Number
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "normal");
-  doc.text(invoiceData.invoiceNo || "INV-00000", margin, 28);
+  doc.text(invoiceData.invoiceNo || "INV-00000", margin, headerYPos);
 
   // Date and Time - Right aligned
   doc.setFontSize(9);
@@ -97,11 +108,11 @@ export const generateInvoicePDF = async (invoiceData) => {
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   const invoiceDate = new Date(invoiceData.createdAt);
-  doc.text(invoiceDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }), 
+  doc.text(invoiceDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
     pageWidth - margin, 25, { align: "right" });
   doc.setFontSize(9);
   doc.setTextColor(...grayColor);
-  doc.text(invoiceDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }).toLowerCase(), 
+  doc.text(invoiceDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }).toLowerCase(),
     pageWidth - margin, 30, { align: "right" });
 
   // Horizontal line
@@ -125,7 +136,7 @@ export const generateInvoicePDF = async (invoiceData) => {
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "bold");
-  
+
   if (invoiceData.customer) {
     doc.text(invoiceData.customer.name || "N/A", margin, yPos);
   } else {
@@ -175,7 +186,7 @@ export const generateInvoicePDF = async (invoiceData) => {
   doc.setDrawColor(200, 200, 200);
   doc.setLineWidth(0.3);
   doc.line(margin, yPos, pageWidth - margin, yPos);
-  
+
   yPos += 6;
   doc.setFontSize(9);
   doc.setTextColor(...grayColor);
@@ -203,7 +214,7 @@ export const generateInvoicePDF = async (invoiceData) => {
 
   invoiceData.items.forEach((item, index) => {
     yPos += 7;
-    
+
     // Check if we need a new page
     if (yPos > pageHeight - 60) {
       doc.addPage();
@@ -211,13 +222,13 @@ export const generateInvoicePDF = async (invoiceData) => {
     }
 
     doc.text(String(index + 1), col1, yPos);
-    
+
     // Get item name from populated item reference or fallback
     const itemName = item.item?.name || item.name || item.itemName || "Item";
     const maxWidth = col3 - col2 - 5;
     const itemLines = doc.splitTextToSize(itemName, maxWidth);
     doc.text(itemLines[0], col2, yPos); // Show first line only for compact view
-    
+
     doc.text(String(item.quantity || 0), col3, yPos, { align: "center" });
     doc.text(`Rs. ${(item.price || 0).toFixed(2)}`, col4, yPos, { align: "right" });
     doc.text(`Rs. ${(item.total || 0).toFixed(2)}`, col5, yPos, { align: "right" });
@@ -302,7 +313,7 @@ export const generateInvoicePDF = async (invoiceData) => {
 
     if ((invoiceData.paidAmount || 0) > 0) {
       const splitDetails = invoiceData.splitPaymentDetails || [];
-      
+
       if (splitDetails.length > 0) {
         // Show each split payment method
         splitDetails.forEach(split => {
@@ -329,10 +340,10 @@ export const generateInvoicePDF = async (invoiceData) => {
     doc.setLineWidth(0.3);
     doc.line(labelX, yPos, valueX, yPos);
     yPos += 7;
-    
+
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    
+
     if (invoiceData.customer.dues < 0) {
       doc.setTextColor(0, 128, 0); // Green
       doc.text("Available Credit Balance:", labelX, yPos);
@@ -346,7 +357,7 @@ export const generateInvoicePDF = async (invoiceData) => {
       doc.text("Account Balance:", labelX, yPos);
       doc.text("Rs. 0.00", valueX, yPos, { align: "right" });
     }
-    
+
     doc.setTextColor(0, 0, 0); // Reset to black
     doc.setFontSize(10);
   }
@@ -363,19 +374,29 @@ export const generateInvoicePDF = async (invoiceData) => {
     doc.text("Paid in Full", labelX, yPos);
   }
   // === FOOTER SECTION ===
-  const footerY = pageHeight - 25;
+  const shopAddress = invoiceData.createdBy?.shopAddress || "";
+  const footerY = pageHeight - (shopAddress ? 35 : 25);
   doc.setDrawColor(200, 200, 200);
   doc.setLineWidth(0.3);
   doc.line(margin, footerY, pageWidth - margin, footerY);
 
+  // Shop Address (if available)
+  if (shopAddress) {
+    doc.setFontSize(8);
+    doc.setTextColor(...grayColor);
+    doc.setFont("helvetica", "normal");
+    const addressLines = doc.splitTextToSize(shopAddress, pageWidth - (margin * 2));
+    doc.text(addressLines, pageWidth / 2, footerY + 5, { align: "center" });
+  }
+
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "normal");
-  doc.text("Thank you & Please Visit Again ", pageWidth / 2, footerY + 6, { align: "center" });
-  
+  doc.text("Thank you & Please Visit Again ", pageWidth / 2, footerY + (shopAddress ? 16 : 6), { align: "center" });
+
   doc.setFontSize(8);
   doc.setTextColor(...grayColor);
-  doc.text("This is a computer-generated invoice.", pageWidth / 2, footerY + 11, { align: "center" });
+  doc.text("This is a computer-generated invoice.", pageWidth / 2, footerY + (shopAddress ? 21 : 11), { align: "center" });
 
   // Save PDF
   const invoicesDir = path.join("invoices");

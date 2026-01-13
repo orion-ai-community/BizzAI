@@ -22,7 +22,7 @@ export const getAllUsers = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, shopName } = req.body;
+    const { name, email, phone, shopName, gstNumber, shopAddress } = req.body;
 
     // Validate that user is updating their own profile
     if (req.user._id.toString() !== id) {
@@ -43,6 +43,8 @@ export const updateUser = async (req, res) => {
     if (email !== undefined) updateData.email = email;
     if (phone !== undefined) updateData.phone = phone;
     if (shopName !== undefined) updateData.shopName = shopName;
+    if (gstNumber !== undefined) updateData.gstNumber = gstNumber;
+    if (shopAddress !== undefined) updateData.shopAddress = shopAddress;
 
     const user = await User.findByIdAndUpdate(
       id,
@@ -61,6 +63,8 @@ export const updateUser = async (req, res) => {
         name: user.name,
         email: user.email,
         shopName: user.shopName,
+        gstNumber: user.gstNumber,
+        shopAddress: user.shopAddress,
         phone: user.phone,
         role: user.role,
       },
