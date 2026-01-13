@@ -68,7 +68,7 @@ const InvoiceDetail = () => {
     const paidVia = invoice.paidViaMethod || invoice.paymentMethod;
 
     if (credit > 0 && paid === 0) return 'Customer Credit';
-    
+
     // If we have split payment details array, use it
     if (splitDetails.length > 1) {
       const methods = splitDetails.map(d => formatPaymentMethodLabel(d.method)).join(" + ");
@@ -77,7 +77,7 @@ const InvoiceDetail = () => {
       }
       return `Split (${methods})`;
     }
-    
+
     // Single split detail (shouldn't happen normally, but handle it)
     if (splitDetails.length === 1) {
       const method = formatPaymentMethodLabel(splitDetails[0].method);
@@ -86,7 +86,7 @@ const InvoiceDetail = () => {
       }
       return method;
     }
-    
+
     // Fallback to paidViaMethod logic (for backward compatibility)
     const primaryLabel = formatPaymentMethodLabel(paidVia);
     if (credit > 0 && paid > 0) return `Split (${primaryLabel} + Customer Credit)`;
@@ -114,7 +114,7 @@ const InvoiceDetail = () => {
             onClick={() => navigate('/pos/invoices')}
             className="mt-4 text-indigo-600 dark:text-[rgb(var(--color-primary))] hover:text-indigo-700 dark:hover:text-[rgb(var(--color-primary-hover))]"
           >
-            Back to Invoices
+            Back to Invoices 
           </button>
         </div>
       </Layout>
@@ -176,19 +176,27 @@ const InvoiceDetail = () => {
           <div className="border-b dark:border-[rgb(var(--color-border))] pb-6 mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-3xl font-bold text-indigo-600 mb-2">INVOICE</h2>
-                <div className="text-lg font-semibold text-gray-900">{invoice.invoiceNo}</div>
+                {/* Shop Name */}
+                {invoice.createdBy?.shopName && (
+                  <div className="text-2xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-1">{invoice.createdBy.shopName}</div>
+                )}
+                {/* GST Number */}
+                {invoice.createdBy?.gstNumber && (
+                  <div className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-muted))] mb-3">GSTIN: {invoice.createdBy.gstNumber}</div>
+                )}
+                <h2 className="text-3xl font-bold text-indigo-600 dark:text-[rgb(var(--color-text-secondary))] mb-2">INVOICE</h2>
+                <div className="text-lg font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">{invoice.invoiceNo}</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-600 mb-1">Invoice Date</div>
-                <div className="font-medium text-gray-900">
+                <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-1">Invoice Date</div>
+                <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                   {new Date(invoice.createdAt).toLocaleDateString('en-IN', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric',
                   })}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
+                <div className="text-sm text-gray-500 mt-1 dark:text-[rgb(var(--color-text-muted))]">
                   {new Date(invoice.createdAt).toLocaleTimeString('en-IN', {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -201,31 +209,31 @@ const InvoiceDetail = () => {
           {/* Customer Info & Status */}
           <div className="grid grid-cols-2 gap-8 mb-8">
             <div>
-              <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Bill To</h3>
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-[rgb(var(--color-text-muted))] uppercase mb-2">Bill To</h3>
               {invoice.customer ? (
                 <div>
-                  <div className="font-bold text-gray-900 text-lg">{invoice.customer.name}</div>
-                  <div className="text-gray-600 mt-1">{invoice.customer.phone}</div>
+                  <div className="font-bold text-gray-900 dark:text-[rgb(var(--color-text))] text-lg">{invoice.customer.name}</div>
+                  <div className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mt-1">{invoice.customer.phone}</div>
                   {invoice.customer.email && (
-                    <div className="text-gray-600">{invoice.customer.email}</div>
+                    <div className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{invoice.customer.email}</div>
                   )}
                   {invoice.customer.address && (
-                    <div className="text-gray-600 mt-1">{invoice.customer.address}</div>
+                    <div className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mt-1">{invoice.customer.address}</div>
                   )}
                 </div>
               ) : (
-                <div className="text-gray-600">Walk-in Customer</div>
+                <div className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Walk-in Customer</div>
               )}
             </div>
 
             <div className="text-right">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Payment Status</h3>
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-[rgb(var(--color-text-muted))] uppercase mb-2">Payment Status</h3>
               <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(invoice.paymentStatus)}`}>
                 {invoice.paymentStatus.toUpperCase()}
               </span>
               <div className="mt-4">
-                <div className="text-sm text-gray-600">Payment Method</div>
-                <div className="font-medium text-gray-900 capitalize">{paymentMethodDisplay}</div>
+                <div className="text-sm text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Payment Method</div>
+                <div className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))] capitalize">{paymentMethodDisplay}</div>
               </div>
             </div>
           </div>
@@ -234,22 +242,22 @@ const InvoiceDetail = () => {
           <div className="mb-8">
             <table className="w-full">
               <thead>
-                <tr className="border-b-2 border-gray-300">
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700">#</th>
-                  <th className="text-left py-3 px-2 font-semibold text-gray-700">Item</th>
-                  <th className="text-right py-3 px-2 font-semibold text-gray-700">Quantity</th>
-                  <th className="text-right py-3 px-2 font-semibold text-gray-700">Price</th>
-                  <th className="text-right py-3 px-2 font-semibold text-gray-700">Total</th>
+                <tr className="border-b-2 border-gray-500">
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-[rgb(var(--color-text))]">#</th>
+                  <th className="text-left py-3 px-2 font-semibold text-gray-700 dark:text-[rgb(var(--color-text))]">Item</th>
+                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-[rgb(var(--color-text))]">Quantity</th>
+                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-[rgb(var(--color-text))]">Price</th>
+                  <th className="text-right py-3 px-2 font-semibold text-gray-700 dark:text-[rgb(var(--color-text))]">Total</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, index) => (
-                  <tr key={index} className="border-b border-gray-200">
-                    <td className="py-3 px-2 text-gray-600">{index + 1}</td>
-                    <td className="py-3 px-2 text-gray-900">{item.name || 'Item'}</td>
-                    <td className="py-3 px-2 text-right text-gray-900">{item.quantity}</td>
-                    <td className="py-3 px-2 text-right text-gray-900">₹{fmt(item.price)}</td>
-                    <td className="py-3 px-2 text-right font-medium text-gray-900">
+                  <tr key={index} className="border-b border-gray-200 dark:border-[rgb(var(--color-border))]">
+                    <td className="py-3 px-2 text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{index + 1}</td>
+                    <td className="py-3 px-2 text-gray-900 dark:text-[rgb(var(--color-text))]">{item.name || 'Item'}</td>
+                    <td className="py-3 px-2 text-right text-gray-900 dark:text-[rgb(var(--color-text))]">{item.quantity}</td>
+                    <td className="py-3 px-2 text-right text-gray-900 dark:text-[rgb(var(--color-text))]">₹{fmt(item.price)}</td>
+                    <td className="py-3 px-2 text-right font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">
                       ₹{fmt(item.total)}
                     </td>
                   </tr>
@@ -262,35 +270,35 @@ const InvoiceDetail = () => {
           <div className="flex justify-end">
             <div className="w-64">
               <div className="flex justify-between py-2 border-b">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="font-medium text-gray-900">₹{fmt(invoice.subtotal)}</span>
+                <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Subtotal:</span>
+                <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{fmt(invoice.subtotal)}</span>
               </div>
               {invoice.discount > 0 && (
                 <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Discount:</span>
+                  <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Discount:</span>
                   <span className="font-medium text-red-600">-₹{fmt(invoice.discount)}</span>
                 </div>
               )}
               {invoice.previousDueAmount > 0 && (
                 <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Previous Due Added:</span>
+                  <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Previous Due Added:</span>
                   <span className="font-medium text-amber-600">+₹{fmt(invoice.previousDueAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between py-3 border-b-2 border-gray-300">
-                <span className="text-lg font-bold text-gray-900">Total Amount:</span>
-                <span className="text-lg font-bold text-indigo-600">
+                <span className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Total Amount:</span>
+                <span className="text-lg font-bold text-indigo-600 dark:text-[rgb(var(--color-text-secondary))]">
                   ₹{fmt(invoice.totalAmount)}
                 </span>
               </div>
               {invoice.creditApplied > 0 && (
                 <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Credit Applied:</span>
+                  <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Credit Applied:</span>
                   <span className="font-medium text-green-600">-₹{fmt(invoice.creditApplied)}</span>
                 </div>
               )}
               <div className="flex justify-between py-2 border-b">
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">
                   {invoice.paidAmount > 0
                     ? `Paid Amount (${formatPaymentMethodLabel(invoice.paidViaMethod || invoice.paymentMethod)}):`
                     : 'Paid Amount:'}
@@ -298,25 +306,25 @@ const InvoiceDetail = () => {
                 <span className="font-medium text-green-600">₹{fmt(invoice.paidAmount)}</span>
               </div>
               {invoice.creditApplied > 0 && (
-                <div className="mt-2 pt-3 border-t border-gray-200 space-y-2">
-                  <div className="text-sm font-semibold text-gray-600">Payment Breakdown</div>
+                <div className="mt-2 pt-3 border-t border-gray-200 dark:border-[rgb(var(--color-border))] space-y-2">
+                  <div className="text-sm font-semibold text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Payment Breakdown</div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Customer Credit:</span>
-                    <span className="font-medium text-gray-900">₹{fmt(invoice.creditApplied)}</span>
+                    <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">Customer Credit:</span>
+                    <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{fmt(invoice.creditApplied)}</span>
                   </div>
                   {invoice.paidAmount > 0 && (
                     <>
                       {invoice.splitPaymentDetails && invoice.splitPaymentDetails.length > 0 ? (
                         invoice.splitPaymentDetails.map((split, idx) => (
                           <div key={idx} className="flex justify-between text-sm">
-                            <span className="text-gray-600">{formatPaymentMethodLabel(split.method)}:</span>
-                            <span className="font-medium text-gray-900">₹{fmt(split.amount)}</span>
+                            <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{formatPaymentMethodLabel(split.method)}:</span>
+                            <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{fmt(split.amount)}</span>
                           </div>
                         ))
                       ) : (
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">{formatPaymentMethodLabel(invoice.paidViaMethod || invoice.paymentMethod)}:</span>
-                          <span className="font-medium text-gray-900">₹{fmt(invoice.paidAmount)}</span>
+                          <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))]">{formatPaymentMethodLabel(invoice.paidViaMethod || invoice.paymentMethod)}:</span>
+                          <span className="font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">₹{fmt(invoice.paidAmount)}</span>
                         </div>
                       )}
                     </>
@@ -326,12 +334,12 @@ const InvoiceDetail = () => {
               {(() => {
                 const effectivePayment = invoice.paidAmount + (invoice.creditApplied || 0);
                 const balanceDue = invoice.totalAmount - effectivePayment;
-                
+
                 if (balanceDue > 0) {
                   return (
                     <div className="flex justify-between py-2">
-                      <span className="text-gray-600 font-medium">Balance Due:</span>
-                      <span className="font-bold text-red-600">
+                      <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] font-medium">Balance Due:</span>
+                      <span className="font-bold text-red-600 dark:text-[rgb(var(--color-text-secondary))]">
                         ₹{balanceDue.toFixed(2)}
                       </span>
                     </div>
@@ -339,8 +347,8 @@ const InvoiceDetail = () => {
                 } else {
                   return (
                     <div className="flex justify-between py-2">
-                      <span className="text-gray-600 font-medium">Paid in Full</span>
-                      <span className="font-bold text-green-600">✓</span>
+                      <span className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] font-medium">Paid in Full</span>
+                      <span className="font-bold text-green-600 dark:text-[rgb(var(--color-text-secondary))]">✓</span>
                     </div>
                   );
                 }
@@ -350,7 +358,7 @@ const InvoiceDetail = () => {
                   <span className="text-sm font-medium text-gray-700">
                     {invoice.customer.dues < 0 ? 'Available Credit Balance:' : invoice.customer.dues > 0 ? 'Customer Outstanding Due:' : 'Account Balance:'}
                   </span>
-                  <span className={`text-sm font-bold ${invoice.customer.dues < 0 ? 'text-green-700' : invoice.customer.dues > 0 ? 'text-red-700' : 'text-gray-700'}`}>
+                  <span className={`text-sm font-bold ${invoice.customer.dues < 0 ? 'text-green-700' : invoice.customer.dues > 0 ? 'text-red-700' : 'text-gray-700 dark:text-[rgb(var(--color-text))]'}`}>
                     ₹{fmt(Math.abs(invoice.customer.dues))}
                   </span>
                 </div>
@@ -359,7 +367,11 @@ const InvoiceDetail = () => {
           </div>
 
           {/* Footer */}
-          <div className="mt-12 pt-6 border-t text-center text-gray-500 text-sm">
+          <div className="mt-12 pt-6 border-t text-center text-gray-500 dark:text-[rgb(var(--color-text-muted))] text-sm">
+            {/* Shop Address */}
+            {invoice.createdBy?.shopAddress && (
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-4">{invoice.createdBy.shopAddress}</p>
+            )}
             <p>Thank you for your business!</p>
             <p className="mt-2">This is a computer-generated invoice.</p>
           </div>

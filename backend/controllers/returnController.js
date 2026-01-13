@@ -221,69 +221,81 @@ export const createReturn = async (req, res) => {
             });
         }
 
-        // Create transaction record
+        // Create transaction record (non-critical). Failures here should not block the return.
         if (invoice.customer) {
-            await Transaction.create({
-                type: "return",
-                customer: invoice.customer._id,
-                invoice: invoiceId,
-                return: returnRecord._id,
-                amount: totalReturnAmount,
-                paymentMethod: refundMethod,
-                description: `Return processed for invoice ${invoice.invoiceNo} - Return ID: ${returnId}`,
-            });
+            try {
+                await Transaction.create({
+                    type: "return",
+                    customer: invoice.customer._id,
+                    invoice: invoiceId,
+                    return: returnRecord._id,
+                    amount: totalReturnAmount,
+                    paymentMethod: refundMethod,
+                    description: `Return processed for invoice ${invoice.invoiceNo} - Return ID: ${returnId}`,
+                });
+            } catch (txnErr) {
+                error(`Return transaction creation failed (non-blocking): ${txnErr.message}`);
+            }
         }
 
         // Handle Bank Refund (Money OUT)
         if (refundMethod === 'bank' && req.body.bankAccount) {
-            const BankAccount = (await import("../models/BankAccount.js")).default;
-            const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
+            try {
+                const BankAccount = (await import("../models/BankAccount.js")).default;
+                const CashbankTransactionDyn = (await import("../models/CashbankTransaction.js")).default;
 
-            const bankAcc = await BankAccount.findOne({
-                _id: req.body.bankAccount,
-                userId: req.user._id
-            });
+                const bankAcc = await BankAccount.findOne({
+                    _id: req.body.bankAccount,
+                    userId: req.user._id
+                });
 
-            if (bankAcc) {
-                // Create cashbank transaction (money OUT - refund to customer)
-                const cashbankTxn = await CashbankTransaction.create({
+                if (bankAcc) {
+                    // Create cashbank transaction (money OUT - refund to customer)
+                    const cashbankTxn = await CashbankTransactionDyn.create({
+                        type: 'out',
+                        amount: totalReturnAmount,
+                        fromAccount: req.body.bankAccount,
+                        toAccount: 'sale_return',
+                        description: `Refund for sales return ${returnId}`,
+                        date: new Date(),
+                        userId: req.user._id,
+                    });
+
+                    // Update bank balance (deduct)
+                    await BankAccount.updateOne(
+                        { _id: req.body.bankAccount, userId: req.user._id },
+                        {
+                            $inc: { currentBalance: -totalReturnAmount },
+                            $push: { transactions: cashbankTxn._id }
+                        }
+                    );
+
+                    // Update return record
+                    returnRecord.bankAccount = req.body.bankAccount;
+                    returnRecord.refundProcessed = true;
+                    await returnRecord.save();
+
+                    info(`Bank refund for return ${returnId}: -₹${totalReturnAmount} from ${bankAcc.bankName}`);
+                }
+            } catch (bankErr) {
+                error(`Bank refund processing failed (non-blocking): ${bankErr.message}`);
+            }
+        } else if (refundMethod === 'cash') {
+            try {
+                // Record cash refund transaction
+                await CashbankTransaction.create({
                     type: 'out',
                     amount: totalReturnAmount,
-                    fromAccount: req.body.bankAccount,
+                    fromAccount: 'cash',
                     toAccount: 'sale_return',
-                    description: `Refund for sales return ${returnId}`,
-                    date: new Date(),
+                    description: `Cash refund for sales return ${returnId}`,
                     userId: req.user._id,
                 });
 
-                // Update bank balance (deduct)
-                await BankAccount.updateOne(
-                    { _id: req.body.bankAccount, userId: req.user._id },
-                    {
-                        $inc: { currentBalance: -totalReturnAmount },
-                        $push: { transactions: cashbankTxn._id }
-                    }
-                );
-
-                // Update return record
-                returnRecord.bankAccount = req.body.bankAccount;
-                returnRecord.refundProcessed = true;
-                await returnRecord.save();
-
-                info(`Bank refund for return ${returnId}: -₹${totalReturnAmount} from ${bankAcc.bankName}`);
+                info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
+            } catch (cashErr) {
+                error(`Cash refund processing failed (non-blocking): ${cashErr.message}`);
             }
-        } else if (refundMethod === 'cash') {
-            // Record cash refund transaction
-            await CashbankTransaction.create({
-                type: 'out',
-                amount: totalReturnAmount,
-                fromAccount: 'cash',
-                toAccount: 'sale_return',
-                description: `Cash refund for sales return ${returnId}`,
-                userId: req.user._id,
-            });
-
-            info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
         }
 
 
@@ -291,15 +303,23 @@ export const createReturn = async (req, res) => {
             `Return created by ${req.user.name}: ${returnId} for invoice ${invoice.invoiceNo}`
         );
 
-        // Populate and return the created return
-        const populatedReturn = await Return.findById(returnRecord._id)
-            .populate("invoice", "invoiceNo")
-            .populate("customer", "name phone email");
+        // Populate and return the created return (best-effort)
+        try {
+            const populatedReturn = await Return.findById(returnRecord._id)
+                .populate("invoice", "invoiceNo")
+                .populate("customer", "name phone email");
 
-        res.status(201).json({
-            message: "Return created successfully",
-            return: populatedReturn,
-        });
+            return res.status(201).json({
+                message: "Return created successfully",
+                return: populatedReturn,
+            });
+        } catch (popErr) {
+            error(`Return populate failed (non-blocking): ${popErr.message}`);
+            return res.status(201).json({
+                message: "Return created successfully",
+                return: returnRecord,
+            });
+        }
     } catch (err) {
         error(`Create Return Error: ${err.message}`);
         res.status(500).json({ message: "Server Error", error: err.message });
