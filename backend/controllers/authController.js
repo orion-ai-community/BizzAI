@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import { generateToken } from "../config/jwt.js";
 import crypto from "crypto";
-import { sendEmail } from "../utils/emailService.js";
+import { sendHtmlEmail, generatePasswordResetEmail } from "../utils/emailService.js";
 
 // Simple password strength check for registration
 const isStrongPassword = (password) => {
@@ -153,10 +153,14 @@ export const forgotPassword = async (req, res) => {
     const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const resetUrl = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
-    const mailSent = await sendEmail(
+    // Generate professional HTML email
+    const { html, text } = generatePasswordResetEmail(resetUrl, user.name || "User");
+
+    const mailSent = await sendHtmlEmail(
       email,
       "Reset your BizzAI password",
-      `You requested a password reset. Click the link below to set a new password (valid for 1 hour):\n\n${resetUrl}\n\nIf you did not request this, please ignore this email.`
+      html,
+      text
     );
 
     if (!mailSent) {

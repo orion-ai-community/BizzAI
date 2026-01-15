@@ -28,6 +28,7 @@ const Return = () => {
       customer: null,
       items: [],
       refundMethod: "",
+      originalPaymentInfo: null, // NEW: Store original payment details
       notes: "",
     };
   });
@@ -154,11 +155,22 @@ const Return = () => {
         return;
       }
 
+      // NEW: Capture original payment information
+      const originalPaymentInfo = {
+        method: fullInvoice.paymentMethod,
+        paidVia: fullInvoice.paidViaMethod,
+        creditApplied: fullInvoice.creditApplied || 0,
+        paidAmount: fullInvoice.paidAmount || 0,
+        bankAccount: fullInvoice.bankAccount,
+        splitDetails: fullInvoice.splitPaymentDetails || [],
+      };
+
       setFormData({
         selectedInvoice: fullInvoice,
         customer: fullInvoice.customer,
         items: returnItems,
         refundMethod: "", // User must select
+        originalPaymentInfo, // Store detected info
         notes: "",
       });
 
@@ -234,6 +246,12 @@ const Return = () => {
       return false;
     }
 
+    // Validate original_payment has detected info
+    if (formData.refundMethod === 'original_payment' && !formData.originalPaymentInfo) {
+      toast.error("Cannot detect original payment method from invoice. Please select a refund method manually.");
+      return false;
+    }
+
     return true;
   };
 
@@ -283,6 +301,7 @@ const Return = () => {
         customer: null,
         items: [],
         refundMethod: "",
+        originalPaymentInfo: null,
         notes: "",
       });
       toast.info("Return draft cleared");
@@ -374,6 +393,7 @@ const Return = () => {
                         customer: null,
                         items: [],
                         refundMethod: "credit",
+                        originalPaymentInfo: null,
                         notes: "",
                       })
                     }
@@ -577,8 +597,8 @@ const Return = () => {
                   <label className="block text-sm font-medium text-secondary mb-2">
                     Refund Method <span className="text-red-600">*</span>
                   </label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {["credit", "cash", "bank", "upi", "original_payment"].map(
+                  <div className="grid grid-cols-2 gap-3">
+                    {["cash", "original_payment"].map(
                       (method) => (
                         <button
                           key={method}
@@ -597,6 +617,68 @@ const Return = () => {
                       )
                     )}
                   </div>
+
+                  {/* Display Original Payment Info if 'original_payment' selected */}
+                  {formData.refundMethod === 'original_payment' && formData.originalPaymentInfo && (
+                    <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
+                      <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-3 flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Detected Original Payment Method</span>
+                      </h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-blue-700 dark:text-blue-300">Payment Method:</span>
+                          <span className="font-semibold text-blue-900 dark:text-blue-100 capitalize">
+                            {formData.originalPaymentInfo.method.replace('_', ' ')}
+                          </span>
+                        </div>
+
+                        {formData.originalPaymentInfo.method === 'split' && (
+                          <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded">
+                            <p className="text-xs text-amber-800 dark:text-amber-200">
+                              ⚠️ Split payment detected. Refund will be processed as customer credit.
+                            </p>
+                          </div>
+                        )}
+
+                        {formData.originalPaymentInfo.method === 'bank_transfer' && (
+                          <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded">
+                            <p className="text-xs text-green-800 dark:text-green-200">
+                              ✓ Bank refund will be processed to the same account used for payment.
+                            </p>
+                          </div>
+                        )}
+
+                        {(formData.originalPaymentInfo.method === 'upi' || formData.originalPaymentInfo.method === 'card') && (
+                          <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded">
+                            <p className="text-xs text-amber-800 dark:text-amber-200">
+                              ℹ️ {formData.originalPaymentInfo.method.toUpperCase()} payments cannot be directly refunded.
+                              Refund will be processed as customer credit.
+                            </p>
+                          </div>
+                        )}
+
+                        {formData.originalPaymentInfo.method === 'cash' && (
+                          <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded">
+                            <p className="text-xs text-green-800 dark:text-green-200">
+                              ✓ Cash refund will be processed.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Validation message if original_payment selected without info */}
+                  {formData.refundMethod === 'original_payment' && !formData.originalPaymentInfo && (
+                    <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg">
+                      <p className="text-sm text-red-800 dark:text-red-200">
+                        ⚠️ Cannot detect original payment method. Please select an invoice first.
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-secondary mb-2">

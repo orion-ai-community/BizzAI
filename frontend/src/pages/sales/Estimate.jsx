@@ -50,10 +50,10 @@ const Estimate = () => {
         cart.map((cartItem) =>
           cartItem.itemId === item._id
             ? {
-                ...cartItem,
-                quantity: cartItem.quantity + 1,
-                total: (cartItem.quantity + 1) * cartItem.price,
-              }
+              ...cartItem,
+              quantity: cartItem.quantity + 1,
+              total: (cartItem.quantity + 1) * cartItem.price,
+            }
             : cartItem
         )
       );
@@ -81,10 +81,10 @@ const Estimate = () => {
       cart.map((cartItem) =>
         cartItem.itemId === itemId
           ? {
-              ...cartItem,
-              quantity: newQuantity,
-              total: newQuantity * cartItem.price,
-            }
+            ...cartItem,
+            quantity: newQuantity,
+            total: newQuantity * cartItem.price,
+          }
           : cartItem
       )
     );
@@ -561,7 +561,7 @@ const Estimate = () => {
 
           {/* Customer Selection Modal */}
           {showCustomerSelect && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl shadow-2xl border dark:border-[rgb(var(--color-border))] max-w-2xl w-full max-h-[90vh] flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-default dark:border-[rgb(var(--color-border))]">

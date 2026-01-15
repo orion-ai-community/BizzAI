@@ -79,8 +79,24 @@ const returnSchema = new mongoose.Schema(
         },
         refundMethod: {
             type: String,
-            enum: ["credit", "cash", "bank", "upi", "original_payment"],
+            enum: ["credit", "cash", "bank", "upi", "original_payment", "bank_transfer", "card", "cheque"],
             default: "credit",
+        },
+        actualRefundMethod: {
+            type: String,
+            enum: ["credit", "cash", "bank_transfer", "upi", "card", "cheque"],
+            // Stores what refund method was actually used (resolved from original_payment)
+        },
+        originalPaymentInfo: {
+            paymentMethod: String,
+            paidViaMethod: String,
+            creditApplied: Number,
+            paidAmount: Number,
+            splitPaymentDetails: Array,
+            bankAccount: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'BankAccount',
+            },
         },
         bankAccount: {
             type: mongoose.Schema.Types.ObjectId,

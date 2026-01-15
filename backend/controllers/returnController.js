@@ -21,6 +21,10 @@ export const createReturn = async (req, res) => {
             notes = "",
         } = req.body;
 
+        console.log('=== CREATE RETURN REQUEST ===');
+        console.log('Received refundMethod:', refundMethod);
+        console.log('InvoiceId:', invoiceId);
+
         // Validate input
         if (!invoiceId || !items || items.length === 0) {
             return res.status(400).json({
@@ -37,13 +41,68 @@ export const createReturn = async (req, res) => {
         const invoice = await Invoice.findOne({
             _id: invoiceId,
             createdBy: req.user._id,
-        }).populate("customer");
+        }).populate("customer").populate("bankAccount");
 
         if (!invoice) {
             return res.status(404).json({
                 message: "Invoice not found or unauthorized",
             });
         }
+
+        // ========== ORIGINAL PAYMENT DETECTION ==========
+        let actualRefundMethod = refundMethod;
+        let detectedPaymentInfo = null;
+        let refundBankAccount = req.body.bankAccount;
+
+        if (refundMethod === 'original_payment') {
+            // Capture original payment details
+            detectedPaymentInfo = {
+                paymentMethod: invoice.paymentMethod,
+                paidViaMethod: invoice.paidViaMethod,
+                creditApplied: invoice.creditApplied || 0,
+                paidAmount: invoice.paidAmount || 0,
+                splitPaymentDetails: invoice.splitPaymentDetails || [],
+                bankAccount: invoice.bankAccount?._id || invoice.bankAccount,
+            };
+
+            // Determine actual refund method based on original payment
+            if (invoice.paymentMethod === 'split') {
+                // For split payments, default to credit for simplicity
+                // Could be enhanced to split refund across methods
+                actualRefundMethod = 'credit';
+                info(`Split payment detected for return. Refunding as credit.`);
+            } else if (invoice.paymentMethod === 'credit') {
+                // Pure credit payment - refund as credit
+                actualRefundMethod = 'credit';
+            } else if (invoice.paymentMethod === 'bank_transfer') {
+                // Bank transfer - refund to same bank account
+                actualRefundMethod = 'bank_transfer';
+                refundBankAccount = detectedPaymentInfo.bankAccount;
+
+                if (!refundBankAccount) {
+                    return res.status(400).json({
+                        message: "Original bank account not found. Cannot process refund via original payment method."
+                    });
+                }
+            } else if (invoice.paymentMethod === 'cash') {
+                // Cash payment - refund as cash
+                actualRefundMethod = 'cash';
+            } else if (invoice.paymentMethod === 'upi' || invoice.paymentMethod === 'card') {
+                // UPI/Card cannot be directly refunded - convert to credit
+                actualRefundMethod = 'credit';
+                info(`Original payment was ${invoice.paymentMethod}. Refunding as credit.`);
+            } else {
+                // Default fallback
+                actualRefundMethod = invoice.paymentMethod || 'credit';
+            }
+
+            info(`Original payment detection: ${invoice.paymentMethod} → Refunding as: ${actualRefundMethod}`);
+        } else {
+            console.log('Original payment NOT selected, using refundMethod:', refundMethod);
+        }
+
+        console.log('FINAL actualRefundMethod:', actualRefundMethod);
+        console.log('FINAL refundBankAccount:', refundBankAccount);
 
         // Check for existing returns for this invoice
         const existingReturns = await Return.find({
@@ -174,7 +233,10 @@ export const createReturn = async (req, res) => {
             customerName: invoice.customer?.name || "Walk-in Customer",
             returnDate: new Date(),
             returnType,
-            refundMethod,
+            refundMethod, // What user selected (e.g., 'original_payment')
+            actualRefundMethod, // What we actually used (e.g., 'cash', 'bank_transfer')
+            originalPaymentInfo: detectedPaymentInfo, // For audit trail
+            bankAccount: refundBankAccount,
             items: processedItems,
             subtotal,
             taxAmount,
@@ -207,15 +269,8 @@ export const createReturn = async (req, res) => {
         });
 
         // Update customer ledger (reduce dues or create credit)
-        // ONLY if refund method is 'credit' (or 'original_payment' which defaults to credit for unpaid invoices logic usually,
-        // but let's be strict: if we refund via Bank/Cash, we don't adjust Dues unless it was an unpaid invoice... logic gets complex.
-        // Simplified Logic: 
-        // 1. If 'credit', we reduce Dues (giving them store credit or reducing debt).
-        // 2. If 'cash'/'bank', we pay them out. Dues remains unchanged (assuming they paid for the item originally).
-        //    If they hadn't paid (Dues > 0), they shouldn't be getting Cash refund anyway.
-        //    So, conditional update is safer.
-
-        if (invoice.customer && (refundMethod === 'credit' || refundMethod === 'original_payment')) {
+        // Use actualRefundMethod to determine if we should adjust customer dues
+        if (invoice.customer && actualRefundMethod === 'credit') {
             await Customer.findByIdAndUpdate(invoice.customer._id, {
                 $inc: { dues: -totalReturnAmount },
             });
@@ -230,7 +285,7 @@ export const createReturn = async (req, res) => {
                     invoice: invoiceId,
                     return: returnRecord._id,
                     amount: totalReturnAmount,
-                    paymentMethod: refundMethod,
+                    paymentMethod: actualRefundMethod, // Use actual method for transaction record
                     description: `Return processed for invoice ${invoice.invoiceNo} - Return ID: ${returnId}`,
                 });
             } catch (txnErr) {
@@ -239,39 +294,49 @@ export const createReturn = async (req, res) => {
         }
 
         // Handle Bank Refund (Money OUT)
-        if (refundMethod === 'bank' && req.body.bankAccount) {
+        console.log('=== BANK REFUND CHECK ===');
+        console.log('actualRefundMethod:', actualRefundMethod);
+        console.log('refundBankAccount:', refundBankAccount);
+        console.log('Condition met?', actualRefundMethod === 'bank_transfer' && refundBankAccount);
+
+        if (actualRefundMethod === 'bank_transfer' && refundBankAccount) {
+            console.log('Processing bank refund...');
             try {
                 const BankAccount = (await import("../models/BankAccount.js")).default;
                 const CashbankTransactionDyn = (await import("../models/CashbankTransaction.js")).default;
 
                 const bankAcc = await BankAccount.findOne({
-                    _id: req.body.bankAccount,
+                    _id: refundBankAccount,
                     userId: req.user._id
                 });
+
+                console.log('Bank account found:', bankAcc ? bankAcc.bankName : 'NOT FOUND');
 
                 if (bankAcc) {
                     // Create cashbank transaction (money OUT - refund to customer)
                     const cashbankTxn = await CashbankTransactionDyn.create({
                         type: 'out',
                         amount: totalReturnAmount,
-                        fromAccount: req.body.bankAccount,
+                        fromAccount: refundBankAccount,
                         toAccount: 'sale_return',
                         description: `Refund for sales return ${returnId}`,
                         date: new Date(),
                         userId: req.user._id,
                     });
 
+                    console.log('Cashbank transaction created:', cashbankTxn._id);
+
                     // Update bank balance (deduct)
-                    await BankAccount.updateOne(
-                        { _id: req.body.bankAccount, userId: req.user._id },
+                    const updateResult = await BankAccount.updateOne(
+                        { _id: refundBankAccount, userId: req.user._id },
                         {
                             $inc: { currentBalance: -totalReturnAmount },
                             $push: { transactions: cashbankTxn._id }
                         }
                     );
 
-                    // Update return record
-                    returnRecord.bankAccount = req.body.bankAccount;
+                    console.log('Bank balance update result:', updateResult);
+
                     returnRecord.refundProcessed = true;
                     await returnRecord.save();
 
@@ -280,17 +345,22 @@ export const createReturn = async (req, res) => {
             } catch (bankErr) {
                 error(`Bank refund processing failed (non-blocking): ${bankErr.message}`);
             }
-        } else if (refundMethod === 'cash') {
+        } else if (actualRefundMethod === 'cash') {
+            console.log('Processing cash refund...');
             try {
                 // Record cash refund transaction
-                await CashbankTransaction.create({
+                const cashTxn = await CashbankTransaction.create({
                     type: 'out',
                     amount: totalReturnAmount,
                     fromAccount: 'cash',
                     toAccount: 'sale_return',
                     description: `Cash refund for sales return ${returnId}`,
                     userId: req.user._id,
+                    date: new Date(),
                 });
+
+                console.log('Cash transaction created:', cashTxn._id);
+                console.log('Amount:', totalReturnAmount);
 
                 info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
             } catch (cashErr) {
