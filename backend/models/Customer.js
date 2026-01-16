@@ -34,7 +34,13 @@ const customerSchema = new mongoose.Schema(
         ref: "Transaction",
       },
     ],
-    // NEW: Link customer to shop owner
+    // Referral tracking - which customer referred this one
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customer",
+      default: null,
+    },
+    // Link customer to shop owner
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

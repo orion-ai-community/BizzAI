@@ -9,7 +9,7 @@ import { info, error } from "../utils/logger.js";
  */
 export const addCustomer = async (req, res) => {
   try {
-    const { name, phone, email, address } = req.body;
+    const { name, phone, email, address, referredBy } = req.body;
 
     if (!name || !phone) {
       return res.status(400).json({ message: "Name and phone are required" });
@@ -51,6 +51,7 @@ export const addCustomer = async (req, res) => {
       phone,
       email,
       address,
+      referredBy: referredBy || null,
       owner: req.user._id, // Link to current user
     });
 
@@ -118,8 +119,7 @@ export const updateCustomer = async (req, res) => {
     });
 
     info(
-      `Customer updated by ${req.user.name}: ${updated.name} (${
-        updated.email || "no email"
+      `Customer updated by ${req.user.name}: ${updated.name} (${updated.email || "no email"
       })`
     );
     res.status(200).json(updated);
@@ -136,9 +136,9 @@ export const updateCustomer = async (req, res) => {
 export const getAllCustomers = async (req, res) => {
   try {
     // Only get customers that belong to current user
-    const customers = await Customer.find({ owner: req.user._id }).sort({
-      name: 1,
-    });
+    const customers = await Customer.find({ owner: req.user._id })
+      .populate("referredBy", "name phone")
+      .sort({ name: 1 });
     res.status(200).json(customers);
   } catch (err) {
     error(`Get All Customers Error: ${err.message}`);
@@ -161,7 +161,7 @@ export const getCustomerById = async (req, res) => {
     const customer = await Customer.findOne({
       _id: req.params.id,
       owner: req.user._id,
-    });
+    }).populate("referredBy", "name phone");
 
     if (!customer) {
       return res
