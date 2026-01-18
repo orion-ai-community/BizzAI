@@ -68,16 +68,13 @@ app.use(
     })
 );
 
-// NoSQL Injection Prevention - TEMPORARILY DISABLED
-// express-mongo-sanitize is incompatible with Express v5
-// Alternative: Input validation with express-validator is already active
-// TODO: Re-enable when express-mongo-sanitize supports Express v5
-// app.use(mongoSanitize({
-//     replaceWith: '_',
-//     onSanitize: ({ req, key }) => {
-//         console.warn(`Sanitized key: ${key} in request`);
-//     },
-// }));
+// NoSQL Injection Prevention - RE-ENABLED after Express v4 downgrade
+app.use(mongoSanitize({
+    replaceWith: '_',
+    onSanitize: ({ req, key }) => {
+        console.warn(`Sanitized key: ${key} in request`);
+    },
+}));
 
 
 // Response Compression

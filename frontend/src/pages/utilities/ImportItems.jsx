@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
 import Layout from '../../components/Layout';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -155,7 +155,7 @@ const ImportItems = () => {
             }
 
             // Send to backend for bulk import
-            const response = await axios.post(`${API_URL}/api/inventory/import`, {
+            const response = await api.post(`${API_URL}/api/inventory/import`, {
                 items: itemsToImport
             }, {
                 headers: {

@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from './api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/due/";
+const API_URL = "/api/due/";
 
 // Create due adjustment
 const createDueAdjustment = async (adjustmentData, token) => {
@@ -10,7 +10,7 @@ const createDueAdjustment = async (adjustmentData, token) => {
     },
   };
 
-  const response = await axios.post(API_URL + "adjust", adjustmentData, config);
+  const response = await api.post(API_URL + "adjust", adjustmentData, config);
   return response.data;
 };
 
@@ -22,7 +22,7 @@ const getDueAdjustments = async (token) => {
     },
   };
 
-  const response = await axios.get(API_URL + "adjustments", config);
+  const response = await api.get(API_URL + "adjustments", config);
   return response.data;
 };
 
@@ -34,7 +34,7 @@ const getCustomerDueAdjustments = async (customerId, token) => {
     },
   };
 
-  const response = await axios.get(
+  const response = await api.get(
     API_URL + `customer/${customerId}/adjustments`,
     config
   );

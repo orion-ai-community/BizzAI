@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const EstimateList = () => {
@@ -18,8 +18,8 @@ const EstimateList = () => {
     const fetchEstimates = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/estimates`,
+            const response = await api.get(
+                `/api/estimates`,
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
                 }
@@ -37,8 +37,8 @@ const EstimateList = () => {
 
         try {
             const user = JSON.parse(localStorage.getItem('user'));
-            await axios.delete(
-                `${import.meta.env.VITE_BACKEND_URL}/api/estimates/${id}`,
+            await api.delete(
+                `/api/estimates/${id}`,
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
                 }

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/auth";
+const API_URL = "/api/auth";
 
 // Get user from localStorage
 const user = JSON.parse(localStorage.getItem('user'));
@@ -19,7 +19,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData, thunkAPI) => {
     try {
-      const response = await axios.post(`${API_URL}/register`, userData);
+      const response = await api.post(`${API_URL}/register`, userData);
       if (response.data) {
         localStorage.setItem('user', JSON.stringify(response.data));
       }
@@ -39,7 +39,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (userData, thunkAPI) => {
     try {
-      const response = await axios.post(`${API_URL}/login`, userData);
+      const response = await api.post(`${API_URL}/login`, userData);
       if (response.data) {
         localStorage.setItem('user', JSON.stringify(response.data));
       }
@@ -59,7 +59,7 @@ export const requestPasswordReset = createAsyncThunk(
   'auth/forgotPassword',
   async (email, thunkAPI) => {
     try {
-      const response = await axios.post(`${API_URL}/forgot-password`, { email });
+      const response = await api.post(`${API_URL}/forgot-password`, { email });
       return response.data;
     } catch (error) {
       const message =
@@ -76,7 +76,7 @@ export const performPasswordReset = createAsyncThunk(
   'auth/resetPassword',
   async (payload, thunkAPI) => {
     try {
-      const response = await axios.post(`${API_URL}/reset-password`, payload);
+      const response = await api.post(`${API_URL}/reset-password`, payload);
       return response.data;
     } catch (error) {
       const message =
@@ -101,7 +101,7 @@ export const getProfile = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/profile`, {
+      const response = await api.get(`${API_URL}/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -124,8 +124,8 @@ export const updateProfile = createAsyncThunk(
     try {
       const token = thunkAPI.getState().auth.user.token;
       const userId = thunkAPI.getState().auth.user._id;
-      const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/${userId}`,
+      const response = await api.put(
+        `/api/users/${userId}`,
         userData,
         {
           headers: {

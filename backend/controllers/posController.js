@@ -5,6 +5,7 @@ import Customer from "../models/Customer.js";
 import Transaction from "../models/Transaction.js";
 import CashbankTransaction from "../models/CashbankTransaction.js";
 import BankAccount from "../models/BankAccount.js";
+import Counter from "../models/Counter.js";
 import { generateInvoicePDF } from "../utils/invoiceGenerator.js";
 import { sendEmail } from "../utils/emailService.js";
 import { info, error } from "../utils/logger.js";
@@ -23,16 +24,16 @@ export const createInvoice = async (req, res) => {
     if (!items || items.length === 0)
       return res.status(400).json({ message: "No items in invoice" });
 
-    console.log('Items validation passed, calculating totals');
+    info('Items validation passed, calculating totals');
 
     // Calculate totals
     let subtotal = 0;
     for (const it of items) {
-      console.log('Calculating item:', it);
+      info('Calculating item:', { item: it });
       subtotal += it.quantity * it.price;
     }
     const totalAmount = subtotal - discount + previousDueAmount;
-    console.log('Totals calculated:', { subtotal, discount, totalAmount });
+    info('Totals calculated:', { subtotal, discount, totalAmount });
 
     // Validate credit usage
     if (creditApplied > 0 && !customerId) {
@@ -49,18 +50,18 @@ export const createInvoice = async (req, res) => {
     }
 
     // Verify all items belong to current user
-    console.log('Validating items...');
+    info('Validating items...');
     for (const it of items) {
-      console.log('Validating item:', it);
+      info('Validating item:', { item: it });
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(it.item)) {
-        console.log('Invalid ObjectId:', it.item);
+        error('Invalid ObjectId:', { itemId: it.item });
         return res.status(400).json({ message: `Invalid item ID format: ${it.item}` });
       }
 
       const item = await Item.findOne({ _id: it.item, addedBy: req.user._id });
       if (!item) {
-        console.log('Item not found:', it.item);
+        error('Item not found:', { itemId: it.item });
         return res.status(400).json({
           message: `Item not found or unauthorized: ${it.item}`
         });
@@ -69,7 +70,7 @@ export const createInvoice = async (req, res) => {
       // Check AVAILABLE stock (not total stock - must account for reserved stock)
       const availableStock = item.stockQty - (item.reservedStock || 0);
       if (availableStock < it.quantity) {
-        console.log('Insufficient available stock for', item.name, 'Available:', availableStock, 'Reserved:', item.reservedStock);
+        error('Insufficient available stock', { itemName: item.name, available: availableStock, reserved: item.reservedStock });
 
         // Check if trying to use reserved stock
         if (item.stockQty >= it.quantity && item.reservedStock > 0) {
@@ -88,15 +89,15 @@ export const createInvoice = async (req, res) => {
         });
       }
     }
-    console.log('All items validated successfully');
+    info('All items validated successfully');
 
     // Verify customer belongs to current user if provided
     let customer = null;
     if (customerId) {
-      console.log('Validating customer:', customerId);
+      info('Validating customer:', { customerId });
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(customerId)) {
-        console.log('Invalid customer ObjectId');
+        error('Invalid customer ObjectId');
         return res.status(400).json({ message: "Invalid customer ID format" });
       }
 
@@ -105,7 +106,7 @@ export const createInvoice = async (req, res) => {
         owner: req.user._id
       });
       if (!customer) {
-        console.log('Customer not found');
+        error('Customer not found');
         return res.status(400).json({
           message: "Customer not found or unauthorized"
         });
@@ -193,7 +194,7 @@ export const createInvoice = async (req, res) => {
     const invoiceNo = `INV-${String(invoiceNumber).padStart(5, "0")}`;
 
     // Save invoice
-    console.log('Creating invoice with data:', {
+    info('Creating invoice with data:', {
       invoiceNo,
       customer: customerId || null,
       items,
@@ -229,7 +230,7 @@ export const createInvoice = async (req, res) => {
       createdBy: req.user._id,
     });
 
-    console.log('Invoice created successfully:', invoice._id);
+    info('Invoice created successfully:', { invoiceId: invoice._id });
 
     // Update stock and log movements
     for (const it of items) {
@@ -348,14 +349,14 @@ export const createInvoice = async (req, res) => {
 
       // Handle bank payment
       if (paymentMethod === 'bank_transfer' && bankAccount) {
-        console.log('Processing bank payment for account:', bankAccount);
+        info('Processing bank payment for account:', { bankAccount });
         // Validate bank account exists
         const bankAcc = await BankAccount.findOne({ _id: bankAccount, userId: req.user._id });
         if (!bankAcc) {
-          console.log('Bank account not found');
+          error('Bank account not found');
           return res.status(400).json({ message: 'Selected bank account not found' });
         }
-        console.log('Bank account validated:', bankAcc.bankName);
+        info('Bank account validated:', { bankName: bankAcc.bankName });
 
         // Create cashbank transaction
         const cashbankTxn = await CashbankTransaction.create({
@@ -375,11 +376,11 @@ export const createInvoice = async (req, res) => {
 
         // Verify update
         const updatedAcc = await BankAccount.findById(bankAccount);
-        console.log(`Bank balance updated for ${bankAccount}: new balance ${updatedAcc.currentBalance}`);
+        info('Bank balance updated', { bankAccount, newBalance: updatedAcc.currentBalance });
 
         info(`Bank payment recorded for invoice ${invoiceNo}: +${actualPaidAmount} to account ${bankAccount}`);
       } else if (paymentMethod === 'cash') {
-        console.log('Creating cash transaction for POS:', {
+        info('Creating cash transaction for POS:', {
           type: 'in',
           amount: actualPaidAmount,
           fromAccount: 'sale',
@@ -396,7 +397,7 @@ export const createInvoice = async (req, res) => {
           description: `POS Cash Payment for invoice ${invoiceNo}`,
           userId: req.user._id,
         });
-        console.log('Cash transaction created:', cashTxn._id);
+        info('Cash transaction created:', { transactionId: cashTxn._id });
 
         info(`Cash payment recorded for invoice ${invoiceNo}: +${actualPaidAmount}`);
       }

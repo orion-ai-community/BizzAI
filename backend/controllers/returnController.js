@@ -21,9 +21,9 @@ export const createReturn = async (req, res) => {
             notes = "",
         } = req.body;
 
-        console.log('=== CREATE RETURN REQUEST ===');
-        console.log('Received refundMethod:', refundMethod);
-        console.log('InvoiceId:', invoiceId);
+        info('=== CREATE RETURN REQUEST ===');
+        info('Received refundMethod:', { refundMethod });
+        info('InvoiceId:', { invoiceId });
 
         // Validate input
         if (!invoiceId || !items || items.length === 0) {
@@ -98,11 +98,11 @@ export const createReturn = async (req, res) => {
 
             info(`Original payment detection: ${invoice.paymentMethod} → Refunding as: ${actualRefundMethod}`);
         } else {
-            console.log('Original payment NOT selected, using refundMethod:', refundMethod);
+            info('Original payment NOT selected, using refundMethod:', { refundMethod });
         }
 
-        console.log('FINAL actualRefundMethod:', actualRefundMethod);
-        console.log('FINAL refundBankAccount:', refundBankAccount);
+        info('FINAL actualRefundMethod:', { actualRefundMethod });
+        info('FINAL refundBankAccount:', { refundBankAccount });
 
         // Check for existing returns for this invoice
         const existingReturns = await Return.find({
@@ -294,13 +294,13 @@ export const createReturn = async (req, res) => {
         }
 
         // Handle Bank Refund (Money OUT)
-        console.log('=== BANK REFUND CHECK ===');
-        console.log('actualRefundMethod:', actualRefundMethod);
-        console.log('refundBankAccount:', refundBankAccount);
-        console.log('Condition met?', actualRefundMethod === 'bank_transfer' && refundBankAccount);
+        info('=== BANK REFUND CHECK ===');
+        info('actualRefundMethod:', { actualRefundMethod });
+        info('refundBankAccount:', { refundBankAccount });
+        info('Condition met?', { conditionMet: actualRefundMethod === 'bank_transfer' && refundBankAccount });
 
         if (actualRefundMethod === 'bank_transfer' && refundBankAccount) {
-            console.log('Processing bank refund...');
+            info('Processing bank refund...');
             try {
                 const BankAccount = (await import("../models/BankAccount.js")).default;
                 const CashbankTransactionDyn = (await import("../models/CashbankTransaction.js")).default;
@@ -310,7 +310,7 @@ export const createReturn = async (req, res) => {
                     userId: req.user._id
                 });
 
-                console.log('Bank account found:', bankAcc ? bankAcc.bankName : 'NOT FOUND');
+                info('Bank account found:', { bankName: bankAcc ? bankAcc.bankName : 'NOT FOUND' });
 
                 if (bankAcc) {
                     // Create cashbank transaction (money OUT - refund to customer)
@@ -324,7 +324,7 @@ export const createReturn = async (req, res) => {
                         userId: req.user._id,
                     });
 
-                    console.log('Cashbank transaction created:', cashbankTxn._id);
+                    info('Cashbank transaction created:', { transactionId: cashbankTxn._id });
 
                     // Update bank balance (deduct)
                     const updateResult = await BankAccount.updateOne(
@@ -335,7 +335,7 @@ export const createReturn = async (req, res) => {
                         }
                     );
 
-                    console.log('Bank balance update result:', updateResult);
+                    info('Bank balance update result:', { updateResult });
 
                     returnRecord.refundProcessed = true;
                     await returnRecord.save();
@@ -346,7 +346,7 @@ export const createReturn = async (req, res) => {
                 error(`Bank refund processing failed (non-blocking): ${bankErr.message}`);
             }
         } else if (actualRefundMethod === 'cash') {
-            console.log('Processing cash refund...');
+            info('Processing cash refund...');
             try {
                 // Record cash refund transaction
                 const cashTxn = await CashbankTransaction.create({
@@ -359,8 +359,8 @@ export const createReturn = async (req, res) => {
                     date: new Date(),
                 });
 
-                console.log('Cash transaction created:', cashTxn._id);
-                console.log('Amount:', totalReturnAmount);
+                info('Cash transaction created:', { transactionId: cashTxn._id });
+                info('Amount:', { amount: totalReturnAmount });
 
                 info(`Cash refund for return ${returnId}: -₹${totalReturnAmount}`);
             } catch (cashErr) {

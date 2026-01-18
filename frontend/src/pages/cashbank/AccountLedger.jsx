@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -31,8 +31,8 @@ const AccountLedger = () => {
             if (filters.endDate) params.append('endDate', filters.endDate);
             if (filters.reconciled !== 'all') params.append('reconciled', filters.reconciled);
 
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts/${id}/ledger?${params}`,
+            const response = await api.get(
+                `/api/cashbank/accounts/${id}/ledger?${params}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setLedgerData(response.data);
@@ -47,8 +47,8 @@ const AccountLedger = () => {
         try {
             const userData = JSON.parse(localStorage.getItem('user'));
             const token = userData?.token;
-            await axios.put(
-                `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/transactions/${txnId}/reconcile`,
+            await api.put(
+                `/api/cashbank/transactions/${txnId}/reconcile`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -68,8 +68,8 @@ const AccountLedger = () => {
         try {
             const userData = JSON.parse(localStorage.getItem('user'));
             const token = userData?.token;
-            await axios.put(
-                `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/transactions/bulk-reconcile`,
+            await api.put(
+                `/api/cashbank/transactions/bulk-reconcile`,
                 { transactionIds: selectedTxns, reconciled },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -97,7 +97,7 @@ const AccountLedger = () => {
 
     const exportCSV = () => {
         window.open(
-            `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/export?accountId=${id}&format=csv&startDate=${filters.startDate}&endDate=${filters.endDate}`,
+            `/api/cashbank/export?accountId=${id}&format=csv&startDate=${filters.startDate}&endDate=${filters.endDate}`,
             '_blank'
         );
     };

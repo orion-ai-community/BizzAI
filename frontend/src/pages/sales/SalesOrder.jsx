@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -132,8 +132,8 @@ const SalesOrder = () => {
                 notes: formData.notes
             };
 
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders`,
+            const response = await api.post(
+                `/api/sales-orders`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -172,8 +172,8 @@ const SalesOrder = () => {
                 notes: formData.notes
             };
 
-            const createResponse = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders`,
+            const createResponse = await api.post(
+                `/api/sales-orders`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -181,8 +181,8 @@ const SalesOrder = () => {
             const orderId = createResponse.data.salesOrder._id;
 
             // Then confirm it
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders/${orderId}/confirm`,
+            await api.post(
+                `/api/sales-orders/${orderId}/confirm`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

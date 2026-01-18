@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/cashbank";
+const API_URL = "/api/cashbank";
 
 const getConfig = (token) => ({
   headers: {
@@ -26,7 +26,7 @@ export const getAccounts = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/accounts`, getConfig(token));
+      const response = await api.get(`${API_URL}/accounts`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -44,7 +44,7 @@ export const createAccount = createAsyncThunk(
   async (accountData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(`${API_URL}/accounts`, accountData, getConfig(token));
+      const response = await api.post(`${API_URL}/accounts`, accountData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -62,7 +62,7 @@ export const updateAccount = createAsyncThunk(
   async ({ id, accountData }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.put(`${API_URL}/accounts/${id}`, accountData, getConfig(token));
+      const response = await api.put(`${API_URL}/accounts/${id}`, accountData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -80,7 +80,7 @@ export const deleteAccount = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      await axios.delete(`${API_URL}/accounts/${id}`, getConfig(token));
+      await api.delete(`${API_URL}/accounts/${id}`, getConfig(token));
       return id;
     } catch (error) {
       const message =
@@ -98,7 +98,7 @@ export const getTransactions = createAsyncThunk(
   async (accountId, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/accounts/${accountId}/transactions`, getConfig(token));
+      const response = await api.get(`${API_URL}/accounts/${accountId}/transactions`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -116,7 +116,7 @@ export const createTransfer = createAsyncThunk(
   async (transferData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(`${API_URL}/transfers`, transferData, getConfig(token));
+      const response = await api.post(`${API_URL}/transfers`, transferData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -134,7 +134,7 @@ export const getCashBankPosition = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/position`, getConfig(token));
+      const response = await api.get(`${API_URL}/position`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -152,7 +152,7 @@ export const createCashTransaction = createAsyncThunk(
   async (txnData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(`${API_URL}/cash-transactions`, txnData, getConfig(token));
+      const response = await api.post(`${API_URL}/cash-transactions`, txnData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =

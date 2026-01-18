@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -20,8 +20,8 @@ const BankSummary = () => {
             setLoading(true);
             const userData = JSON.parse(localStorage.getItem('user'));
             const token = userData?.token;
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/summary`,
+            const response = await api.get(
+                `/api/cashbank/summary`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSummary(response.data);

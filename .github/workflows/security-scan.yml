@@ -26,7 +26,6 @@ jobs:
       - name: Run npm audit (Backend)
         working-directory: ./backend
         run: npm audit --audit-level=moderate
-        continue-on-error: true
       
       - name: Install dependencies (Frontend)
         working-directory: ./frontend
@@ -35,7 +34,6 @@ jobs:
       - name: Run npm audit (Frontend)
         working-directory: ./frontend
         run: npm audit --audit-level=moderate
-        continue-on-error: true
 
   docker-scan:
     runs-on: ubuntu-latest

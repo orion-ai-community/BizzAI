@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/node";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import profilingPkg from "@sentry/profiling-node";
+const { nodeProfilingIntegration } = profilingPkg;
 
 /**
  * Initialize Sentry for error tracking and performance monitoring

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/customers";
+const API_URL = "/api/customers";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -26,7 +26,7 @@ export const getAllCustomers = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(API_URL, getConfig(token));
+      const response = await api.get(API_URL, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -44,7 +44,7 @@ export const getCustomerById = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/${id}`, getConfig(token));
+      const response = await api.get(`${API_URL}/${id}`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -62,7 +62,7 @@ export const addCustomer = createAsyncThunk(
   async (customerData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(API_URL, customerData, getConfig(token));
+      const response = await api.post(API_URL, customerData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -80,7 +80,7 @@ export const updateCustomer = createAsyncThunk(
   async ({ id, customerData }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/${id}`,
         customerData,
         getConfig(token)
@@ -102,7 +102,7 @@ export const deleteCustomer = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      await axios.delete(`${API_URL}/${id}`, getConfig(token));
+      await api.delete(`${API_URL}/${id}`, getConfig(token));
       return id;
     } catch (error) {
       const message =
@@ -120,7 +120,7 @@ export const getCustomerTransactions = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/${id}/transactions`,
         getConfig(token)
       );

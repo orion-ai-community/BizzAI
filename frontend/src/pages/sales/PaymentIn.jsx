@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from '../../services/api';
 import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
 import PageHeader from "../../components/PageHeader";
@@ -79,7 +79,7 @@ const PaymentIn = () => {
 
   const fetchBankAccounts = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/cashbank/accounts`, {
+      const response = await api.get(`${API_URL}/api/cashbank/accounts`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBankAccounts(response.data);
@@ -90,7 +90,7 @@ const PaymentIn = () => {
 
   const fetchCustomerInfo = async (customerId) => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/api/payment-in/customer/${customerId}/info`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -243,7 +243,7 @@ const PaymentIn = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`${API_URL}/api/payment-in`, payload, {
+      const response = await api.post(`${API_URL}/api/payment-in`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -357,7 +357,7 @@ const PaymentIn = () => {
         notes: formData.notes,
       };
 
-      const response = await axios.post(`${API_URL}/api/payment-in`, payload, {
+      const response = await api.post(`${API_URL}/api/payment-in`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
