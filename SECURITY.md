@@ -97,6 +97,33 @@ Security updates will be released as:
 
 All security updates will be documented in [CHANGELOG.md](CHANGELOG.md).
 
+## Known Issues
+
+### xlsx Library Vulnerability (Frontend)
+
+**Status**: Known Issue - No Fix Available  
+**Severity**: HIGH  
+**CVE**: GHSA-4r6h-8v6p-xvw6, GHSA-5pgg-2g8v-p4x9
+
+**Description**: The `xlsx` library (v0.18.5) has known vulnerabilities:
+- Prototype Pollution (CVSS 7.8)
+- Regular Expression Denial of Service (CVSS 7.5)
+
+**Why Not Fixed**: The vulnerability advisories recommend upgrading to v0.19.3+ or v0.20.2+, but these versions do not exist in npm registry as of January 2026. The latest available version is 0.18.5.
+
+**Risk Assessment**: 
+- **Impact**: LOW for typical usage
+- **Exploitability**: Requires malicious Excel file upload
+- **Mitigation**: 
+  - File upload validation implemented
+  - Only trusted users can import files
+  - Input sanitization in place
+  - Feature is optional (ImportItems page)
+
+**Workaround**: If you don't need Excel import functionality, you can remove the `xlsx` dependency and the ImportItems feature.
+
+**Tracking**: We are monitoring for updates to the xlsx package and will upgrade immediately when a secure version becomes available.
+
 ## Contact
 
 For security-related questions or concerns:
