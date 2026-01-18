@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import Modal from './Modal';
 
 const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, paidAmount }) => {
@@ -17,10 +17,10 @@ const PaymentModal = ({ isOpen, onClose, onSubmit, documentType, totalAmount, pa
                 const userData = JSON.parse(localStorage.getItem('user'));
                 const token = userData?.token;
                 console.log('PaymentModal: Fetching bank accounts...');
-                console.log('API URL:', `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts`);
+                console.log('API URL:', `/api/cashbank/accounts`);
 
-                const response = await axios.get(
-                    `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts`,
+                const response = await api.get(
+                    `/api/cashbank/accounts`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

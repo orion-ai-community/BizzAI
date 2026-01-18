@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/bills";
+const API_URL = "/api/bills";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -25,7 +25,7 @@ export const getAllBills = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(API_URL, getConfig(token));
+      const response = await api.get(API_URL, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -43,7 +43,7 @@ export const createBill = createAsyncThunk(
   async (billData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(API_URL, billData, getConfig(token));
+      const response = await api.post(API_URL, billData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -61,7 +61,7 @@ export const getBillById = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/${id}`, getConfig(token));
+      const response = await api.get(`${API_URL}/${id}`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -79,7 +79,7 @@ export const updateBill = createAsyncThunk(
   async ({ id, billData }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.put(`${API_URL}/${id}`, billData, getConfig(token));
+      const response = await api.put(`${API_URL}/${id}`, billData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -97,7 +97,7 @@ export const deleteBill = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      await axios.delete(`${API_URL}/${id}`, getConfig(token));
+      await api.delete(`${API_URL}/${id}`, getConfig(token));
       return id;
     } catch (error) {
       const message =

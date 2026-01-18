@@ -1,5 +1,6 @@
 import User from "../models/User.js";
-import { generateToken } from "../config/jwt.js";
+import RefreshToken from "../models/RefreshToken.js";
+import { generateToken, generateRefreshToken, generateRandomToken } from "../config/jwt.js";
 import crypto from "crypto";
 import { sendHtmlEmail, generatePasswordResetEmail } from "../utils/emailService.js";
 
@@ -55,13 +56,27 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Generate tokens
+      const accessToken = generateToken(user._id);
+      const refreshToken = generateRandomToken();
+
+      // Store refresh token
+      await RefreshToken.create({
+        token: refreshToken,
+        user: user._id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        createdByIp: req.ip,
+        userAgent: req.headers["user-agent"],
+      });
+
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         shopName: user.shopName,
         phone: user.phone,
-        token: generateToken(user._id),
+        token: accessToken,
+        refreshToken: refreshToken,
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -93,6 +108,19 @@ export const loginUser = async (req, res) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
+    // Generate tokens
+    const accessToken = generateToken(user._id);
+    const refreshToken = generateRandomToken();
+
+    // Store refresh token
+    await RefreshToken.create({
+      token: refreshToken,
+      user: user._id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      createdByIp: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
     // Send response
     res.status(200).json({
       _id: user._id,
@@ -102,7 +130,8 @@ export const loginUser = async (req, res) => {
       gstNumber: user.gstNumber,
       shopAddress: user.shopAddress,
       phone: user.phone,
-      token: generateToken(user._id),
+      token: accessToken,
+      refreshToken: refreshToken,
     });
   } catch (error) {
     console.error("Login Error:", error);

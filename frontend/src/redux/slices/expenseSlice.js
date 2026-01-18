@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/expenses";
+const API_URL = "/api/expenses";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -25,7 +25,7 @@ export const getAllExpenses = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(API_URL, getConfig(token));
+      const response = await api.get(API_URL, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -43,7 +43,7 @@ export const createExpense = createAsyncThunk(
   async (expenseData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(API_URL, expenseData, getConfig(token));
+      const response = await api.post(API_URL, expenseData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -61,7 +61,7 @@ export const getExpenseById = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/${id}`, getConfig(token));
+      const response = await api.get(`${API_URL}/${id}`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -79,7 +79,7 @@ export const updateExpense = createAsyncThunk(
   async ({ id, expenseData }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.put(`${API_URL}/${id}`, expenseData, getConfig(token));
+      const response = await api.put(`${API_URL}/${id}`, expenseData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -97,7 +97,7 @@ export const deleteExpense = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      await axios.delete(`${API_URL}/${id}`, getConfig(token));
+      await api.delete(`${API_URL}/${id}`, getConfig(token));
       return id;
     } catch (error) {
       const message =

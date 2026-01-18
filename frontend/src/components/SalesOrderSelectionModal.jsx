@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import api from '../services/api';
 
 const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
     const { user } = useSelector((state) => state.auth);
@@ -18,8 +18,8 @@ const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders`,
+            const response = await api.get(
+                `/api/sales-orders`,
                 {
                     headers: { Authorization: `Bearer ${user.token}` }
                 }

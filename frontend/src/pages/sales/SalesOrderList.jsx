@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -28,8 +28,8 @@ const SalesOrderList = () => {
             if (filters.status) params.append('status', filters.status);
             if (filters.overdue) params.append('overdue', 'true');
 
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders?${params.toString()}`,
+            const response = await api.get(
+                `/api/sales-orders?${params.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 

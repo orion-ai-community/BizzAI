@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/suppliers";
+const API_URL = "/api/suppliers";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -25,7 +25,7 @@ export const getAllSuppliers = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(API_URL, getConfig(token));
+      const response = await api.get(API_URL, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -43,7 +43,7 @@ export const getSupplierById = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/${id}`, getConfig(token));
+      const response = await api.get(`${API_URL}/${id}`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -61,7 +61,7 @@ export const addSupplier = createAsyncThunk(
   async (supplierData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.post(API_URL, supplierData, getConfig(token));
+      const response = await api.post(API_URL, supplierData, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -79,7 +79,7 @@ export const updateSupplier = createAsyncThunk(
   async ({ id, supplierData }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/${id}`,
         supplierData,
         getConfig(token)
@@ -101,7 +101,7 @@ export const deleteSupplier = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      await axios.delete(`${API_URL}/${id}`, getConfig(token));
+      await api.delete(`${API_URL}/${id}`, getConfig(token));
       return id;
     } catch (error) {
       const message =

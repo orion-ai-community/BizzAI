@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
 import Layout from '../../components/Layout';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const ImportItems = () => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -17,21 +17,21 @@ const ImportItems = () => {
     const validateRow = (row, rowIndex, allRows) => {
         const errors = [];
         const validUnits = [
-            'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle', 
+            'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle',
             'can', 'dozen', 'm', 'cm', 'ft', 'unit', 'pair', 'set'
         ];
-        
+
         // Check required fields
         if (!row.name || row.name.toString().trim() === '') {
             errors.push('Item name is required and cannot be blank');
         }
-        
+
         if (!row.costPrice || row.costPrice === '') {
             errors.push('Cost price is required');
         } else if (isNaN(row.costPrice) || parseFloat(row.costPrice) <= 0) {
             errors.push('Cost price must be a positive number');
         }
-        
+
         if (!row.sellingPrice || row.sellingPrice === '') {
             errors.push('Selling price is required');
         } else if (isNaN(row.sellingPrice) || parseFloat(row.sellingPrice) <= 0) {
@@ -57,7 +57,7 @@ const ImportItems = () => {
             const duplicateRows = allRows
                 .map((r, idx) => ({ ...r, originalIndex: idx }))
                 .filter(r => r.sku && r.sku.toLowerCase().trim() === skuLower && r.originalIndex !== rowIndex);
-            
+
             if (duplicateRows.length > 0) {
                 const rowNumbers = [rowIndex + 1, ...duplicateRows.map(r => r.originalIndex + 1)].sort((a, b) => a - b);
                 errors.push(
@@ -65,7 +65,7 @@ const ImportItems = () => {
                 );
             }
         }
-        
+
         // Return status based on errors
         if (errors.length === 0) {
             // Check for warnings (optional fields)
@@ -74,7 +74,7 @@ const ImportItems = () => {
             }
             return { status: 'valid', errors: [] };
         }
-        
+
         return { status: 'error', errors };
     };
 
@@ -106,7 +106,7 @@ const ImportItems = () => {
                     stock: row['Stock Quantity'] || row['Stock'] || row['Quantity'] || '0',
                     unit: row['Unit'] || '',
                 };
-                
+
                 return processedRow;
             });
 
@@ -130,7 +130,7 @@ const ImportItems = () => {
         try {
             setImporting(true);
             const validRows = mappingData.filter(row => row.status === 'valid');
-            
+
             if (validRows.length === 0) {
                 toast.error('No valid rows to import');
                 return;
@@ -155,7 +155,7 @@ const ImportItems = () => {
             }
 
             // Send to backend for bulk import
-            const response = await axios.post(`${API_URL}/api/inventory/import`, {
+            const response = await api.post(`${API_URL}/api/inventory/import`, {
                 items: itemsToImport
             }, {
                 headers: {
@@ -164,13 +164,13 @@ const ImportItems = () => {
             });
 
             toast.success(`Successfully imported ${response.data.imported} items and updated ${response.data.updated} items`);
-            
+
             // Show detailed errors if any
             if (response.data.validationErrors && response.data.validationErrors.length > 0) {
                 setErrors(response.data.validationErrors);
                 toast.warning(`${response.data.skipped} items were skipped due to validation errors`);
             }
-            
+
             // Reset form if all imported/updated successfully
             if (response.data.skipped === 0) {
                 setShowPreview(false);
@@ -182,7 +182,7 @@ const ImportItems = () => {
             console.error('Import error:', error);
             const errorMsg = error.response?.data?.message || 'Failed to import items';
             toast.error(errorMsg);
-            
+
             if (error.response?.data?.validationErrors) {
                 setErrors(error.response.data.validationErrors);
             } else if (error.response?.data?.errors) {
@@ -238,7 +238,7 @@ const ImportItems = () => {
         ];
 
         const worksheet = XLSX.utils.json_to_sheet(sampleData);
-        
+
         // Set column widths
         worksheet['!cols'] = [
             { wch: 20 }, // Name
@@ -249,7 +249,7 @@ const ImportItems = () => {
             { wch: 15 }, // Stock Quantity
             { wch: 10 }  // Unit
         ];
-        
+
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Items');
         XLSX.writeFile(workbook, 'sample_import_items.xlsx');
@@ -399,7 +399,7 @@ const ImportItems = () => {
                                     <label className="block text-sm font-medium text-secondary mb-2">
                                         {field} {['Name', 'Cost Price', 'Selling Price'].includes(field) && <span className="text-red-500">*</span>}
                                     </label>
-                                    <select 
+                                    <select
                                         className="w-full px-4 py-2 border border-default rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                         defaultValue={field.toLowerCase().replace(' ', '_')}
                                     >
