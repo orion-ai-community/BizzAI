@@ -2,160 +2,108 @@
 
 ## Supported Versions
 
+We release patches for security vulnerabilities in the following versions:
+
 | Version | Supported          |
 | ------- | ------------------ |
 | 2.0.x   | :white_check_mark: |
-| 1.0.x   | :x:                |
+| < 2.0   | :x:                |
 
 ## Reporting a Vulnerability
 
-We take the security of BizzAI seriously. If you discover a security vulnerability, please follow these steps:
+**Please do not report security vulnerabilities through public GitHub issues.**
 
-### 1. Do Not Disclose Publicly
+Instead, please report them via email to our security team:
 
-Please do not create a public GitHub issue for security vulnerabilities.
+**Primary Contact:** shingadekartik1@gmail.com  
+**CC:** nalekunal343@gmail.com, tusharminche@gmail.com
 
-### 2. Report Privately
+### What to Include
 
-Send an email to: **security@yourdomain.com** with:
+Please include the following information in your report:
 
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if any)
+- Type of vulnerability (e.g., SQL injection, XSS, authentication bypass)
+- Full paths of source file(s) related to the vulnerability
+- Location of the affected source code (tag/branch/commit or direct URL)
+- Step-by-step instructions to reproduce the issue
+- Proof-of-concept or exploit code (if possible)
+- Impact of the vulnerability, including how an attacker might exploit it
 
-### 3. Response Timeline
+### Response Timeline
 
 - **Initial Response:** Within 48 hours
 - **Status Update:** Within 7 days
 - **Fix Timeline:** Depends on severity
-  - Critical: 24-48 hours
-  - High: 7 days
-  - Medium: 30 days
-  - Low: 90 days
+  - Critical: 1-7 days
+  - High: 7-14 days
+  - Medium: 14-30 days
+  - Low: 30-90 days
 
-### 4. Disclosure Policy
-
-- We will acknowledge your report within 48 hours
-- We will provide regular updates on our progress
-- We will credit you in our security advisories (unless you prefer to remain anonymous)
-- We will notify you when the vulnerability is fixed
-
-## Security Measures
-
-BizzAI implements the following security measures:
-
-### Authentication & Authorization
-- JWT tokens with 1-hour expiry
-- Refresh token rotation
-- Rate limiting on authentication endpoints
-- Password strength requirements
-- Bcrypt password hashing
-
-### Data Protection
-- HTTPS enforcement
-- Security headers (CSP, HSTS, XSS protection)
-- NoSQL injection prevention
-- Input validation and sanitization
-- Encrypted database backups
-
-### Infrastructure
-- Health check endpoints
-- Graceful shutdown
-- Request timeout protection
-- Error tracking (Sentry)
-- Structured logging
-
-### Monitoring
-- Real-time error tracking
-- Performance monitoring
-- Security scanning (automated)
-- Dependency vulnerability scanning
-
-## Best Practices for Users
-
-### For Administrators
-
-1. **Strong Secrets**
-   - Use 64+ character random secrets for JWT
-   - Rotate secrets regularly
-   - Never commit secrets to version control
-
-2. **Environment Security**
-   - Keep all dependencies updated
-   - Enable automated security scanning
-   - Review security advisories regularly
-
-3. **Access Control**
-   - Use strong passwords (8+ chars, mixed case, numbers, symbols)
-   - Enable 2FA if available
-   - Limit user permissions
-
-4. **Monitoring**
-   - Monitor error tracking dashboard
-   - Review logs regularly
-   - Set up alerts for suspicious activity
+## Security Best Practices
 
 ### For Developers
 
-1. **Code Security**
-   - Never hardcode secrets
-   - Validate all user inputs
-   - Use parameterized queries
-   - Sanitize outputs
+1. **Never commit sensitive data** (.env files, API keys, passwords)
+2. **Use environment variables** for all configuration
+3. **Keep dependencies updated** - Run `npm audit` regularly
+4. **Follow secure coding practices** - Input validation, output encoding
+5. **Use HTTPS** in production environments
+6. **Implement proper authentication** - JWT tokens, secure sessions
+7. **Enable security headers** - Helmet.js is already configured
+8. **Rate limiting** - Already implemented for API endpoints
 
-2. **Dependencies**
-   - Run `npm audit` regularly
-   - Keep dependencies updated
-   - Review dependency changes
+### For Deployers
 
-3. **Testing**
-   - Write security tests
-   - Test authentication flows
-   - Test authorization boundaries
+1. **Change all default secrets** in production
+2. **Use strong passwords** (minimum 32 characters for secrets)
+3. **Enable firewall rules** - Only expose necessary ports
+4. **Regular backups** - Use provided backup scripts
+5. **Monitor logs** - Check for suspicious activity
+6. **Keep system updated** - OS, Node.js, MongoDB
+7. **Use SSL/TLS certificates** - Let's Encrypt or commercial
+8. **Implement intrusion detection** - Consider fail2ban or similar
 
-## Security Checklist
+## Security Features
 
-Before deploying to production:
+BizzAI includes the following security features:
 
-- [ ] All environment variables set securely
-- [ ] Strong JWT secrets generated (64+ characters)
-- [ ] HTTPS enforced with valid SSL certificate
-- [ ] Rate limiting configured and tested
-- [ ] Security headers verified
-- [ ] Input validation implemented
-- [ ] Error messages don't expose sensitive data
-- [ ] Database backups encrypted and tested
-- [ ] Monitoring and alerting configured
-- [ ] Security scanning enabled in CI/CD
+- ✅ **JWT Authentication** - Secure token-based auth
+- ✅ **Password Hashing** - bcrypt with salt
+- ✅ **Rate Limiting** - Prevent brute force attacks
+- ✅ **CORS Protection** - Configured origins
+- ✅ **Helmet.js** - Security headers
+- ✅ **MongoDB Sanitization** - Prevent NoSQL injection
+- ✅ **Input Validation** - Express-validator
+- ✅ **XSS Protection** - Output encoding
+- ✅ **Session Management** - 24-hour token expiration
+- ✅ **Error Tracking** - Sentry integration
 
-## Known Security Considerations
+## Vulnerability Disclosure Policy
 
-### 1. Session Management
-- Access tokens expire after 1 hour
-- Refresh tokens expire after 7 days
-- Tokens can be revoked manually
+We follow a **responsible disclosure** policy:
 
-### 2. Rate Limiting
-- Login: 5 attempts per 15 minutes
-- Password reset: 3 attempts per hour
-- General API: 100 requests per 15 minutes
-
-### 3. Data Encryption
-- Passwords: Bcrypt with salt
-- Backups: GPG encryption
-- Transit: HTTPS/TLS 1.2+
+1. **Report** the vulnerability privately to our security team
+2. **Allow time** for us to investigate and fix the issue
+3. **Coordinate** public disclosure timing with our team
+4. **Credit** will be given to security researchers who follow this policy
 
 ## Security Updates
 
-We release security updates as soon as possible after discovering vulnerabilities. Subscribe to our security advisories to stay informed.
+Security updates will be released as:
+
+- **Patch releases** (2.0.x) for minor security fixes
+- **Minor releases** (2.x.0) for moderate security improvements
+- **Major releases** (x.0.0) for significant security overhauls
+
+All security updates will be documented in [CHANGELOG.md](CHANGELOG.md).
 
 ## Contact
 
-For security concerns: **security@yourdomain.com**
+For security-related questions or concerns:
 
-For general support: **support@yourdomain.com**
+- **Email:** shingadekartik1@gmail.com
+- **GitHub:** [@orion-ai-community](https://github.com/orion-ai-community)
 
 ---
 
-**Last Updated:** January 15, 2026
+**Last Updated:** January 18, 2026

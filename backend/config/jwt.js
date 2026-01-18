@@ -6,7 +6,7 @@ import crypto from "crypto";
  */
 export const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "1h", // 1 hour for access token
+    expiresIn: "24h", // 24 hours for access token (similar to Vyapar app)
   });
 };
 
