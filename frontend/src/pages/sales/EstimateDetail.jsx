@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../../components/Layout";
-import axios from "axios";
+import api from '../../services/api';
 import { toast } from "react-toastify";
 import EstimateTemplate from "../../components/EstimateTemplate";
 
@@ -18,8 +18,8 @@ const EstimateDetail = () => {
   const fetchEstimate = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/estimates/${id}`,
+      const response = await api.get(
+        `/api/estimates/${id}`,
         {
           headers: { Authorization: `Bearer ${user.token}` },
         }

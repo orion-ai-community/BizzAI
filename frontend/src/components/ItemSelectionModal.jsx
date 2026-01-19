@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
+import api from '../services/api';
 
 const ItemSelectionModal = ({ isOpen, onClose, onSelect }) => {
     const [items, setItems] = useState([]);
@@ -36,8 +36,8 @@ const ItemSelectionModal = ({ isOpen, onClose, onSelect }) => {
                 return;
             }
 
-            console.log('Fetching items from:', `${import.meta.env.VITE_BACKEND_URL}/api/inventory`);
-            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/inventory`, {
+            console.log('Fetching items from:', `/api/inventory`);
+            const response = await api.get(`/api/inventory`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('Items fetched successfully:', response.data);

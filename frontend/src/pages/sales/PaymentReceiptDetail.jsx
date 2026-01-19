@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from '../../services/api';
 import { toast } from "react-toastify";
 import Layout from "../../components/Layout";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const PaymentReceiptDetail = () => {
   const { id } = useParams();
@@ -23,7 +23,7 @@ const PaymentReceiptDetail = () => {
   const fetchPaymentDetail = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/api/payment-in/${id}`, {
+      const response = await api.get(`${API_URL}/api/payment-in/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPayment(response.data);

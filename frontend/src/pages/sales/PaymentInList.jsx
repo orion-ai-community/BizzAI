@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const PaymentInList = () => {
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ const PaymentInList = () => {
     const fetchPayments = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_URL}/api/payment-in`, {
+            const response = await api.get(`${API_URL}/api/payment-in`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPayments(response.data);

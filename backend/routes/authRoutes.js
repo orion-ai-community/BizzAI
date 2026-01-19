@@ -1,20 +1,17 @@
 import express from "express";
 import { registerUser, loginUser, getProfile, forgotPassword, resetPassword } from "../controllers/authController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { authLimiter, passwordResetLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
 
-// POST - Register a new user
-router.post("/register", registerUser);
+// Public routes with rate limiting
+router.post("/register", authLimiter, registerUser);
+router.post("/login", authLimiter, loginUser);
+router.post("/forgot-password", passwordResetLimiter, forgotPassword);
+router.post("/reset-password", passwordResetLimiter, resetPassword);
 
-// POST - Login existing user
-router.post("/login", loginUser);
-
-// GET - Get current user profile (protected)
+// Protected routes
 router.get("/profile", protect, getProfile);
-
-// Password reset flow
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
 
 export default router;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -21,8 +21,8 @@ const SalesOrderDetail = () => {
         try {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const token = user?.token;
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders/${id}`,
+            const response = await api.get(
+                `/api/sales-orders/${id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setOrder(response.data);
@@ -44,8 +44,8 @@ const SalesOrderDetail = () => {
         try {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const token = user?.token;
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/sales-orders/${id}/cancel`,
+            await api.post(
+                `/api/sales-orders/${id}/cancel`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

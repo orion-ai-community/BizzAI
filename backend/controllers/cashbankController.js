@@ -164,7 +164,7 @@ export const getTransactions = async (req, res) => {
 export const createTransfer = async (req, res) => {
   try {
     const { fromAccount, toAccount, amount, description } = req.body;
-    console.log('Transfer request:', { fromAccount, toAccount, amount, description });
+    info('Transfer request:', { fromAccount, toAccount, amount, description });
 
     if (!fromAccount || !toAccount || !amount) {
       return res.status(400).json({ message: "Please provide from account, to account, and amount" });
@@ -242,7 +242,7 @@ export const createTransfer = async (req, res) => {
     }
 
     info(`Transfer created by ${req.user.name}: ${amount} from ${fromAccount} to ${toAccount}`);
-    console.log('Transfer successful, transaction ID:', transactionId);
+    info('Transfer successful, transaction ID:', { transactionId });
 
     res.status(201).json(transaction);
   } catch (err) {

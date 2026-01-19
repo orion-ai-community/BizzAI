@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 import FormInput from '../../components/FormInput';
 import SupplierSelectionModal from '../../components/SupplierSelectionModal';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,8 +29,8 @@ const PurchaseReturn = () => {
             try {
                 const userData = JSON.parse(localStorage.getItem('user'));
                 const token = userData?.token;
-                const response = await axios.get(
-                    `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts`,
+                const response = await api.get(
+                    `/api/cashbank/accounts`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setBankAccounts(response.data.filter(acc => acc.status === 'active'));
@@ -63,8 +63,8 @@ const PurchaseReturn = () => {
             const userData = JSON.parse(localStorage.getItem('user'));
             const token = userData?.token;
 
-            await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/api/purchase-returns`,
+            await api.post(
+                `/api/purchase-returns`,
                 {
                     supplierId: formData.supplier._id,
                     items: formData.items,

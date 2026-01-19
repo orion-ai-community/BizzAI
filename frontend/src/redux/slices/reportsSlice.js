@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/reports";
+const API_URL = "/api/reports";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -27,7 +27,7 @@ export const getSalesReport = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/sales`, getConfig(token));
+      const response = await api.get(`${API_URL}/sales`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -45,7 +45,7 @@ export const getStockReport = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/stock`, getConfig(token));
+      const response = await api.get(`${API_URL}/stock`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -63,7 +63,7 @@ export const getCustomerReport = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/customers`, getConfig(token));
+      const response = await api.get(`${API_URL}/customers`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =
@@ -81,7 +81,7 @@ export const getDashboardStats = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      const response = await axios.get(`${API_URL}/dashboard-stats`, getConfig(token));
+      const response = await api.get(`${API_URL}/dashboard-stats`, getConfig(token));
       return response.data;
     } catch (error) {
       const message =

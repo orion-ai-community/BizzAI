@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
 
@@ -31,7 +31,7 @@ const ReturnedItems = () => {
     const fetchReturns = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_URL}/api/returns`, {
+            const response = await api.get(`${API_URL}/api/returns`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setReturns(response.data);
@@ -49,7 +49,7 @@ const ReturnedItems = () => {
         }
 
         try {
-            await axios.delete(`${API_URL}/api/returns/${returnId}`, {
+            await api.delete(`${API_URL}/api/returns/${returnId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert('Return deleted successfully');

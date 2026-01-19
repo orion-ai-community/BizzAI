@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getAllItems } from "../../redux/slices/inventorySlice";
 import { getAllCustomers } from "../../redux/slices/customerSlice";
 import Layout from "../../components/Layout";
-import axios from "axios";
+import api from '../../services/api';
 import { toast } from "react-toastify";
 import EstimateTemplate from "../../components/EstimateTemplate";
 
@@ -141,8 +141,8 @@ const Estimate = () => {
         notes,
       };
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/estimates`,
+      const response = await api.post(
+        `/api/estimates`,
         estimateData,
         {
           headers: { Authorization: `Bearer ${user.token}` },

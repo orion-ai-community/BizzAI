@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 import { getAllInvoices, deleteInvoice, reset } from "../redux/slices/posSlice";
 import Layout from "../components/Layout";
@@ -46,8 +46,8 @@ const Invoices = () => {
     try {
       const userData = JSON.parse(localStorage.getItem('user'));
       const token = userData?.token;
-      await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/pos/invoice/${paymentModal.invoice._id}/payment`,
+      await api.put(
+        `/api/pos/invoice/${paymentModal.invoice._id}/payment`,
         paymentData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

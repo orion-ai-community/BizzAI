@@ -5,8 +5,13 @@ services:
       - "5000:5000"
     environment:
       - PORT=5000
-      - MONGO_URI=mongodb://mongo:27017/bizzai
-      - JWT_SECRET=dev_secret_key_change_in_prod
+      - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/bizzai}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - NODE_ENV=${NODE_ENV:-development}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
     depends_on:
       - mongo
     networks:

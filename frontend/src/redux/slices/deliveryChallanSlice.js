@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/delivery-challan";
+const API_URL = "/api/delivery-challan";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -25,7 +25,7 @@ export const createDeliveryChallan = createAsyncThunk(
     async (challanData, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.post(API_URL, challanData, getConfig(token));
+            const response = await api.post(API_URL, challanData, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -43,7 +43,7 @@ export const getAllDeliveryChallans = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.get(API_URL, getConfig(token));
+            const response = await api.get(API_URL, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -61,7 +61,7 @@ export const getDeliveryChallanById = createAsyncThunk(
     async (id, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.get(`${API_URL}/${id}`, getConfig(token));
+            const response = await api.get(`${API_URL}/${id}`, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -79,7 +79,7 @@ export const updateDeliveryChallan = createAsyncThunk(
     async ({ id, data }, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.put(`${API_URL}/${id}`, data, getConfig(token));
+            const response = await api.put(`${API_URL}/${id}`, data, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -97,7 +97,7 @@ export const convertToInvoice = createAsyncThunk(
     async (id, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.post(`${API_URL}/${id}/convert-to-invoice`, {}, getConfig(token));
+            const response = await api.post(`${API_URL}/${id}/convert-to-invoice`, {}, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -115,7 +115,7 @@ export const deleteDeliveryChallan = createAsyncThunk(
     async (id, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            await axios.delete(`${API_URL}/${id}`, getConfig(token));
+            await api.delete(`${API_URL}/${id}`, getConfig(token));
             return id;
         } catch (error) {
             const message =

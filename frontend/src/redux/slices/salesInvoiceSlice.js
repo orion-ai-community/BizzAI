@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../services/api';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL + "/api/sales-invoice";
+const API_URL = "/api/sales-invoice";
 
 // Get token from state
 const getConfig = (token) => ({
@@ -26,7 +26,7 @@ export const getSalesInvoiceSummary = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.get(`${API_URL}/summary`, getConfig(token));
+            const response = await api.get(`${API_URL}/summary`, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -44,7 +44,7 @@ export const getAllSalesInvoices = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.get(`${API_URL}/invoices`, getConfig(token));
+            const response = await api.get(`${API_URL}/invoices`, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -62,7 +62,7 @@ export const getSalesInvoiceById = createAsyncThunk(
     async (id, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.get(`${API_URL}/invoice/${id}`, getConfig(token));
+            const response = await api.get(`${API_URL}/invoice/${id}`, getConfig(token));
             return response.data;
         } catch (error) {
             const message =
@@ -80,7 +80,7 @@ export const deleteSalesInvoice = createAsyncThunk(
     async (id, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            await axios.delete(`${API_URL}/invoice/${id}`, getConfig(token));
+            await api.delete(`${API_URL}/invoice/${id}`, getConfig(token));
             return id;
         } catch (error) {
             const message =
@@ -98,7 +98,7 @@ export const markSalesInvoiceAsPaid = createAsyncThunk(
     async ({ id, amount, bankAccount, paymentMethod }, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            const response = await axios.put(`${API_URL}/invoice/${id}/mark-paid`, {
+            const response = await api.put(`${API_URL}/invoice/${id}/mark-paid`, {
                 amount,
                 bankAccount,
                 paymentMethod

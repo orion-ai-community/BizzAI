@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import Layout from '../../components/Layout';
 import PageHeader from '../../components/PageHeader';
@@ -51,8 +51,8 @@ const Bills = () => {
         try {
             const userData = JSON.parse(localStorage.getItem('user'));
             const token = userData?.token;
-            const response = await axios.get(
-                `${import.meta.env.VITE_BACKEND_URL}/api/cashbank/accounts`,
+            const response = await api.get(
+                `/api/cashbank/accounts`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             console.log('Bank accounts response:', response.data);
@@ -83,8 +83,8 @@ const Bills = () => {
         try {
             const userData = JSON.parse(localStorage.getItem('user'));
             const token = userData?.token;
-            await axios.put(
-                `${import.meta.env.VITE_BACKEND_URL}/api/bills/${paymentModal.bill._id}/payment`,
+            await api.put(
+                `/api/bills/${paymentModal.bill._id}/payment`,
                 paymentData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
