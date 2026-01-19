@@ -77,6 +77,26 @@ const PaymentIn = () => {
     }
   }, [formData.customer]);
 
+  // Auto-adjust deposit account when payment methods change
+  useEffect(() => {
+    const hasNonCashMethod = formData.paymentMethods.some(
+      (pm) => pm.method !== "cash"
+    );
+
+    // If user switches to UPI or Bank Transfer and deposit account is still "cash",
+    // and there are bank accounts available, suggest the first one
+    if (
+      hasNonCashMethod &&
+      formData.depositAccount === "cash" &&
+      bankAccounts.length > 0
+    ) {
+      setFormData({
+        ...formData,
+        depositAccount: bankAccounts[0]._id,
+      });
+    }
+  }, [formData.paymentMethods]);
+
   const fetchBankAccounts = async () => {
     try {
       const response = await api.get(`${API_URL}/api/cashbank/accounts`, {
@@ -675,21 +695,52 @@ const PaymentIn = () => {
           {/* Deposit To */}
           <div className="bg-card rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-main mb-4">Deposit To</h2>
-            <select
-              value={formData.depositAccount}
-              onChange={(e) =>
-                setFormData({ ...formData, depositAccount: e.target.value })
+            {(() => {
+              // Check if any payment method is not cash
+              const hasNonCashMethod = formData.paymentMethods.some(
+                (pm) => pm.method !== "cash"
+              );
+
+              // If there's a non-cash payment method, show only bank accounts
+              if (hasNonCashMethod) {
+                return (
+                  <select
+                    value={formData.depositAccount}
+                    onChange={(e) =>
+                      setFormData({ ...formData, depositAccount: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-default rounded-lg"
+                    required
+                  >
+                    <option value="">Select Bank Account</option>
+                    {bankAccounts.map((acc) => (
+                      <option key={acc._id} value={acc._id}>
+                        🏦 {acc.bankName} - {acc.accountNumber.slice(-4)}
+                      </option>
+                    ))}
+                  </select>
+                );
               }
-              className="w-full px-4 py-2 border border-default rounded-lg"
-              required
-            >
-              <option value="cash">💵 Cash in Hand</option>
-              {bankAccounts.map((acc) => (
-                <option key={acc._id} value={acc._id}>
-                  🏦 {acc.bankName} - {acc.accountNumber.slice(-4)}
-                </option>
-              ))}
-            </select>
+
+              // Otherwise, show both cash and bank accounts
+              return (
+                <select
+                  value={formData.depositAccount}
+                  onChange={(e) =>
+                    setFormData({ ...formData, depositAccount: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-default rounded-lg"
+                  required
+                >
+                  <option value="cash">💵 Cash in Hand</option>
+                  {bankAccounts.map((acc) => (
+                    <option key={acc._id} value={acc._id}>
+                      🏦 {acc.bankName} - {acc.accountNumber.slice(-4)}
+                    </option>
+                  ))}
+                </select>
+              );
+            })()}
           </div>
 
           {/* Outstanding Invoices */}
