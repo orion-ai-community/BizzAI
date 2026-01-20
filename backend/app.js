@@ -39,6 +39,14 @@ dotenv.config();
 const app = express();
 
 // =======================
+// Trust Proxy (for Render/production)
+// =======================
+// Required for rate limiting and IP detection behind reverse proxy
+if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+}
+
+// =======================
 // Sentry (must be first)
 // =======================
 initSentry(app);
