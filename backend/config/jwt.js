@@ -2,11 +2,11 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
 /**
- * Generate access token (short-lived)
+ * Generate access token (short-lived) - PRODUCTION SECURITY
  */
 export const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "24h", // 24 hours for access token (similar to Vyapar app)
+    expiresIn: "15m", // 15 minutes - production security (was 24h)
   });
 };
 
