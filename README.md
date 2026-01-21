@@ -216,6 +216,22 @@ npm install
 cp .env.example .env
 ```
 
+#### 4. Database Seed (Optional)
+
+Populate the database with sample data for faster development and testing:
+
+```bash
+cd backend
+npm run seed
+```
+
+This creates a demo account with pre-populated data:
+- **Email**: `demo@bizzai.com`
+- **Password**: `Demo@123`
+- 5 sample customers, 20 inventory items, 3 suppliers, and sample invoices
+
+> ⚠️ **Note**: This is for development only. Do not run on production databases.
+
 ### 🐳 Running with Docker (Recommended)
 
 1. Ensure you have Docker and Docker Compose installed.
