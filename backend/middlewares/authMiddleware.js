@@ -26,8 +26,22 @@ export const protect = async (req, res, next) => {
       // CRITICAL: Validate deviceId from cookie matches user's active deviceId
       const deviceIdFromCookie = getDeviceIdFromCookie(req);
 
+      // DEBUG: Log deviceId validation (remove after fixing)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 DeviceID Validation:', {
+          cookieDeviceId: deviceIdFromCookie ? deviceIdFromCookie.substring(0, 8) + '...' : 'MISSING',
+          activeDeviceId: req.user.activeDeviceId ? req.user.activeDeviceId.substring(0, 8) + '...' : 'NONE',
+          match: deviceIdFromCookie === req.user.activeDeviceId
+        });
+      }
+
       if (!deviceIdFromCookie || req.user.activeDeviceId !== deviceIdFromCookie) {
         // Device mismatch - this device was logged out from another location
+        console.warn('⚠️  Device validation failed:', {
+          hasCookie: !!deviceIdFromCookie,
+          hasActiveDevice: !!req.user.activeDeviceId,
+          userId: req.user._id
+        });
         return res.status(401).json({
           message: "Session expired. Please log in again.",
           sessionExpired: true
