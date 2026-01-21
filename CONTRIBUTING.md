@@ -126,10 +126,29 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/orion-
 <!-- You might want to create an issue template for enhancement suggestions that can be used as a guide and that defines the structure of the information to be included. If you do so, reference it here in the description. -->
 
 ### Your First Code Contribution
-<!-- TODO
-include Setup of env, IDE and typical getting started instructions?
 
--->
+#### Quick Local Setup with Test Data
+
+To get started quickly with sample data, run the database seed script:
+
+```bash
+cd backend
+npm run seed
+```
+
+This will populate your local database with:
+- A demo shop owner account
+- 5 customers with realistic data
+- 20 inventory items (groceries, dairy, beverages, etc.)
+- 3 suppliers
+- 1 bank account
+- 5 sample invoices (mix of paid/unpaid/partial)
+
+**Demo Login Credentials:**
+- 📧 Email: `demo@bizzai.com`
+- 🔐 Password: `Demo@123`
+
+> ⚠️ The seed script clears existing data for the demo user before creating fresh data. Never run on production!
 
 ### Improving The Documentation
 <!-- TODO
