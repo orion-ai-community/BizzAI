@@ -35,6 +35,16 @@ const isAllowedOrigin = (origin) => {
         return true;
     }
 
+    // Allow Vercel preview deployments if prefix is configured
+    // Pattern matches: https://{prefix}-{branch}-{id}.vercel.app
+    const vercelPrefix = process.env.VERCEL_PREVIEW_PREFIX;
+    if (vercelPrefix) {
+        const vercelPattern = new RegExp(`^https:\\/\\/${vercelPrefix}[\\w-]*\\.vercel\\.app$`);
+        if (vercelPattern.test(origin)) {
+            return true;
+        }
+    }
+
     // Check against whitelist
     return allowedOrigins.includes(origin);
 };
