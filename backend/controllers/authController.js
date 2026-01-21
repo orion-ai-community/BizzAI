@@ -110,21 +110,31 @@ export const registerUser = async (req, res) => {
  * @route POST /api/auth/login
  */
 export const loginUser = async (req, res) => {
+  // Import rate limiter handler
+  const { handleLoginAttempt } = await import('../middlewares/rateLimiter.js');
+
   try {
     const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
+      await handleLoginAttempt(req, false);
       return res.status(400).json({ message: "Please enter email and password" });
     }
 
     // Find user
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      await handleLoginAttempt(req, false);
+      return res.status(404).json({ message: "User not found" });
+    }
 
     // Match password
     const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      await handleLoginAttempt(req, false);
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     // Get deviceId from signed cookie (if exists)
     const existingDeviceId = getDeviceIdFromCookie(req);
@@ -179,6 +189,9 @@ export const loginUser = async (req, res) => {
       createdByIp: req.ip,
       userAgent: req.headers["user-agent"],
     });
+
+    // Reset rate limit counters on successful login
+    await handleLoginAttempt(req, true);
 
     // Send response
     res.status(200).json({

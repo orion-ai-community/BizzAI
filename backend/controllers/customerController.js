@@ -114,9 +114,15 @@ export const updateCustomer = async (req, res) => {
       }
     }
 
+    // Attach for audit middleware (before update)
+    req.originalEntity = customer.toObject();
+
     const updated = await Customer.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+
+    // Attach for audit middleware (after update)
+    req.updatedEntity = updated.toObject();
 
     info(
       `Customer updated by ${req.user.name}: ${updated.name} (${updated.email || "no email"
@@ -198,6 +204,9 @@ export const deleteCustomer = async (req, res) => {
         .status(404)
         .json({ message: "Customer not found or unauthorized" });
     }
+
+    // Attach for audit middleware (before deletion)
+    req.deletedEntity = customer.toObject();
 
     await Customer.findByIdAndDelete(req.params.id);
     info(`Customer deleted by ${req.user.name}: ${customer.name}`);

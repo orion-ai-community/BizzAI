@@ -468,6 +468,9 @@ export const deleteReturn = async (req, res) => {
             });
         }
 
+        // Attach for audit middleware (before deletion)
+        req.deletedEntity = returnRecord.toObject();
+
         // Reverse inventory adjustments
         for (const item of returnRecord.items) {
             if (item.inventoryAdjusted && item.condition === "not_damaged") {

@@ -43,6 +43,7 @@
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
     "helmet": "^7.1.0",
+    "ioredis": "^5.9.2",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^4.0.0",
     "mongoose": "^8.19.1",
