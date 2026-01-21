@@ -447,6 +447,10 @@ process.on('SIGTERM', async () => {
     await redisClient.quit();
 });
 
+// Named exports for testing
+export { loginRateLimiter, handleLoginAttempt, authLimiter, passwordResetLimiter, forceLogoutLimiter, redisClient };
+
+// Default export
 export default {
     loginRateLimiter,
     handleLoginAttempt,
@@ -456,3 +460,4 @@ export default {
     redisClient,
     isRedisAvailable: () => isRedisAvailable,
 };
+
