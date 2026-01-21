@@ -28,6 +28,13 @@ export const protect = async (req, res, next) => {
 
       if (!deviceIdFromCookie || req.user.activeDeviceId !== deviceIdFromCookie) {
         // Device mismatch - this device was logged out from another location
+        if (process.env.NODE_ENV === 'production') {
+          console.warn('⚠️  Device validation failed:', {
+            hasCookie: !!deviceIdFromCookie,
+            hasActiveDevice: !!req.user.activeDeviceId,
+            userId: req.user._id
+          });
+        }
         return res.status(401).json({
           message: "Session expired. Please log in again.",
           sessionExpired: true
