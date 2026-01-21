@@ -120,7 +120,13 @@ export const updateItem = async (req, res) => {
       }
     }
 
+    // Attach for audit middleware (before update)
+    req.originalEntity = item.toObject();
+
     const updated = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    // Attach for audit middleware (after update)
+    req.updatedEntity = updated.toObject();
 
     info(`Item updated by ${req.user.name}: ${updated.name}`);
 
@@ -151,6 +157,9 @@ export const deleteItem = async (req, res) => {
     if (!item) {
       return res.status(404).json({ message: "Item not found or unauthorized" });
     }
+
+    // Attach for audit middleware (before deletion)
+    req.deletedEntity = item.toObject();
 
     await Item.findByIdAndDelete(req.params.id);
 
@@ -205,7 +214,7 @@ export const importItems = async (req, res) => {
 
     // Valid unit labels
     const validUnits = [
-      'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle', 
+      'pcs', 'kg', 'g', 'mg', 'l', 'ml', 'box', 'pack', 'bag', 'bottle',
       'can', 'dozen', 'm', 'cm', 'ft', 'unit', 'pair', 'set'
     ];
 
@@ -213,7 +222,7 @@ export const importItems = async (req, res) => {
     const existingItems = await Item.find({ addedBy: req.user._id }).select('name sku stockQty');
     const existingItemsMap = new Map();
     const existingSKUs = new Map();
-    
+
     existingItems.forEach(item => {
       existingItemsMap.set(item.name.toLowerCase(), item);
       if (item.sku) {
@@ -304,7 +313,7 @@ export const importItems = async (req, res) => {
           const skuLower = item.sku.toLowerCase().trim();
           existingItem = existingSKUs.get(skuLower);
         }
-        
+
         // Fallback to name if no SKU match
         if (!existingItem && item.name) {
           const nameLower = item.name.toLowerCase().trim();
@@ -314,7 +323,7 @@ export const importItems = async (req, res) => {
         if (existingItem) {
           // Item exists - UPDATE stock quantity by adding new quantity to existing
           const newStockQty = (existingItem.stockQty || 0) + (item.stockQty ? parseInt(item.stockQty) : 0);
-          
+
           await Item.findByIdAndUpdate(
             existingItem._id,
             {

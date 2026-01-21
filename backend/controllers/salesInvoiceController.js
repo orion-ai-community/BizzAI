@@ -122,6 +122,9 @@ export const deleteSalesInvoice = async (req, res) => {
       });
     }
 
+    // Attach for audit middleware (before deletion)
+    req.deletedEntity = invoice.toObject();
+
     // ERP-GRADE: Soft delete only
     invoice.isDeleted = true;
     invoice.deletedAt = new Date();

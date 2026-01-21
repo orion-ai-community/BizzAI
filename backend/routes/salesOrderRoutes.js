@@ -10,6 +10,8 @@ import {
     convertToInvoice,
 } from "../controllers/salesOrderController.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/rbacMiddleware.js";
+import { auditUpdate } from "../middlewares/auditMiddleware.js";
 
 const router = express.Router();
 
@@ -20,11 +22,15 @@ router.use(protect);
 router.post("/", createSalesOrder);
 router.get("/", listSalesOrders);
 router.get("/:id", getSalesOrderById);
-router.put("/:id", updateSalesOrder);
+router.put("/:id", auditUpdate("SalesOrder", "UPDATE_SALES_ORDER"), updateSalesOrder);
 
 // Sales Order Actions
 router.post("/:id/confirm", confirmSalesOrder);
-router.post("/:id/cancel", cancelSalesOrder);
+router.post(
+    "/:id/cancel",
+    requirePermission("delete:salesorder"),
+    cancelSalesOrder
+);
 
 // Conversion Routes
 router.post("/:id/convert-to-dc", convertToDeliveryChallan);

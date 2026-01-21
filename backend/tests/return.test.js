@@ -2,7 +2,7 @@ import request from "supertest";
 import app from "../app.js";
 import { connect, closeDatabase, clearDatabase } from "./setup.js";
 
-beforeAll(async () => await connect());
+beforeAll(async () => await connect(), 60000); // 60 second timeout for MongoDB setup
 afterEach(async () => await clearDatabase());
 afterAll(async () => await closeDatabase());
 

@@ -7,7 +7,12 @@ export const connect = async () => {
     // Prevent MongooseError: Can't call `openUri()` on an active connection with different connection strings
     await mongoose.disconnect();
 
-    mongoServer = await MongoMemoryServer.create();
+    // Configure MongoDB Memory Server with longer timeout for instance startup
+    mongoServer = await MongoMemoryServer.create({
+        instance: {
+            launchTimeout: 60000, // 60 seconds for instance to start
+        },
+    });
     const uri = mongoServer.getUri();
     await mongoose.connect(uri);
 };

@@ -1,0 +1,625 @@
+﻿
+> backend@2.0.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest login-security.test.js
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+npm : (node:14128) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+At line:1 char:1
++ npm test -- login-security.test.js 2>&1 | Out-File -FilePath "test-ou ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:14128) Ex...nge at any time:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14128) [MONGOOSE] Warning: Duplicate schema index on {"estimateNo":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+2026-01-22 00:31:16 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"973dfe463ec85785","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:16 +0000] "POST /api/auth/login HTTP/1.1" 401 33 "-" "-"
+2026-01-22 00:31:16 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"973dfe463ec85785","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:16 +0000] "POST /api/auth/login HTTP/1.1" 401 33 "-" "-"
+2026-01-22 00:31:16 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"973dfe463ec85785","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:16 +0000] "POST /api/auth/login HTTP/1.1" 401 33 "-" "-"
+2026-01-22 00:31:16 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"973dfe463ec85785","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:16 +0000] "POST /api/auth/login HTTP/1.1" 401 33 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"973dfe463ec85785","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 401 33 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[33mwarn[39m]: SECURITY: IP rate limit exceeded {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","count":5,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 92 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":101,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":102,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":103,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":104,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":105,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":106,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":107,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":108,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":109,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":110,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":111,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":112,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":113,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":114,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":115,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":116,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":117,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":118,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":119,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":120,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":121,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":122,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":123,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":124,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":125,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":126,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":127,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":128,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":129,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":130,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":131,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":132,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":133,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":134,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":135,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":136,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":137,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":138,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":139,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":140,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":141,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":142,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":143,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":144,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":145,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":146,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":147,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":148,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":149,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":150,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":151,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":152,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":153,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":154,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":155,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":156,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":157,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":158,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":159,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":160,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:17 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":161,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:17 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:18 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":162,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:18 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:18 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":163,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:18 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+2026-01-22 00:31:18 [[31merror[39m]: SECURITY: Global login spike detected {"service":"bizzai-backend","count":164,"max":100,"correlationId":"unknown"}
+::ffff:127.0.0.1 - - [21/Jan/2026:19:01:18 +0000] "POST /api/auth/login HTTP/1.1" 429 78 "-" "-"
+FAIL tests/login-security.test.js (8.293 s)
+  Enterprise Login Security
+    1. IP-Based Rate Limiting
+      ΓêÜ should allow 5 attempts from same IP (752 ms)
+      ΓêÜ should block 6th attempt from same IP (63 ms)
+    2. Account-Based Rate Limiting
+      ├ù should block same account from different IPs (9 ms)
+    3. Device-Based Rate Limiting
+      ├ù should limit attempts from same device (24 ms)
+    4. Global Spike Detection
+      ΓêÜ should detect and block global login floods (625 ms)
+    5. Counter Reset on Success
+      ├ù should reset all counters on successful login (39 ms)
+    6. Distributed Attack Detection
+      ├ù should detect distributed brute-force attack (27 ms)
+    7. Cooldown Expiry
+      ├ù should allow login after cooldown expires (39 ms)
+    8. Redis Outage Behavior
+      ├ù should fail-safe when Redis is unavailable (5 ms)
+      ΓêÜ should use in-memory fallback when Redis fails (27 ms)
+    9. Credential Stuffing Detection
+      ├ù should detect high-velocity attempts from same IP (50 ms)
+    10. Response Consistency
+      ΓêÜ should return same response shape when rate limited (32 ms)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 2. Account-Based Rate Limiting ΓÇ║ should block same account from different IPs
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 429
+
+    [0m [90m 92 |[39m                     [33m.[39msend({ email[33m:[39m 
+[32m'test@example.com'[39m[33m,[39m password[33m:[39m [32m'wrong'[39m })[33m;[39m
+     [90m 93 |[39m
+    [31m[1m>[22m[39m[90m 94 |[39m                 
+expect(res[33m.[39mstatus)[33m.[39mnot[33m.[39mtoBe([35m429[39m)[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 95 |[39m             }
+     [90m 96 |[39m
+     [90m 97 |[39m             [90m// 6th attempt from new IP should be blocked (account limit)[39m[0m
+
+      at Object.<anonymous> (tests/login-security.test.js:94:40)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 3. Device-Based Rate Limiting ΓÇ║ should limit attempts from same device
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "Too many login attempts from this device"
+    Received string:    "Too many login attempts from this IP. Please try again later."
+
+    [0m [90m 125 |[39m
+     [90m 126 |[39m             expect(res[33m.[39mstatus)[33m.[39mtoBe([35m429[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 127 |[39m             
+expect(res[33m.[39mbody[33m.[39mmessage)[33m.[39mtoContain([32m'Too many login attempts from this 
+device'[39m)[33m;[39m
+     [90m     |[39m                                      [31m[1m^[22m[39m
+     [90m 128 |[39m         })[33m;[39m
+     [90m 129 |[39m     })[33m;[39m
+     [90m 130 |[39m[0m
+
+      at Object.<anonymous> (tests/login-security.test.js:127:38)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 5. Counter Reset on Success ΓÇ║ should reset all counters on successful login
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 429
+
+    [0m [90m 163 |[39m                 [33m.[39msend({ email[33m:[39m [32m'test@example.com'[39m[33m,[39m 
+password[33m:[39m [32m'ValidPassword123!'[39m })[33m;[39m
+     [90m 164 |[39m
+    [31m[1m>[22m[39m[90m 165 |[39m             
+expect(successRes[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                       [31m[1m^[22m[39m
+     [90m 166 |[39m
+     [90m 167 |[39m             [90m// Next 5 attempts should be allowed (counters reset)[39m
+     [90m 168 |[39m             [36mfor[39m ([36mlet[39m i [33m=[39m [35m0[39m[33m;[39m i [33m<[39m 
+[35m5[39m[33m;[39m i[33m++[39m) {[0m
+
+      at Object.<anonymous> (tests/login-security.test.js:165:39)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 6. Distributed Attack Detection ΓÇ║ should detect distributed brute-force attack
+
+    ReferenceError: require is not defined
+
+    [0m [90m 187 |[39m
+     [90m 188 |[39m             [90m// Check Redis for attack signal[39m
+    [31m[1m>[22m[39m[90m 189 |[39m             [36mconst[39m attackKey [33m=[39m 
+[32m'attack:distributed:'[39m [33m+[39m
+     [90m     |[39m                               [31m[1m^[22m[39m
+     [90m 190 |[39m                 require([32m'crypto'[39m)[33m.[39mcreateHash([32m'sha256'[39m)
+     [90m 191 |[39m                     [33m.[39mupdate([32m'test@example.com'[39m)
+     [90m 192 |[39m                     [33m.[39mdigest([32m'hex'[39m)[0m
+
+      at Object.<anonymous> (tests/login-security.test.js:189:31)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 7. Cooldown Expiry ΓÇ║ should allow login after cooldown expires
+
+    expect(received).not.toBe(expected) // Object.is equality
+
+    Expected: not 429
+
+    [0m [90m 222 |[39m                 [33m.[39msend({ email[33m:[39m [32m'test@example.com'[39m[33m,[39m 
+password[33m:[39m [32m'wrong'[39m })[33m;[39m
+     [90m 223 |[39m
+    [31m[1m>[22m[39m[90m 224 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mnot[33m.[39mtoBe([35m429[39m)[33m;[39m
+     [90m     |[39m                                    [31m[1m^[22m[39m
+     [90m 225 |[39m         })[33m;[39m
+     [90m 226 |[39m     })[33m;[39m
+     [90m 227 |[39m[0m
+
+      at Object.<anonymous> (tests/login-security.test.js:224:36)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 8. Redis Outage Behavior ΓÇ║ should fail-safe when Redis is unavailable
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 429
+
+    [0m [90m 242 |[39m                 [33m.[39msend({ email[33m:[39m [32m'test@example.com'[39m[33m,[39m 
+password[33m:[39m [32m'ValidPassword123!'[39m })[33m;[39m
+     [90m 243 |[39m
+    [31m[1m>[22m[39m[90m 244 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 245 |[39m
+     [90m 246 |[39m             [90m// Safe reconnect - ignore errors[39m
+     [90m 247 |[39m             [36mtry[39m {[0m
+
+      at Object.<anonymous> (tests/login-security.test.js:244:32)
+
+  ΓùÅ Enterprise Login Security ΓÇ║ 9. Credential Stuffing Detection ΓÇ║ should detect high-velocity attempts from 
+same IP
+
+    Connection is closed.
+
+    [0m [90m 305 |[39m             [90m// Check for velocity attack signal in Redis[39m
+     [90m 306 |[39m             [36mconst[39m velocityKey [33m=[39m [32m'attack:velocity:'[39m [33m+[39m 
+[32m'::1'[39m[33m;[39m [90m// Default IP in tests[39m
+    [31m[1m>[22m[39m[90m 307 |[39m             [36mconst[39m attempts [33m=[39m [36mawait[39m 
+redisClient[33m.[39m[36mget[39m(velocityKey)[33m;[39m
+     [90m     |[39m                                                [31m[1m^[22m[39m
+     [90m 308 |[39m
+     [90m 309 |[39m             expect(parseInt(attempts))[33m.[39mtoBeGreaterThanOrEqual([35m10[39m)[33m;[39m
+     [90m 310 |[39m         })[33m;[39m[0m
+
+      at EventEmitter.sendCommand (node_modules/ioredis/built/Redis.js:333:28)
+      at EventEmitter.get (node_modules/ioredis/built/utils/Commander.js:90:25)
+      at Object.<anonymous> (tests/login-security.test.js:307:48)
+
+----------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------
+File                                    | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                               
+----------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------
+All files                               |   13.44 |     2.76 |    6.09 |   13.74 |                                                                                                                                 
+ backend                                |   44.94 |       40 |       0 |   45.97 |                                                                                                                                 
+  app.js                                |    85.1 |       50 |       0 |    85.1 | 46,54-55,84,115,128,158                                                                                                         
+  fixInvoiceIndex.js                    |       0 |      100 |       0 |       0 | 7-40                                                                                                                            
+  jest.config.js                        |       0 |        0 |       0 |       0 |                                                                                                                                 
+  server.js                             |       0 |        0 |       0 |       0 | 8-64                                                                                                                            
+ backend/controllers                    |     5.1 |     0.32 |    0.59 |    5.24 |                                                                                                                                 
+  authController.js                     |    12.5 |     6.17 |    12.5 |   12.76 | 10-15,25-104,121-122,128-129,140-210,219-226,235-279,289-339,349-381                                                            
+  billController.js                     |     5.1 |        0 |       0 |     5.1 | 9-30,38-45,54-170,179-197,206-236,245-264,273-390                                                                               
+  cashbankController.js                 |    5.62 |        0 |       0 |    5.88 | 11-23,32-67,76-101,110-138,147-156,165-251,260-336,345-470,479-505,514-543,552-576,585-638,647-699                              
+  customerController.js                 |     7.4 |        0 |       0 |     7.4 | 11-64,73-134,143-151,160-181,190-216,225-255                                                                                    
+  deliveryChallanController.js          |    2.56 |        0 |       0 |    2.73 | 19-251,260-274,283-304,313-361,370-583,592-662                                                                                  
+  dueController.js                      |   14.03 |        0 |       0 |   14.03 | 12-114,123-132,141-175,181,185,189,193,197                                                                                      
+  estimateController.js                 |    6.09 |        0 |       0 |    6.49 | 15-97,107-114,124-138,148-183,193-208                                                                                           
+  expenseController.js                  |    7.24 |        0 |       0 |    7.24 | 12-18,27-111,120-138,147-190,199-218                                                                                            
+  healthController.js                   |      25 |        0 |       0 |      25 | 14,29-52,66                                                                                                                     
+  inventoryController.js                |    4.66 |        0 |       0 |    4.72 | 11-44,53-58,67-85,94-137,146-170,179-191,200-379                                                                                
+  paymentInController.js                |    3.52 |        0 |       0 |    3.57 | 15-322,331-341,350-380,389-432,441-497                                                                                          
+  posController.js                      |    2.32 |        0 |       0 |    2.33 | 21-429,438-444,453-481,490-508,517-647                                                                                          
+  purchaseReturnController.js           |    6.45 |        0 |       0 |    6.89 | 10-99,104-110,119-129,138-186                                                                                                   
+  reportController.js                   |     7.4 |        0 |       0 |    7.84 | 14-27,36-42,51-59,68-182                                                                                                        
+  returnController.js                   |    2.16 |        0 |       0 |    2.16 | 15-395,404-413,422-445,454-560                                                                                                  
+  salesInvoiceController.js             |    5.68 |        0 |       0 |    5.88 | 14-38,47-57,66-94,103-145,154-262                                                                                               
+  salesOrderController.js               |    2.53 |        0 |       0 |     2.6 | 18-137,146-257,266-330,339-373,382-414,423-477,486-650,659-824                                                                  
+  settingsController.js                 |       0 |        0 |       0 |       0 |                                                                                                                                 
+  supplierController.js                 |    7.14 |        0 |       0 |    7.14 | 10-67,76-128,137-143,152-171,180-201                                                                                            
+  userController.js                     |    6.97 |        0 |       0 |     8.1 | 9-13,23-73,83-99                                                                                                                
+ backend/controllers/.patches           |       0 |        0 |       0 |       0 |                                                                                                                                 
+  convertToDeliveryChallan_CORRECTED.js |       0 |        0 |       0 |       0 | 4-176                                                                                                                           
+ backend/examples                       |       0 |        0 |       0 |       0 |                                                                                                                                 
+  frontendCsrfInterceptor.js            |       0 |        0 |       0 |       0 | 10-85                                                                                                                           
+  transactionExamples.js                |       0 |        0 |       0 |       0 | 16-130                                                                                                                          
+ backend/middlewares                    |   20.62 |    14.98 |   14.95 |   20.96 |                                                                                                                                 
+  auditEnforcement.js                   |       0 |        0 |       0 |       0 | 24-188                                                                                                                          
+  auditMiddleware.js                    |   22.72 |        0 |   22.22 |   22.72 | 29-43,54-75,85-105                                                                                                              
+  authMiddleware.js                     |    7.69 |        0 |       0 |    7.69 | 12-43                                                                                                                           
+  authorizationEnforcement.js           |       0 |        0 |       0 |       0 | 15-201                                                                                                                          
+  correlationMiddleware.js              |       0 |        0 |       0 |       0 | 16-133                                                                                                                          
+  csrfMiddleware.js                     |   17.94 |        0 |       0 |   18.91 | 23-31,41-57,64-67,78-100,108-114                                                                                                
+  errorHandler.js                       |    12.5 |        0 |       0 |    12.5 | 2-15                                                                                                                            
+  observabilityEnforcement.js           |       0 |        0 |       0 |       0 | 19-127                                                                                                                          
+  rateLimiter.js                        |   51.21 |    47.47 |    62.5 |   52.56 | 37-38,44,52,102-112,135-136,142-147,159,172-180,242-256,265-275,294-301,320-324,365-380,389-402,415-428,433-447,457-458,467-483 
+  rbacMiddleware.js                     |      20 |        0 |    7.69 |   22.22 | 89-92,102-103,113-114,126-138,148-161,170-181,189-200,211-224                                                                   
+  requestId.js                          |     100 |      100 |     100 |     100 |                                                                                                                                 
+  timeout.js                            |   46.15 |        0 |      50 |   46.15 | 13-22,32                                                                                                                        
+  transactionEnforcement.js             |       0 |        0 |       0 |       0 | 17-170                                                                                                                          
+ backend/models                         |   60.55 |     2.63 |   11.11 |   63.74 |                                                                                                                                 
+  AuditLog.js                           |   25.53 |        0 |       0 |   29.26 | 94-96,113,117,121,125,130-147,155-172,193-203                                                                                   
+  BankAccount.js                        |      16 |        0 |       0 |   17.39 | 55-70,79-92                                                                                                                     
+  Bill.js                               |     100 |      100 |     100 |     100 |                                                                                                                                 
+  CashbankTransaction.js                |      50 |        0 |       0 |      50 | 57-60                                                                                                                           
+  Counter.js                            |   57.14 |        0 |       0 |   57.14 | 37-45                                                                                                                           
+  Customer.js                           |     100 |      100 |     100 |     100 |                                                                                                                                 
+  DeliveryChallan.js                    |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Due.js                                |       0 |      100 |     100 |       0 | 3-29                                                                                                                            
+  DueAdjustment.js                      |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Estimate.js                           |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Expense.js                            |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Invoice.js                            |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Item.js                               |   77.77 |      100 |       0 |   77.77 | 57,62                                                                                                                           
+  Notification.js                       |       0 |      100 |     100 |       0 | 3-30                                                                                                                            
+  PaymentIn.js                          |     100 |      100 |     100 |     100 |                                                                                                                                 
+  PurchaseReturn.js                     |     100 |      100 |     100 |     100 |                                                                                                                                 
+  RefreshToken.js                       |   71.42 |        0 |       0 |   71.42 | 46,51                                                                                                                           
+  Return.js                             |     100 |      100 |     100 |     100 |                                                                                                                                 
+  SalesOrder.js                         |     100 |      100 |     100 |     100 |                                                                                                                                 
+  StockMovement.js                      |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Supplier.js                           |     100 |      100 |     100 |     100 |                                                                                                                                 
+  Transaction.js                        |     100 |      100 |     100 |     100 |                                                                                                                                 
+  User.js                               |      90 |       50 |     100 |     100 | 75                                                                                                                              
+ backend/routes                         |   67.83 |        0 |       0 |   67.83 |                                                                                                                                 
+  authRoutes.js                         |     100 |      100 |     100 |     100 |                                                                                                                                 
+  billRoutes.js                         |     100 |      100 |     100 |     100 |                                                                                                                                 
+  cashbankRoutes.js                     |     100 |      100 |     100 |     100 |                                                                                                                                 
+  customerRoutes.js                     |     100 |      100 |     100 |     100 |                                                                                                                                 
+  deliveryChallanRoutes.js              |     100 |      100 |     100 |     100 |                                                                                                                                 
+  dueRoutes.js                          |     100 |      100 |     100 |     100 |                                                                                                                                 
+  estimateRoutes.js                     |     100 |      100 |     100 |     100 |                                                                                                                                 
+  expenseRoutes.js                      |     100 |      100 |     100 |     100 |                                                                                                                                 
+  healthRoutes.js                       |     100 |      100 |     100 |     100 |                                                                                                                                 
+  inventoryRoutes.js                    |     100 |      100 |     100 |     100 |                                                                                                                                 
+  paymentInRoutes.js                    |     100 |      100 |     100 |     100 |                                                                                                                                 
+  posRoutes.js                          |     100 |      100 |     100 |     100 |                                                                                                                                 
+  purchaseReturnRoutes.js               |     100 |      100 |     100 |     100 |                                                                                                                                 
+  refreshTokenRoutes.js                 |    6.25 |        0 |       0 |    6.25 | 16-93,103-134,144-164                                                                                                           
+  reportRoutes.js                       |     100 |      100 |     100 |     100 |                                                                                                                                 
+  returnRoutes.js                       |     100 |      100 |     100 |     100 |                                                                                                                                 
+  salesInvoiceRoutes.js                 |     100 |      100 |     100 |     100 |                                                                                                                                 
+  salesOrderRoutes.js                   |     100 |      100 |     100 |     100 |                                                                                                                                 
+  settingsRoutes.js                     |       0 |      100 |     100 |       0 | 9-13                                                                                                                            
+  supplierRoutes.js                     |     100 |      100 |     100 |     100 |                                                                                                                                 
+  userRoutes.js                         |     100 |      100 |     100 |     100 |                                                                                                                                 
+ backend/scripts                        |       0 |        0 |       0 |       0 |                                                                                                                                 
+  addIndexes.js                         |       0 |        0 |       0 |       0 | 11-89                                                                                                                           
+  clear-device-sessions.js              |       0 |      100 |       0 |       0 | 4-25                                                                                                                            
+  migrate.js                            |       0 |        0 |       0 |       0 | 8-102                                                                                                                           
+  seed.js                               |       0 |        0 |       0 |       0 | 17-367                                                                                                                          
+ backend/tests                          |   66.66 |       25 |   66.66 |   66.66 |                                                                                                                                 
+  setup.js                              |   66.66 |       25 |   66.66 |   66.66 | 28-32                                                                                                                           
+ backend/utils                          |    8.51 |     1.33 |    5.76 |    8.66 |                                                                                                                                 
+  aiReportHelper.js                     |   11.11 |        0 |       0 |    12.5 | 8-15,39-49                                                                                                                      
+  deviceUtils.js                        |      40 |        0 |       0 |      40 | 8,17-19,33-35,49                                                                                                                
+  emailService.js                       |   12.76 |        0 |       0 |   12.76 | 7,16-29,43-57,69-92,104-125,136-247                                                                                             
+  inventoryValidator.js                 |   10.71 |        0 |       0 |   10.71 | 7-30,40-62,74-77                                                                                                                
+  invoiceGenerator.js                   |    1.14 |        0 |       0 |    1.16 | 6-24,29-57,66-409                                                                                                               
+  logger.js                             |      72 |    28.57 |    37.5 |      72 | 58,68,76,80,92,99-107                                                                                                           
+  paymentStatusCalculator.js            |   14.28 |        0 |       0 |   14.28 | 9-19                                                                                                                            
+  stockAlert.js                         |    12.5 |        0 |       0 |   14.28 | 8-26                                                                                                                            
+  stockMovementLogger.js                |   18.18 |        0 |       0 |   18.18 | 25-46,56-64                                                                                                                     
+  stockReservation.js                   |   10.52 |        0 |       0 |   10.52 | 14-49,71-105,125-131,140-145                                                                                                    
+  transaction.js                        |       0 |        0 |       0 |       0 | 23-216                                                                                                                          
+----------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 5 passed, 12 total
+Snapshots:   0 total
+Time:        12.644 s
+Ran all test suites matching /login-security.test.js/i.
