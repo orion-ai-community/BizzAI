@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { info, warn, error } from "./logger.js";
 
 /**
  * Generate a cryptographically secure device ID
@@ -40,7 +41,7 @@ export const setDeviceIdCookie = (res, deviceId) => {
 
     // CRITICAL: Validate COOKIE_SECRET is set
     if (!process.env.COOKIE_SECRET) {
-        console.error('❌ CRITICAL: COOKIE_SECRET environment variable is not set!');
+        error('❌ CRITICAL: COOKIE_SECRET environment variable is not set!');
         throw new Error('COOKIE_SECRET must be configured for signed cookies');
     }
 
@@ -60,7 +61,7 @@ export const setDeviceIdCookie = (res, deviceId) => {
 
     // Production logging for diagnostics (protect sensitive data)
     if (isProduction) {
-        console.log('🍪 [PRODUCTION] Set deviceId cookie:', {
+        info('🍪 [PRODUCTION] Set deviceId cookie', {
             deviceIdPrefix: deviceId.substring(0, 8) + '...',
             sameSite,
             secure: isProduction,
@@ -70,7 +71,7 @@ export const setDeviceIdCookie = (res, deviceId) => {
         });
     } else {
         // Debug log in development
-        console.log('🍪 Set deviceId cookie:', {
+        info('🍪 Set deviceId cookie', {
             deviceId: deviceId.substring(0, 8) + '...',
             sameSite,
             secure: isProduction
@@ -106,7 +107,7 @@ export const getDeviceIdFromCookie = (req) => {
 
     // Production logging for diagnostics
     if (isProduction && !deviceId) {
-        console.warn('⚠️  [PRODUCTION] deviceId cookie not found:', {
+        warn('⚠️  [PRODUCTION] deviceId cookie not found', {
             hasSignedCookies: !!req.signedCookies,
             signedCookiesKeys: req.signedCookies ? Object.keys(req.signedCookies) : [],
             hasCookies: !!req.cookies,

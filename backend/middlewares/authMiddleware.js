@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { getDeviceIdFromCookie } from "../utils/deviceUtils.js";
+import { warn } from "../utils/logger.js";
 
 /**
  * Middleware to protect routes
@@ -29,13 +30,13 @@ export const protect = async (req, res, next) => {
       // Enhanced logging for production diagnostics
       if (process.env.NODE_ENV === 'production') {
         if (!deviceIdFromCookie) {
-          console.warn('⚠️  [AUTH] Device validation failed - No cookie:', {
+          warn('⚠️  [AUTH] Device validation failed - No cookie', {
             userId: req.user._id,
             hasActiveDevice: !!req.user.activeDeviceId,
             activeDevicePrefix: req.user.activeDeviceId ? req.user.activeDeviceId.substring(0, 8) + '...' : 'none'
           });
         } else if (req.user.activeDeviceId !== deviceIdFromCookie) {
-          console.warn('⚠️  [AUTH] Device validation failed - Mismatch:', {
+          warn('⚠️  [AUTH] Device validation failed - Mismatch', {
             userId: req.user._id,
             cookieDevicePrefix: deviceIdFromCookie.substring(0, 8) + '...',
             activeDevicePrefix: req.user.activeDeviceId ? req.user.activeDeviceId.substring(0, 8) + '...' : 'none'

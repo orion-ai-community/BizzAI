@@ -4,6 +4,7 @@ import { generateToken, generateRefreshToken, generateRandomToken } from "../con
 import crypto from "crypto";
 import { sendHtmlEmail, generatePasswordResetEmail } from "../utils/emailService.js";
 import { generateDeviceId, setDeviceIdCookie, getDeviceIdFromCookie } from "../utils/deviceUtils.js";
+import { info } from "../utils/logger.js";
 
 // Simple password strength check for registration
 const isStrongPassword = (password) => {
@@ -195,7 +196,7 @@ export const loginUser = async (req, res) => {
 
     // Production logging for diagnostics
     if (process.env.NODE_ENV === 'production') {
-      console.log('✅ [LOGIN] User logged in successfully:', {
+      info('✅ [LOGIN] User logged in successfully', {
         userId: user._id,
         email: user.email,
         deviceIdPrefix: deviceIdToUse.substring(0, 8) + '...',
@@ -343,7 +344,7 @@ export const forceLogout = async (req, res) => {
 
     // Production logging for diagnostics
     if (process.env.NODE_ENV === 'production') {
-      console.log('✅ [FORCE-LOGOUT] Device sessions cleared:', {
+      info('✅ [FORCE-LOGOUT] Device sessions cleared', {
         userId: user._id,
         email: user.email,
         ip: req.ip || req.connection.remoteAddress
