@@ -7,7 +7,7 @@ A modern, full-stack Point of Sale (POS) and inventory management system designe
 ### 🔐 Authentication & Authorization
 
 - Secure user registration and login with JWT authentication
-- Role-based access control (Owner, Admin)
+- Role-based access control (Owner)
 - Protected routes and API endpoints
 - Password encryption with bcrypt
 

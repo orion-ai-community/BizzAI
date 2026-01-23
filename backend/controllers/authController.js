@@ -130,9 +130,27 @@ export const loginUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if account is locked
+    if (user.isLocked()) {
+      return res.status(423).json({
+        message: "Account locked due to too many failed attempts. Try again later.",
+        lockedUntil: user.accountLockedUntil,
+      });
+    }
+
+    // Check if account is suspended
+    if (user.status === "suspended") {
+      return res.status(403).json({
+        message: "Account suspended. Please contact support.",
+      });
+    }
+
     // Match password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
+      // Record failed attempt
+      await user.incLoginAttempts();
+      await user.recordFailedLogin(req.ip || req.connection.remoteAddress || "unknown", req.headers["user-agent"] || "unknown");
       await handleLoginAttempt(req, false);
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -167,6 +185,12 @@ export const loginUser = async (req, res) => {
       // New device or first login - generate new deviceId
       deviceIdToUse = generateDeviceId();
     }
+
+    // Reset failed login attempts on successful login
+    await user.resetLoginAttempts();
+
+    // Record successful login
+    await user.recordLogin(ipAddress, userAgent);
 
     // Update device session tracking
     user.activeDeviceId = deviceIdToUse;

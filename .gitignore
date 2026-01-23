@@ -127,3 +127,4 @@ backend/invoices/
 *.log
 *.tmp
 *.pdf
+bizzai-admin/

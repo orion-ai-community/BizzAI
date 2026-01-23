@@ -39,30 +39,10 @@ const PERMISSIONS = {
         "delete:payment",
         "delete:user",
 
-        // Admin permissions
+        // Management permissions
         "manage:users",
         "manage:roles",
         "export:data",
-    ],
-    admin: [
-        // Read permissions
-        "read:invoice",
-        "read:customer",
-        "read:item",
-        "read:return",
-        "read:salesorder",
-        "read:payment",
-        "read:reports",
-
-        // Write permissions
-        "write:invoice",
-        "write:customer",
-        "write:item",
-        "write:return",
-        "write:salesorder",
-        "write:payment",
-
-        // NO delete permissions for admin
     ],
     staff: [
         // Read permissions only
@@ -181,24 +161,7 @@ export const requireOwner = (req, res, next) => {
     next();
 };
 
-/**
- * Middleware to require admin or owner role
- * Usage: router.post('/api/items', protect, requireAdminOrOwner, createItem);
- */
-export const requireAdminOrOwner = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({ message: "Authentication required" });
-    }
 
-    if (req.user.role !== "owner" && req.user.role !== "admin") {
-        return res.status(403).json({
-            message: "Admin or Owner access required",
-            userRole: req.user.role,
-        });
-    }
-
-    next();
-};
 
 /**
  * Authorization guard for resource ownership
@@ -233,6 +196,5 @@ export default {
     requirePermission,
     requireAnyPermission,
     requireOwner,
-    requireAdminOrOwner,
     requireResourceOwnership,
 };
