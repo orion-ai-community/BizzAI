@@ -34,6 +34,28 @@ const refreshTokenSchema = new mongoose.Schema(
         userAgent: {
             type: String,
         },
+        // Device metadata for session correlation
+        deviceId: {
+            type: String,
+            index: true,
+        },
+        deviceType: {
+            type: String,
+            enum: ["mobile", "tablet", "desktop", "unknown"],
+            default: "unknown",
+        },
+        browser: {
+            type: String,
+        },
+        os: {
+            type: String,
+        },
+        lastUsedAt: {
+            type: Date,
+            default: function () {
+                return this.createdAt || new Date();
+            },
+        },
     },
     { timestamps: true }
 );

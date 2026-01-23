@@ -46,6 +46,59 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    // ==================== ACCOUNT LIFECYCLE ====================
+    accountStatus: {
+      type: String,
+      enum: ["active", "inactive", "suspended", "locked"],
+      default: "active",
+      index: true,
+    },
+    accountCreatedSource: {
+      type: String,
+      enum: ["web", "mobile", "api"],
+      default: "web",
+    },
+    accountDeactivatedAt: {
+      type: Date,
+      default: null,
+    },
+    accountSuspendedReason: {
+      type: String,
+      default: null,
+    },
+
+    // ==================== REAL ACTIVITY TRACKING ====================
+    lastLoginAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    lastLogoutAt: {
+      type: Date,
+      default: null,
+    },
+    lastSeenAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    lastActivityType: {
+      type: String,
+      enum: ["login", "logout", "api_call", "token_refresh", "invoice_management", "customer_management", "inventory_management"],
+      default: null,
+    },
+
+    // ==================== SESSION & DEVICE TRACKING ====================
+    activeSessionCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    activeDeviceIds: {
+      type: [String],
+      default: [],
+    },
     // Device session tracking for single device login enforcement
     // deviceId is a cryptographically secure random identifier stored in HttpOnly cookie
     activeDeviceId: {
@@ -57,6 +110,25 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    lastActiveDeviceId: {
+      type: String,
+      default: null,
+    },
+    lastActiveDeviceType: {
+      type: String,
+      enum: ["mobile", "tablet", "desktop", "unknown"],
+      default: null,
+    },
+    lastActiveOS: {
+      type: String,
+      default: null,
+    },
+    lastActiveBrowser: {
+      type: String,
+      default: null,
+    },
+
+    // ==================== NETWORK & LOCATION ====================
     // IP and UA stored as audit metadata only, NOT used for device identification
     lastLoginIp: {
       type: String,
@@ -66,24 +138,46 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    // Security tracking fields
-    status: {
+    lastKnownIp: {
       type: String,
-      enum: ["active", "inactive", "suspended"],
-      default: "active",
-    },
-    lastLogin: {
-      type: Date,
       default: null,
     },
+    lastKnownCountry: {
+      type: String,
+      default: null,
+    },
+    lastKnownCity: {
+      type: String,
+      default: null,
+    },
+
+    // ==================== ENHANCED LOGIN HISTORY ====================
     loginHistory: [
       {
         timestamp: { type: Date, default: Date.now },
         ipAddress: String,
         userAgent: String,
+        deviceId: { type: String, default: null },
+        deviceType: { type: String, default: null },
+        browser: { type: String, default: null },
+        os: { type: String, default: null },
         success: { type: Boolean, default: true },
+        failureReason: { type: String, default: null },
       },
     ],
+
+    // ==================== SECURITY TRACKING ====================
+    // Legacy status field - kept for backward compatibility
+    status: {
+      type: String,
+      enum: ["active", "inactive", "suspended"],
+      default: "active",
+    },
+    // Legacy lastLogin field - kept for backward compatibility
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
     failedLoginAttempts: {
       type: Number,
       default: 0,
@@ -95,6 +189,29 @@ const userSchema = new mongoose.Schema(
     accountLockedUntil: {
       type: Date,
       default: null,
+    },
+    suspiciousActivityCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    lastSuspiciousActivityAt: {
+      type: Date,
+      default: null,
+    },
+    riskScore: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
+    passwordChangeRequired: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

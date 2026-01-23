@@ -4,6 +4,8 @@ import RefreshToken from "../models/RefreshToken.js";
 import { generateToken, generateRefreshToken, verifyRefreshToken, generateRandomToken } from "../config/jwt.js";
 import User from "../models/User.js";
 import { clearDeviceIdCookie, getDeviceIdFromCookie } from "../utils/deviceUtils.js";
+import { getDeviceMetadata, getIpAddress } from "../utils/deviceParser.js";
+import { logUserActivity } from "../utils/activityLogger.js";
 
 const router = express.Router();
 
@@ -69,13 +71,40 @@ router.post("/refresh", async (req, res) => {
         storedToken.revokedAt = new Date();
         await storedToken.save();
 
-        // Create new refresh token
+        // Create new refresh token with device metadata
+        const deviceMeta = getDeviceMetadata(req);
+        const ipAddress = getIpAddress(req);
+
         await RefreshToken.create({
             token: newRefreshToken,
             user: user._id,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            createdByIp: req.ip,
-            userAgent: req.headers["user-agent"],
+            createdByIp: ipAddress,
+            userAgent: deviceMeta.userAgent,
+            deviceId: deviceIdFromCookie,
+            deviceType: deviceMeta.deviceType,
+            browser: deviceMeta.browser,
+            os: deviceMeta.os,
+        });
+
+        // Update user activity tracking
+        user.lastSeenAt = new Date();
+        user.lastActivityType = "token_refresh";
+        user.lastKnownIp = ipAddress;
+        await user.save();
+
+        // Update token lastUsedAt
+        storedToken.lastUsedAt = new Date();
+        await storedToken.save();
+
+        // Log token refresh activity
+        await logUserActivity(user._id, "TOKEN_REFRESH", {
+            ipAddress,
+            userAgent: deviceMeta.userAgent,
+            deviceId: deviceIdFromCookie,
+            deviceType: deviceMeta.deviceType,
+            browser: deviceMeta.browser,
+            os: deviceMeta.os,
         });
 
         res.json({
@@ -120,9 +149,42 @@ router.post("/revoke", protect, async (req, res) => {
         // Clear device session on logout
         const user = await User.findById(req.user._id);
         if (user) {
-            user.activeDeviceId = null;
-            user.activeSessionCreatedAt = null;
+            // Extract device metadata
+            const deviceMeta = getDeviceMetadata(req);
+            const ipAddress = getIpAddress(req);
+            const deviceIdFromCookie = getDeviceIdFromCookie(req);
+
+            // Update activity tracking
+            user.lastLogoutAt = new Date();
+            user.lastActivityType = "logout";
+
+            // Decrement session count
+            if (user.activeSessionCount > 0) {
+                user.activeSessionCount -= 1;
+            }
+
+            // Remove device from activeDeviceIds
+            if (deviceIdFromCookie && user.activeDeviceIds.includes(deviceIdFromCookie)) {
+                user.activeDeviceIds = user.activeDeviceIds.filter(id => id !== deviceIdFromCookie);
+            }
+
+            // Clear active device if this was the active device
+            if (user.activeDeviceId === deviceIdFromCookie) {
+                user.activeDeviceId = null;
+                user.activeSessionCreatedAt = null;
+            }
+
             await user.save();
+
+            // Log logout activity
+            await logUserActivity(user._id, "LOGOUT", {
+                ipAddress,
+                userAgent: deviceMeta.userAgent,
+                deviceId: deviceIdFromCookie,
+                deviceType: deviceMeta.deviceType,
+                browser: deviceMeta.browser,
+                os: deviceMeta.os,
+            });
         }
 
         // Clear deviceId cookie
@@ -150,9 +212,31 @@ router.post("/revoke-all", protect, async (req, res) => {
         // Clear device session on logout all
         const user = await User.findById(req.user._id);
         if (user) {
+            // Extract device metadata
+            const deviceMeta = getDeviceMetadata(req);
+            const ipAddress = getIpAddress(req);
+
+            // Update activity tracking
+            user.lastLogoutAt = new Date();
+            user.lastActivityType = "logout";
+
+            // Clear all session data
+            user.activeSessionCount = 0;
+            user.activeDeviceIds = [];
             user.activeDeviceId = null;
             user.activeSessionCreatedAt = null;
+
             await user.save();
+
+            // Log logout all activity
+            await logUserActivity(user._id, "LOGOUT_ALL", {
+                ipAddress,
+                userAgent: deviceMeta.userAgent,
+                deviceId: null,
+                deviceType: deviceMeta.deviceType,
+                browser: deviceMeta.browser,
+                os: deviceMeta.os,
+            });
         }
 
         // Clear deviceId cookie

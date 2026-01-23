@@ -58,6 +58,30 @@ export const protect = async (req, res, next) => {
         });
       }
 
+      // Update lastSeenAt on every authenticated request (non-blocking)
+      // Determine activity type based on request path
+      let activityType = "api_call";
+      if (req.path.includes("/invoices") || req.path.includes("/sales")) {
+        activityType = "invoice_management";
+      } else if (req.path.includes("/customers")) {
+        activityType = "customer_management";
+      } else if (req.path.includes("/items") || req.path.includes("/inventory")) {
+        activityType = "inventory_management";
+      }
+
+      // Non-blocking update (don't await to avoid slowing down requests)
+      User.findByIdAndUpdate(
+        req.user._id,
+        {
+          lastSeenAt: new Date(),
+          lastActivityType: activityType,
+        },
+        { new: false }
+      ).catch(err => {
+        // Silent fail - don't block request if update fails
+        warn('Failed to update lastSeenAt', { userId: req.user._id, error: err.message });
+      });
+
       next();
     } else {
       return res.status(401).json({ message: "Not authorized, token missing" });

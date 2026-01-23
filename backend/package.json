@@ -49,6 +49,7 @@
     "mongoose": "^8.19.1",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.9",
+    "ua-parser-js": "^2.0.8",
     "uuid": "^9.0.1",
     "winston": "^3.11.0"
   },

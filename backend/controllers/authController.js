@@ -5,6 +5,8 @@ import crypto from "crypto";
 import { sendHtmlEmail, generatePasswordResetEmail } from "../utils/emailService.js";
 import { generateDeviceId, setDeviceIdCookie, getDeviceIdFromCookie } from "../utils/deviceUtils.js";
 import { info } from "../utils/logger.js";
+import { getDeviceMetadata, getIpAddress } from "../utils/deviceParser.js";
+import { logUserActivity } from "../utils/activityLogger.js";
 
 // Simple password strength check for registration
 const isStrongPassword = (password) => {
@@ -61,15 +63,36 @@ export const registerUser = async (req, res) => {
       // Generate cryptographically secure deviceId for initial session
       const deviceId = generateDeviceId();
 
-      // Store audit metadata (IP and UA for logging only, NOT for device identification)
-      const userAgent = req.headers["user-agent"] || "unknown";
-      const ipAddress = req.ip || req.connection.remoteAddress || "unknown";
+      // Extract device metadata
+      const deviceMeta = getDeviceMetadata(req);
+      const ipAddress = getIpAddress(req);
 
-      // Set initial device session
+      // Set initial device session and activity tracking
       user.activeDeviceId = deviceId;
       user.activeSessionCreatedAt = new Date();
+      user.activeSessionCount = 1;
+      user.activeDeviceIds = [deviceId];
+
+      // Update activity tracking fields
+      user.lastLoginAt = new Date();
+      user.lastSeenAt = new Date();
+      user.lastActivityType = "login";
+
+      // Update device tracking
+      user.lastActiveDeviceId = deviceId;
+      user.lastActiveDeviceType = deviceMeta.deviceType;
+      user.lastActiveOS = deviceMeta.os;
+      user.lastActiveBrowser = deviceMeta.browser;
+
+      // Update network tracking
       user.lastLoginIp = ipAddress;
-      user.lastLoginUserAgent = userAgent;
+      user.lastLoginUserAgent = deviceMeta.userAgent;
+      user.lastKnownIp = ipAddress;
+
+      // Set account status
+      user.accountStatus = "active";
+      user.accountCreatedSource = "web";
+
       await user.save();
 
       // Issue deviceId as secure HttpOnly signed cookie
@@ -79,13 +102,27 @@ export const registerUser = async (req, res) => {
       const accessToken = generateToken(user._id);
       const refreshToken = generateRandomToken();
 
-      // Store refresh token
+      // Store refresh token with device metadata
       await RefreshToken.create({
         token: refreshToken,
         user: user._id,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        createdByIp: req.ip,
-        userAgent: req.headers["user-agent"],
+        createdByIp: ipAddress,
+        userAgent: deviceMeta.userAgent,
+        deviceId: deviceId,
+        deviceType: deviceMeta.deviceType,
+        browser: deviceMeta.browser,
+        os: deviceMeta.os,
+      });
+
+      // Log registration activity
+      await logUserActivity(user._id, "REGISTRATION", {
+        ipAddress,
+        userAgent: deviceMeta.userAgent,
+        deviceId,
+        deviceType: deviceMeta.deviceType,
+        browser: deviceMeta.browser,
+        os: deviceMeta.os,
       });
 
       res.status(201).json({
@@ -148,25 +185,52 @@ export const loginUser = async (req, res) => {
     // Match password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
+      // Extract device metadata for logging
+      const deviceMeta = getDeviceMetadata(req);
+      const ipAddress = getIpAddress(req);
+
       // Record failed attempt
       await user.incLoginAttempts();
-      await user.recordFailedLogin(req.ip || req.connection.remoteAddress || "unknown", req.headers["user-agent"] || "unknown");
+      await user.recordFailedLogin(ipAddress, deviceMeta.userAgent);
       await handleLoginAttempt(req, false);
+
+      // Log failed login activity
+      await logUserActivity(user._id, "FAILED_LOGIN", {
+        ipAddress,
+        userAgent: deviceMeta.userAgent,
+        deviceId: null,
+        deviceType: deviceMeta.deviceType,
+        browser: deviceMeta.browser,
+        os: deviceMeta.os,
+        metadata: { reason: "invalid_password" },
+      });
+
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     // Get deviceId from signed cookie (if exists)
     const existingDeviceId = getDeviceIdFromCookie(req);
 
-    // Store audit metadata (IP and UA for logging only, NOT for device identification)
-    const userAgent = req.headers["user-agent"] || "unknown";
-    const ipAddress = req.ip || req.connection.remoteAddress || "unknown";
+    // Extract device metadata
+    const deviceMeta = getDeviceMetadata(req);
+    const ipAddress = getIpAddress(req);
 
     // Check for active session on different device
     // Device conflict occurs when:
     // 1. User has an active deviceId stored
     // 2. AND the deviceId from cookie doesn't match (or doesn't exist)
     if (user.activeDeviceId && user.activeDeviceId !== existingDeviceId) {
+      // Log failed login attempt due to device conflict
+      await logUserActivity(user._id, "FAILED_LOGIN", {
+        ipAddress,
+        userAgent: deviceMeta.userAgent,
+        deviceId: existingDeviceId,
+        deviceType: deviceMeta.deviceType,
+        browser: deviceMeta.browser,
+        os: deviceMeta.os,
+        metadata: { reason: "device_conflict" },
+      });
+
       return res.status(409).json({
         message: "This account is currently active on another device.",
         deviceConflict: true,
@@ -178,6 +242,8 @@ export const loginUser = async (req, res) => {
     // - If no activeDeviceId (first login or after force logout), generate new one
     // - If existingDeviceId exists and matches, reuse it
     let deviceIdToUse;
+    const isNewDevice = !existingDeviceId || user.activeDeviceId !== existingDeviceId;
+
     if (existingDeviceId && user.activeDeviceId === existingDeviceId) {
       // Same device, same session - reuse existing deviceId
       deviceIdToUse = existingDeviceId;
@@ -189,14 +255,35 @@ export const loginUser = async (req, res) => {
     // Reset failed login attempts on successful login
     await user.resetLoginAttempts();
 
-    // Record successful login
-    await user.recordLogin(ipAddress, userAgent);
+    // Record successful login (legacy method)
+    await user.recordLogin(ipAddress, deviceMeta.userAgent);
 
-    // Update device session tracking
+    // Update comprehensive activity tracking
     user.activeDeviceId = deviceIdToUse;
     user.activeSessionCreatedAt = new Date();
+    user.lastLoginAt = new Date();
+    user.lastSeenAt = new Date();
+    user.lastActivityType = "login";
+
+    // Update session count
+    if (isNewDevice) {
+      user.activeSessionCount = (user.activeSessionCount || 0) + 1;
+      if (!user.activeDeviceIds.includes(deviceIdToUse)) {
+        user.activeDeviceIds.push(deviceIdToUse);
+      }
+    }
+
+    // Update device tracking
+    user.lastActiveDeviceId = deviceIdToUse;
+    user.lastActiveDeviceType = deviceMeta.deviceType;
+    user.lastActiveOS = deviceMeta.os;
+    user.lastActiveBrowser = deviceMeta.browser;
+
+    // Update network tracking
     user.lastLoginIp = ipAddress;
-    user.lastLoginUserAgent = userAgent;
+    user.lastLoginUserAgent = deviceMeta.userAgent;
+    user.lastKnownIp = ipAddress;
+
     await user.save();
 
     // Issue deviceId as secure HttpOnly signed cookie
@@ -206,13 +293,28 @@ export const loginUser = async (req, res) => {
     const accessToken = generateToken(user._id);
     const refreshToken = generateRandomToken();
 
-    // Store refresh token
+    // Store refresh token with device metadata
     await RefreshToken.create({
       token: refreshToken,
       user: user._id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      createdByIp: req.ip,
-      userAgent: req.headers["user-agent"],
+      createdByIp: ipAddress,
+      userAgent: deviceMeta.userAgent,
+      deviceId: deviceIdToUse,
+      deviceType: deviceMeta.deviceType,
+      browser: deviceMeta.browser,
+      os: deviceMeta.os,
+    });
+
+    // Log successful login activity
+    await logUserActivity(user._id, "LOGIN", {
+      ipAddress,
+      userAgent: deviceMeta.userAgent,
+      deviceId: deviceIdToUse,
+      deviceType: deviceMeta.deviceType,
+      browser: deviceMeta.browser,
+      os: deviceMeta.os,
+      metadata: { isNewDevice },
     });
 
     // Reset rate limit counters on successful login
