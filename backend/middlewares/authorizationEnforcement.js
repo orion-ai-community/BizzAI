@@ -74,7 +74,7 @@ const extractRoutes = (app) => {
  * @returns {boolean} True if protected
  */
 const isProtected = (middlewares) => {
-    const authMiddlewares = ['protect', 'requirePermission', 'requireOwner'];
+    const authMiddlewares = ['protect', 'requirePermission', 'requireOwner', 'requireAdminOrOwner'];
     return middlewares.some(mw => authMiddlewares.includes(mw));
 };
 
