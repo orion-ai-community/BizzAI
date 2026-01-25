@@ -23,18 +23,6 @@ const SalesInvoice = () => {
     message,
   } = useSelector((state) => state.salesInvoice);
 
-  const [formData, setFormData] = useState({
-    invoiceNo: "INV-" + Date.now(),
-    invoiceDate: new Date().toISOString().split("T")[0],
-    dueDate: "",
-    customer: null,
-    items: [{ name: "", quantity: 1, rate: 0, tax: 18, amount: 0 }],
-    discount: 0,
-    shippingCharges: 0,
-    notes: "",
-    termsAndConditions: "",
-  });
-
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [deleteConfirm, setDeleteConfirm] = useState(null);

@@ -107,9 +107,7 @@ const CashInHand = () => {
             label: 'Flow',
             render: (val, row) => {
                 const isDirectIn = val === 'in';
-                const isDirectOut = val === 'out';
                 const isTransferIn = val === 'transfer' && row.toAccount === 'cash';
-                const isTransferOut = val === 'transfer' && row.fromAccount === 'cash';
 
                 if (isDirectIn || isTransferIn) return <span className="text-green-600 font-bold">Cash In</span>;
                 return <span className="text-red-600 font-bold">Cash Out</span>;

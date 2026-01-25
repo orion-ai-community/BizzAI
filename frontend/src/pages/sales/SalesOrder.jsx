@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
@@ -132,7 +132,7 @@ const SalesOrder = () => {
                 notes: formData.notes
             };
 
-            const response = await api.post(
+            await api.post(
                 `/api/sales-orders`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -196,16 +196,6 @@ const SalesOrder = () => {
             setLoading(false);
         }
     };
-
-    const statusOptions = [
-        { value: 'Draft', label: 'Draft', color: 'bg-gray-100 text-gray-800' },
-        { value: 'Confirmed', label: 'Confirmed', color: 'bg-blue-100 text-blue-800' },
-        { value: 'Partially Delivered', label: 'Partially Delivered', color: 'bg-purple-100 text-purple-800' },
-        { value: 'Delivered', label: 'Delivered', color: 'bg-indigo-100 text-indigo-800' },
-        { value: 'Partially Invoiced', label: 'Partially Invoiced', color: 'bg-yellow-100 text-yellow-800' },
-        { value: 'Invoiced', label: 'Invoiced', color: 'bg-green-100 text-green-800' },
-        { value: 'Cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-800' }
-    ];
 
     return (
         <Layout>
