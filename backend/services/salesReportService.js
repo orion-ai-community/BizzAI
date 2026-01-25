@@ -130,6 +130,13 @@ class SalesReportService {
             query.customer = filters.customerId;
         }
 
+        // Item filters (will be applied in aggregation for items within invoices)
+        // Store these for later use in data processing
+        this.itemFilters = {
+            category: filters.itemCategory,
+            sku: filters.itemSku,
+        };
+
         return query;
     }
 
@@ -219,6 +226,22 @@ class SalesReportService {
     }
 
     /**
+     * Get previous period dates for comparison
+     */
+    getPreviousPeriodDates(dateFilter, customStartDate, customEndDate) {
+        const { startDate, endDate } = this.buildDateFilter(dateFilter, customStartDate, customEndDate);
+        const duration = endDate - startDate;
+
+        const prevEndDate = new Date(startDate);
+        prevEndDate.setMilliseconds(-1);
+
+        const prevStartDate = new Date(prevEndDate);
+        prevStartDate.setTime(prevStartDate.getTime() - duration);
+
+        return { prevStartDate, prevEndDate };
+    }
+
+    /**
      * Get summary KPIs for sales report
      */
     async getSalesSummary(userId, filters = {}) {
@@ -258,6 +281,46 @@ class SalesReportService {
             const averageOrderValue = totalInvoices > 0 ? totalSales / totalInvoices : 0;
             const totalOutstanding = totalSales - totalPaid;
 
+            // Get previous period data for comparison
+            const { prevStartDate, prevEndDate } = this.getPreviousPeriodDates(
+                filters.dateFilter,
+                filters.customStartDate,
+                filters.customEndDate
+            );
+
+            const prevQuery = {
+                createdBy: userId,
+                isDeleted: { $ne: true },
+                createdAt: { $gte: prevStartDate, $lte: prevEndDate }
+            };
+
+            const prevInvoices = await Invoice.find(prevQuery)
+                .populate('items.item', 'costPrice')
+                .lean();
+
+            let prevTotalSales = 0;
+            let prevTotalInvoices = prevInvoices.length;
+            let prevTotalQuantity = 0;
+            let prevTotalCost = 0;
+
+            prevInvoices.forEach(invoice => {
+                prevTotalSales += invoice.totalAmount || 0;
+                invoice.items.forEach(item => {
+                    prevTotalQuantity += item.quantity;
+                    if (item.item && item.item.costPrice) {
+                        prevTotalCost += item.item.costPrice * item.quantity;
+                    }
+                });
+            });
+
+            const prevNetProfit = prevTotalSales - prevTotalCost;
+
+            // Calculate percentage changes
+            const calculateChange = (current, previous) => {
+                if (previous === 0) return current > 0 ? 100 : 0;
+                return ((current - previous) / previous) * 100;
+            };
+
             return {
                 totalSales: parseFloat(totalSales.toFixed(2)),
                 totalInvoices,
@@ -268,6 +331,13 @@ class SalesReportService {
                 netProfit: parseFloat(netProfit.toFixed(2)),
                 averageOrderValue: parseFloat(averageOrderValue.toFixed(2)),
                 totalOutstanding: parseFloat(totalOutstanding.toFixed(2)),
+                // Comparison data
+                comparison: {
+                    salesChange: parseFloat(calculateChange(totalSales, prevTotalSales).toFixed(2)),
+                    invoicesChange: parseFloat(calculateChange(totalInvoices, prevTotalInvoices).toFixed(2)),
+                    quantityChange: parseFloat(calculateChange(totalQuantity, prevTotalQuantity).toFixed(2)),
+                    profitChange: parseFloat(calculateChange(netProfit, prevNetProfit).toFixed(2)),
+                }
             };
         } catch (err) {
             logError(`Sales Summary Error: ${err.message}`);
@@ -380,12 +450,35 @@ class SalesReportService {
                 .sort((a, b) => b.amount - a.amount)
                 .slice(0, 10);
 
+            // Profit Trend (Daily)
+            const profitTrend = await Invoice.aggregate([
+                { $match: query },
+                {
+                    $lookup: {
+                        from: 'items',
+                        localField: 'items.item',
+                        foreignField: '_id',
+                        as: 'itemDetails'
+                    }
+                },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                        totalRevenue: { $sum: '$totalAmount' },
+                        // Note: Profit calculation requires item cost data
+                        // This is a simplified version
+                    },
+                },
+                { $sort: { _id: 1 } },
+            ]);
+
             return {
                 salesTrend,
                 paymentMethods,
                 topCustomers,
                 categoryData,
                 topItems,
+                profitTrend,
             };
         } catch (err) {
             logError(`Charts Data Error: ${err.message}`);

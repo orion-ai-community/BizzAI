@@ -16,6 +16,7 @@ const SalesReportSummaryCards = ({ summary, isLoading }) => {
         {
             label: 'Total Sales',
             value: `₹${summary.totalSales.toLocaleString('en-IN')}`,
+            change: summary.comparison?.salesChange,
             icon: '💰',
             color: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
             textColor: 'text-green-700 dark:text-green-300',
@@ -23,6 +24,7 @@ const SalesReportSummaryCards = ({ summary, isLoading }) => {
         {
             label: 'Total Invoices',
             value: summary.totalInvoices.toLocaleString('en-IN'),
+            change: summary.comparison?.invoicesChange,
             icon: '📄',
             color: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
             textColor: 'text-blue-700 dark:text-blue-300',
@@ -30,6 +32,7 @@ const SalesReportSummaryCards = ({ summary, isLoading }) => {
         {
             label: 'Total Quantity',
             value: summary.totalQuantity.toLocaleString('en-IN'),
+            change: summary.comparison?.quantityChange,
             icon: '📦',
             color: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800',
             textColor: 'text-purple-700 dark:text-purple-300',
@@ -58,6 +61,7 @@ const SalesReportSummaryCards = ({ summary, isLoading }) => {
         {
             label: 'Net Profit',
             value: `₹${summary.netProfit.toLocaleString('en-IN')}`,
+            change: summary.comparison?.profitChange,
             icon: '💎',
             color: 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800',
             textColor: 'text-indigo-700 dark:text-indigo-300',
@@ -80,9 +84,22 @@ const SalesReportSummaryCards = ({ summary, isLoading }) => {
                 >
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-2xl">{card.icon}</span>
+                        {card.change !== undefined && card.change !== null && (
+                            <span
+                                className={`text-xs font-semibold px-2 py-1 rounded-full ${card.change >= 0
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                    }`}
+                            >
+                                {card.change >= 0 ? '↑' : '↓'} {Math.abs(card.change).toFixed(1)}%
+                            </span>
+                        )}
                     </div>
                     <p className="text-sm text-secondary mb-1">{card.label}</p>
                     <p className={`text-2xl font-bold ${card.textColor}`}>{card.value}</p>
+                    {card.change !== undefined && card.change !== null && (
+                        <p className="text-xs text-secondary mt-1">vs previous period</p>
+                    )}
                 </div>
             ))}
         </div>

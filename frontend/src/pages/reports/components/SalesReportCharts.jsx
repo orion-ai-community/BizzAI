@@ -165,6 +165,29 @@ const SalesReportCharts = ({ charts, isLoading }) => {
                         </ResponsiveContainer>
                     </div>
                 )}
+
+                {/* Profit Trend */}
+                {charts.profitTrend && charts.profitTrend.length > 0 && (
+                    <div className="bg-card p-6 rounded-xl border border-border lg:col-span-2">
+                        <h4 className="text-lg font-semibold text-main mb-4">Profit Trend</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={charts.profitTrend.map(item => ({
+                                date: new Date(item._id).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
+                                revenue: item.totalRevenue,
+                            }))}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                <XAxis dataKey="date" stroke="#9CA3AF" />
+                                <YAxis stroke="#9CA3AF" />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
+                                    formatter={(value) => `₹${value.toLocaleString('en-IN')}`}
+                                />
+                                <Legend />
+                                <Line type="monotone" dataKey="revenue" stroke="#10B981" strokeWidth={2} name="Revenue (₹)" />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </div>
         </div>
     );

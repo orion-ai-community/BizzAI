@@ -27,6 +27,8 @@ const initialState = {
     paymentStatus: [],
     paymentMethod: [],
     customerId: null,
+    itemCategory: '',
+    itemSku: '',
   },
   salesPagination: {
     currentPage: 1,

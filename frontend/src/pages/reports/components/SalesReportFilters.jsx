@@ -69,8 +69,8 @@ const SalesReportFilters = ({ filters, onFilterChange, onReset }) => {
                             key={preset.value}
                             onClick={() => handleDatePresetChange(preset.value)}
                             className={`px-4 py-2 rounded-lg border transition ${localFilters.dateFilter === preset.value
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'bg-card text-main border-border hover:border-blue-400'
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-card text-main border-border hover:border-blue-400'
                                 }`}
                         >
                             {preset.label}
@@ -123,8 +123,8 @@ const SalesReportFilters = ({ filters, onFilterChange, onReset }) => {
                                 key={status}
                                 onClick={() => handleMultiSelectChange('paymentStatus', status)}
                                 className={`px-3 py-1 rounded-lg border text-sm transition ${localFilters.paymentStatus?.includes(status)
-                                        ? 'bg-green-600 text-white border-green-600'
-                                        : 'bg-card text-main border-border hover:border-green-400'
+                                    ? 'bg-green-600 text-white border-green-600'
+                                    : 'bg-card text-main border-border hover:border-green-400'
                                     }`}
                             >
                                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -142,13 +142,38 @@ const SalesReportFilters = ({ filters, onFilterChange, onReset }) => {
                             key={method}
                             onClick={() => handleMultiSelectChange('paymentMethod', method)}
                             className={`px-3 py-1 rounded-lg border text-sm transition ${localFilters.paymentMethod?.includes(method)
-                                    ? 'bg-purple-600 text-white border-purple-600'
-                                    : 'bg-card text-main border-border hover:border-purple-400'
+                                ? 'bg-purple-600 text-white border-purple-600'
+                                : 'bg-card text-main border-border hover:border-purple-400'
                                 }`}
                         >
                             {method.toUpperCase().replace('_', ' ')}
                         </button>
                     ))}
+                </div>
+            </div>
+
+            {/* Item Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label className="block text-sm font-medium text-main mb-2">Item Category</label>
+                    <input
+                        type="text"
+                        placeholder="Search by category..."
+                        value={localFilters.itemCategory || ''}
+                        onChange={(e) => handleInputChange('itemCategory', e.target.value)}
+                        className="w-full px-4 py-2 bg-card border border-border rounded-lg text-main focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-main mb-2">Item SKU</label>
+                    <input
+                        type="text"
+                        placeholder="Search by SKU..."
+                        value={localFilters.itemSku || ''}
+                        onChange={(e) => handleInputChange('itemSku', e.target.value)}
+                        className="w-full px-4 py-2 bg-card border border-border rounded-lg text-main focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                 </div>
             </div>
 
