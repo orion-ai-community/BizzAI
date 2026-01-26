@@ -4,7 +4,7 @@ const supplierSchema = new mongoose.Schema(
   {
     supplierId: {
       type: String,
-      unique: true,
+      required: true,
     },
     businessName: {
       type: String,
@@ -74,8 +74,12 @@ const supplierSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Compound index to ensure supplierId is unique per owner
+supplierSchema.index({ supplierId: 1, owner: 1 }, { unique: true });
 // Compound index to ensure contactNo is unique per owner
 supplierSchema.index({ contactNo: 1, owner: 1 }, { unique: true });
+// Compound index to ensure email is unique per owner
+supplierSchema.index({ email: 1, owner: 1 }, { unique: true });
 
 const Supplier = mongoose.model("Supplier", supplierSchema);
 export default Supplier;
