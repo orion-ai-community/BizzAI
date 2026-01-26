@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { forceLogout, login, reset } from '../redux/slices/authSlice';
-import { toast } from 'react-toastify';
 
 const DeviceConflictModal = ({ email, password, onClose }) => {
     const dispatch = useDispatch();
     const { isLoading } = useSelector((state) => state.auth);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [error, setError] = useState('');
 
     const handleForceLogout = async () => {
         if (isProcessing) return; // Prevent multiple calls
@@ -15,14 +13,14 @@ const DeviceConflictModal = ({ email, password, onClose }) => {
         setIsProcessing(true);
         try {
             // First, force logout from previous device
-            const result = await dispatch(forceLogout({ email, password })).unwrap();
+            await dispatch(forceLogout({ email, password })).unwrap();
 
             // If successful, automatically attempt login again
             await dispatch(login({ email, password })).unwrap();
 
             // Close modal on success
             onClose();
-        } catch (error) {
+        } catch {
             // Error will be handled by authSlice state
             setIsProcessing(false);
         }
@@ -65,12 +63,7 @@ const DeviceConflictModal = ({ email, password, onClose }) => {
                     This account is currently active on another device.
                 </p>
 
-                {/* Error Message */}
-                {error && (
-                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-red-600 dark:text-red-400 text-sm text-center">{error}</p>
-                    </div>
-                )}
+
 
                 {/* Buttons */}
                 <div className="flex flex-col gap-3">

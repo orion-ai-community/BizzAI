@@ -96,7 +96,6 @@ const POS = () => {
   useEffect(() => {
     if (isSuccess && invoice) {
       // Remove completed tab and navigate
-      const completedTab = activeTab;
       const newTabs = tabs.filter(tab => tab.id !== activeTabId);
 
       if (newTabs.length === 0) {
@@ -129,7 +128,7 @@ const POS = () => {
       dispatch(clearInvoice());
       dispatch(reset());
     }
-  }, [isSuccess, invoice, navigate, dispatch]);
+  }, [isSuccess, invoice, navigate, dispatch, activeTabId, tabs]);
 
   // Save tabs to localStorage whenever they change
   useEffect(() => {
@@ -561,7 +560,6 @@ const POS = () => {
 
     const total = calculateTotal();
     const paid = parseFloat(activeTab.paidAmount) || 0;
-    const creditApplied = getCreditApplied();
 
     if (paid < 0) {
       alert('Invalid payment amount!');
@@ -629,8 +627,6 @@ const POS = () => {
 
     console.log('Active tab:', { paymentMethod: activeTab.paymentMethod, bankAccount: activeTab.bankAccount });
 
-    const total = calculateTotal();
-    const paid = parseFloat(activeTab.paidAmount) || 0;
     const creditApplied = getCreditApplied();
 
     const invoiceData = {

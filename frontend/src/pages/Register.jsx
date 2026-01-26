@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { register, reset } from "../redux/slices/authSlice";
-import { toast } from "react-toastify";
 import SecurePasswordInput from '../components/SecurePasswordInput';
 
 // Frontend password strength check mirrors backend

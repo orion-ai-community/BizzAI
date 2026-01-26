@@ -54,6 +54,7 @@ import PurchaseReturn from './pages/purchase/PurchaseReturn';
 
 // Reports
 import ReportsDashboard from './pages/reports/ReportsDashboard';
+import SalesReport from './pages/reports/SalesReport';
 
 // Cash & Bank
 import BankAccounts from './pages/cashbank/BankAccounts';
@@ -377,6 +378,7 @@ function App() {
 
             {/* Reports Route */}
             <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
+            <Route path="/reports/sales" element={<ProtectedRoute><SalesReport /></ProtectedRoute>} />
 
             {/* 404 Route */}
             <Route path="*" element={<Navigate to="/login" replace />} />

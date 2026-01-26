@@ -9,12 +9,6 @@ const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (isOpen) {
-            fetchOrders();
-        }
-    }, [isOpen]);
-
     const fetchOrders = async () => {
         setLoading(true);
         try {
@@ -24,13 +18,13 @@ const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
                     headers: { Authorization: `Bearer ${user.token}` }
                 }
             );
-            
+
             // Filter only Confirmed orders that are not fully delivered
-            const availableOrders = response.data.filter(order => 
-                order.status === 'Confirmed' || 
+            const availableOrders = response.data.filter(order =>
+                order.status === 'Confirmed' ||
                 order.status === 'Partially Delivered'
             );
-            
+
             setOrders(availableOrders);
         } catch (error) {
             console.error('Error fetching sales orders:', error);
@@ -39,6 +33,13 @@ const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchOrders();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     const filteredOrders = orders.filter(order =>
         order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,11 +98,10 @@ const SalesOrderSelectionModal = ({ isOpen, onClose, onSelect }) => {
                                                 <h3 className="font-bold text-indigo-600 text-lg">
                                                     {order.orderNumber}
                                                 </h3>
-                                                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                                                    order.status === 'Confirmed' 
-                                                        ? 'bg-green-100 text-green-800' 
+                                                <span className={`px-3 py-1 text-xs font-semibold rounded-full ${order.status === 'Confirmed'
+                                                        ? 'bg-green-100 text-green-800'
                                                         : 'bg-blue-100 text-blue-800'
-                                                }`}>
+                                                    }`}>
                                                     {order.status}
                                                 </span>
                                             </div>

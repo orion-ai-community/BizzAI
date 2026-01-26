@@ -14,7 +14,7 @@ const EditCustomer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { customer, isLoading, isSuccess, isError, message } = useSelector(
+  const { customer, isLoading, isSuccess } = useSelector(
     (state) => state.customers
   );
 
@@ -73,7 +73,7 @@ const EditCustomer = () => {
     } else if (result.type === 'customers/update/rejected') {
       const errorMsg = result.payload || "Failed to update customer";
       toast.error(errorMsg);
-      
+
       if (errorMsg.toLowerCase().includes('phone')) {
         setDuplicateField('phone');
       } else if (errorMsg.toLowerCase().includes('email')) {
@@ -164,9 +164,8 @@ const EditCustomer = () => {
                   if (duplicateField === 'phone') setDuplicateField(null);
                 }}
                 required
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${
-                  duplicateField === 'phone' ? 'border-red-500 border-2' : 'border-default'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${duplicateField === 'phone' ? 'border-red-500 border-2' : 'border-default'
+                  }`}
                 placeholder="+91 9876543210"
               />
               {duplicateField === 'phone' && (
@@ -191,9 +190,8 @@ const EditCustomer = () => {
                   onChange(e);
                   if (duplicateField === 'email') setDuplicateField(null);
                 }}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${
-                  duplicateField === 'email' ? 'border-red-500 border-2' : 'border-default'
-                }`}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${duplicateField === 'email' ? 'border-red-500 border-2' : 'border-default'
+                  }`}
                 placeholder="customer@example.com"
               />
               {duplicateField === 'email' && (

@@ -28,7 +28,7 @@ export const initSentry = () => {
         replaysSessionSampleRate: 0.1,
         replaysOnErrorSampleRate: 1.0,
         // Filter sensitive data
-        beforeSend(event, hint) {
+        beforeSend(event) {
             // Remove sensitive data from breadcrumbs
             if (event.breadcrumbs) {
                 event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {

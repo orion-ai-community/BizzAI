@@ -11,7 +11,7 @@ const AddCustomer = () => {
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
 
-  const { isLoading, isSuccess, isError, message, customers } = useSelector(
+  const { isLoading, isSuccess, customers } = useSelector(
     (state) => state.customers
   );
 

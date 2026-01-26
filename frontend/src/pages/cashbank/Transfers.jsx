@@ -63,7 +63,6 @@ const Transfers = () => {
         { value: 'cash', label: `Cash in Hand (₹${position?.cashInHand?.toLocaleString() || 0})` }
     ];
 
-    const selectedFrom = accountOptions.find(opt => opt.value === formData.fromAccount);
     const selectedTo = accountOptions.find(opt => opt.value === formData.toAccount);
 
     // Dynamic balance check

@@ -5,6 +5,7 @@ import Expense from "../models/Expense.js";
 import { generateAIReport } from "../utils/aiReportHelper.js";
 import { checkStockAlerts } from "../utils/stockAlert.js";
 import { info, error } from "../utils/logger.js";
+import salesReportService from "../services/salesReportService.js";
 
 /**
  * @desc Generate Sales Report (daily/weekly/monthly) - Only for current owner
@@ -179,6 +180,149 @@ export const getDashboardStats = async (req, res) => {
     });
   } catch (err) {
     error(`Dashboard Stats Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Sales Report Data with Filters and Pagination
+ * @route GET /api/reports/sales/data
+ */
+export const getSalesReportData = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+
+    const result = await salesReportService.getSalesData(userId, filters, page, limit);
+
+    info(`Sales report data generated for ${req.user.name}: ${result.pagination.totalRecords} records`);
+
+    res.status(200).json(result);
+  } catch (err) {
+    error(`Sales Report Data Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Sales Report Summary KPIs
+ * @route GET /api/reports/sales/summary
+ */
+export const getSalesReportSummary = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    const summary = await salesReportService.getSalesSummary(userId, filters);
+
+    info(`Sales report summary generated for ${req.user.name}`);
+
+    res.status(200).json(summary);
+  } catch (err) {
+    error(`Sales Report Summary Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Sales Report Charts Data
+ * @route GET /api/reports/sales/charts
+ */
+export const getSalesReportCharts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    const charts = await salesReportService.getChartsData(userId, filters);
+
+    info(`Sales report charts generated for ${req.user.name}`);
+
+    res.status(200).json(charts);
+  } catch (err) {
+    error(`Sales Report Charts Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Export Sales Report to PDF/CSV
+ * @route GET /api/reports/sales/export
+ */
+export const exportSalesReport = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const format = req.query.format || 'pdf'; // pdf, csv
+
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    // Get all data (no pagination for export)
+    const reportData = await salesReportService.getSalesData(userId, filters, 1, 10000);
+    const summary = await salesReportService.getSalesSummary(userId, filters);
+
+    const userInfo = {
+      shopName: req.user.shopName,
+      shopAddress: req.user.shopAddress,
+      gstNumber: req.user.gstNumber,
+      phone: req.user.phone,
+    };
+
+    // Dynamic import to avoid loading exporter if not needed
+    const { default: salesReportExporter } = await import('../utils/salesReportExporter.js');
+
+    if (format === 'pdf') {
+      const pdfBuffer = await salesReportExporter.exportToPDF(reportData, summary, userInfo, filters);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=sales-report-${Date.now()}.pdf`);
+      res.send(Buffer.from(pdfBuffer));
+    } else if (format === 'csv') {
+      const csvData = await salesReportExporter.exportToCSV(reportData, summary);
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=sales-report-${Date.now()}.csv`);
+      res.send(csvData);
+    } else {
+      res.status(400).json({ message: 'Invalid export format. Use pdf or csv.' });
+    }
+
+    info(`Sales report exported as ${format} for ${req.user.name}`);
+  } catch (err) {
+    error(`Sales Report Export Error: ${err.message}`);
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
