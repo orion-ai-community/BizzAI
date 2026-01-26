@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import useDraftSave from '../hooks/useDraftSave';
 import { addSupplier, reset } from '../redux/slices/supplierSlice';
 import Layout from '../components/Layout';
 
@@ -11,7 +12,7 @@ const AddSupplier = () => {
     (state) => state.suppliers
   );
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     businessName: '',
     contactPersonName: '',
     contactNo: '',
@@ -23,7 +24,9 @@ const AddSupplier = () => {
     balanceType: 'payable',
     creditPeriod: 0,
     status: 'active',
-  });
+  };
+
+  const [formData, setFormData, clearDraft] = useDraftSave('supplierDraft', initialFormData);
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
@@ -32,10 +35,11 @@ const AddSupplier = () => {
   useEffect(() => {
     // Only navigate if we explicitly set the flag from this component
     if (shouldNavigate && isSuccess) {
+      clearDraft(); // Clear draft on success
       navigate('/suppliers');
       dispatch(reset());
     }
-  }, [shouldNavigate, isSuccess, navigate, dispatch]);
+  }, [shouldNavigate, isSuccess, navigate, dispatch, clearDraft]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({

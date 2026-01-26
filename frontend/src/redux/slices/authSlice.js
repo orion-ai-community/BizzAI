@@ -93,8 +93,23 @@ export const performPasswordReset = createAsyncThunk(
 // Logout user
 export const logout = createAsyncThunk('auth/logout', async () => {
   localStorage.removeItem('user');
-  // Clear Return page draft to prevent state leakage across sessions
-  localStorage.removeItem('returnDraft');
+
+  // Clear all form drafts to prevent state leakage across sessions
+  const draftKeys = [
+    'returnDraft',
+    'purchaseDraft',
+    'salesInvoiceDraft',
+    'salesOrderDraft',
+    'deliveryChallanDraft',
+    'estimateDraft',
+    'customerDraft',
+    'supplierDraft',
+    'itemDraft',
+    'paymentInDraft',
+    'paymentOutDraft'
+  ];
+
+  draftKeys.forEach(key => localStorage.removeItem(key));
 });
 
 // Force logout from previous device

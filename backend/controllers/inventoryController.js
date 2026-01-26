@@ -379,3 +379,68 @@ export const importItems = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
+/**
+ * @desc Scan item by barcode/SKU for purchase entry
+ * @route GET /api/items/scan?code=<value>
+ */
+export const scanItem = async (req, res) => {
+  try {
+    const { code } = req.query;
+
+    if (!code || code.trim() === '') {
+      return res.status(400).json({ message: "Scan code is required" });
+    }
+
+    const trimmedCode = code.trim();
+
+    // Search by barcode, sku, or supplierSKU
+    const item = await Item.findOne({
+      addedBy: req.user._id,
+      $or: [
+        { barcode: trimmedCode },
+        { sku: trimmedCode },
+        { supplierSKU: trimmedCode }
+      ]
+    });
+
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // Get last purchase rate from recent purchases (if Purchase model exists)
+    let lastPurchaseRate = item.costPrice;
+
+    try {
+      const Purchase = (await import("../models/Purchase.js")).default;
+
+      const lastPurchase = await Purchase.findOne({
+        createdBy: req.user._id,
+        'items.item': item._id,
+        status: 'finalized'
+      })
+        .sort({ purchaseDate: -1 })
+        .select('items');
+
+      if (lastPurchase) {
+        const purchaseItem = lastPurchase.items.find(i => i.item.toString() === item._id.toString());
+        if (purchaseItem) {
+          lastPurchaseRate = purchaseItem.purchaseRate;
+        }
+      }
+    } catch (purchaseError) {
+      // Purchase model might not exist yet, use costPrice
+      info(`Could not fetch last purchase rate: ${purchaseError.message}`);
+    }
+
+    info(`Item scanned by ${req.user.name}: ${item.name} (code: ${trimmedCode})`);
+
+    res.status(200).json({
+      ...item.toObject(),
+      lastPurchaseRate
+    });
+  } catch (err) {
+    error(`Scan Item Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};

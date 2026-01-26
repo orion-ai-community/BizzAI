@@ -43,6 +43,52 @@ const itemSchema = new mongoose.Schema(
       type: String,
       default: "pcs", // e.g. kg, litre, pcs
     },
+    // Purchase-specific fields
+    hsnCode: {
+      type: String,
+      default: "",
+    },
+    trackBatch: {
+      type: Boolean,
+      default: false,
+    },
+    trackExpiry: {
+      type: Boolean,
+      default: false,
+    },
+    batches: [
+      {
+        batchNo: {
+          type: String,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        expiryDate: {
+          type: Date,
+        },
+        purchaseRate: {
+          type: Number,
+          required: true,
+        },
+        purchaseDate: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    // Barcode/SKU fields for scanning
+    barcode: {
+      type: String,
+      sparse: true,
+    },
+    supplierSKU: {
+      type: String,
+      sparse: true,
+    },
     addedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -68,6 +114,10 @@ itemSchema.set("toObject", { virtuals: true });
 
 // Compound index to ensure item name is unique per owner
 itemSchema.index({ name: 1, addedBy: 1 }, { unique: true });
+
+// Sparse indexes for barcode scanning (allows null values)
+itemSchema.index({ barcode: 1, addedBy: 1 }, { sparse: true });
+itemSchema.index({ supplierSKU: 1, addedBy: 1 }, { sparse: true });
 
 const Item = mongoose.model("Item", itemSchema);
 export default Item;

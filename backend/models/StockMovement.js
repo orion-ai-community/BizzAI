@@ -9,7 +9,7 @@ const stockMovementSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ["RESERVE", "RELEASE", "DELIVER", "IN_TRANSIT", "POS_SALE", "RETURN", "INVOICE"],
+            enum: ["RESERVE", "RELEASE", "DELIVER", "IN_TRANSIT", "POS_SALE", "RETURN", "INVOICE", "PURCHASE", "PURCHASE_RETURN", "PURCHASE_CANCEL"],
             required: true,
         },
         quantity: {
@@ -22,7 +22,7 @@ const stockMovementSchema = new mongoose.Schema(
         },
         sourceType: {
             type: String,
-            enum: ["SalesOrder", "DeliveryChallan", "Invoice", "Return"],
+            enum: ["SalesOrder", "DeliveryChallan", "Invoice", "Return", "Purchase", "PurchaseReturn"],
             required: true,
         },
         // Before state

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import useDraftSave from "../hooks/useDraftSave";
 import { addCustomer, reset, getAllCustomers } from "../redux/slices/customerSlice";
 import Layout from "../components/Layout";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,13 +16,15 @@ const AddCustomer = () => {
     (state) => state.customers
   );
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: "",
     phone: "",
     email: "",
     address: "",
     referredBy: "",
-  });
+  };
+
+  const [formData, setFormData, clearDraft] = useDraftSave('customerDraft', initialFormData);
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
   const [duplicateField, setDuplicateField] = useState(null);
@@ -38,10 +41,11 @@ const AddCustomer = () => {
   useEffect(() => {
     // Only navigate if we explicitly set the flag from this component
     if (shouldNavigate && isSuccess) {
+      clearDraft(); // Clear draft on success
       navigate("/customers");
       dispatch(reset());
     }
-  }, [shouldNavigate, isSuccess, navigate, dispatch]);
+  }, [shouldNavigate, isSuccess, navigate, dispatch, clearDraft]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

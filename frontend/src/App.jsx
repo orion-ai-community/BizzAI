@@ -46,6 +46,9 @@ import ReturnedItems from './pages/sales/ReturnedItems';
 
 // Purchase
 import Purchase from './pages/purchase/Purchase';
+import PurchaseEntry from './pages/purchase/PurchaseEntry';
+import PurchaseList from './pages/purchase/PurchaseList';
+import PurchaseDetail from './pages/purchase/PurchaseDetail';
 import Bills from './pages/purchase/Bills';
 import PaymentOut from './pages/purchase/PaymentOut';
 import Expenses from './pages/purchase/Expenses';
@@ -337,7 +340,9 @@ function App() {
 
             {/* Purchase Routes */}
             <Route path="/purchase">
-              <Route path="entry" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
+              <Route path="entry" element={<ProtectedRoute><PurchaseEntry /></ProtectedRoute>} />
+              <Route path="list" element={<ProtectedRoute><PurchaseList /></ProtectedRoute>} />
+              <Route path=":id" element={<ProtectedRoute><PurchaseDetail /></ProtectedRoute>} />
               <Route path="bills" element={<ProtectedRoute><Bills /></ProtectedRoute>} />
               <Route path="payment-out" element={<ProtectedRoute><PaymentOut /></ProtectedRoute>} />
               <Route path="expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />

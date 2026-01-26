@@ -26,6 +26,7 @@ import cashbankRoutes from "./routes/cashbankRoutes.js";
 import paymentInRoutes from "./routes/paymentInRoutes.js";
 import salesOrderRoutes from "./routes/salesOrderRoutes.js";
 import deliveryChallanRoutes from "./routes/deliveryChallanRoutes.js";
+import purchaseRoutes from "./routes/purchaseRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import refreshTokenRoutes from "./routes/refreshTokenRoutes.js";
 import errorHandler from "./middlewares/errorHandler.js";
@@ -149,6 +150,7 @@ app.use("/api/cashbank", cashbankRoutes);
 app.use("/api/payment-in", paymentInRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
 app.use("/api/delivery-challan", deliveryChallanRoutes);
+app.use("/api/purchases", purchaseRoutes);
 
 // =======================
 // Error Handler (must be last)

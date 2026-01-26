@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import useDraftSave from '../hooks/useDraftSave';
 import { addItem, reset } from '../redux/slices/inventorySlice';
 import Layout from '../components/Layout';
 
@@ -11,7 +12,7 @@ const AddItem = () => {
     (state) => state.inventory
   );
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: '',
     sku: '',
     category: '',
@@ -20,7 +21,9 @@ const AddItem = () => {
     stockQty: '',
     lowStockLimit: '5',
     unit: 'pcs',
-  });
+  };
+
+  const [formData, setFormData, clearDraft] = useDraftSave('itemDraft', initialFormData);
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
 
@@ -29,10 +32,11 @@ const AddItem = () => {
   useEffect(() => {
     // Only navigate if we explicitly set the flag from this component
     if (shouldNavigate && isSuccess) {
+      clearDraft(); // Clear draft on success
       navigate('/inventory');
       dispatch(reset());
     }
-  }, [shouldNavigate, isSuccess, navigate, dispatch]);
+  }, [shouldNavigate, isSuccess, navigate, dispatch, clearDraft]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({

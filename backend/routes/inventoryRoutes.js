@@ -7,6 +7,7 @@ import {
   deleteItem,
   getLowStockItems,
   importItems,
+  scanItem,
 } from "../controllers/inventoryController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/rbacMiddleware.js";
@@ -18,6 +19,8 @@ router.post("/", protect, addItem);
 router.post("/import", protect, importItems);
 router.get("/", protect, getAllItems);
 router.get("/low-stock", protect, getLowStockItems);
+// Scan route (must be before /:id to avoid conflicts)
+router.get("/scan", protect, scanItem);
 router.get("/:id", protect, getSingleItem);
 router.put(
   "/:id",

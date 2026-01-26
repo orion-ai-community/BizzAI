@@ -11,6 +11,7 @@ import billReducer from './slices/billSlice';
 import cashbankReducer from './slices/cashbankSlice';
 import dueReducer from './slices/dueSlice';
 import deliveryChallanReducer from './slices/deliveryChallanSlice';
+import purchaseReducer from './slices/purchaseSlice';
 
 export const store = configureStore({
   reducer: {
@@ -26,5 +27,6 @@ export const store = configureStore({
     cashbank: cashbankReducer,
     due: dueReducer,
     deliveryChallan: deliveryChallanReducer,
+    purchase: purchaseReducer,
   },
 });
