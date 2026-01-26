@@ -344,6 +344,13 @@ const Return = () => {
         title="Return"
         description="Process customer returns and issue credits"
         actions={[
+          <button
+            key="list"
+            onClick={() => navigate("/sales/returned-items")}
+            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+          >
+            View Returned Items
+          </button>,
           formData.selectedInvoice && (
             <button
               key="clear"
@@ -740,12 +747,6 @@ const Return = () => {
                 className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
               >
                 {loading ? "Processing..." : "Save Return"}
-              </button>
-              <button
-                onClick={() => navigate("/sales/returned-items")}
-                className="w-full py-3 border border-default text-secondary rounded-lg hover:bg-surface"
-              >
-                View Returned Items
               </button>
             </div>
           </div>
