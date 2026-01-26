@@ -178,6 +178,13 @@ const DeliveryChallan = () => {
                 description="Create delivery notes for goods dispatch"
                 actions={[
                     <button
+                        key="list"
+                        onClick={() => navigate('/sales/delivery-challan-list')}
+                        className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                    >
+                        View All Delivery Challans
+                    </button>,
+                    <button
                         key="save"
                         onClick={handleSave}
                         disabled={isLoading}
