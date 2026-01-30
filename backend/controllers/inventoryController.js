@@ -9,8 +9,11 @@ import { info, error } from "../utils/logger.js";
  */
 export const addItem = async (req, res) => {
   try {
-    const { name, sku, category, costPrice, sellingPrice, stockQty, lowStockLimit, unit } =
-      req.body;
+    const {
+      name, sku, barcode, category, hsnCode, taxRate,
+      costPrice, sellingPrice, stockQty, lowStockLimit, unit,
+      trackBatch, trackExpiry
+    } = req.body;
 
     if (!name || !costPrice || !sellingPrice) {
       return res.status(400).json({ message: "Please fill all required fields" });
@@ -25,12 +28,17 @@ export const addItem = async (req, res) => {
     const item = await Item.create({
       name,
       sku,
+      barcode,
       category,
+      hsnCode,
+      taxRate: taxRate || 18,
       costPrice,
       sellingPrice,
-      stockQty,
+      stockQty: stockQty || 0,
       lowStockLimit,
       unit,
+      trackBatch: trackBatch || false,
+      trackExpiry: trackExpiry || false,
       addedBy: req.user._id,
     });
 

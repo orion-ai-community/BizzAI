@@ -148,7 +148,15 @@ export const getTransactions = async (req, res) => {
     const transactions = await CashbankTransaction.find({
       userId: req.user._id,
       $or: [{ fromAccount: req.params.id }, { toAccount: req.params.id }]
-    }).sort({ date: -1 });
+    }).sort({ date: -1, createdAt: -1 });
+
+    // Debug: Log first 3 transactions to verify sort order
+    console.log('\n=== TRANSACTION SORT DEBUG ===');
+    console.log('Total transactions:', transactions.length);
+    transactions.slice(0, 3).forEach((t, i) => {
+      console.log(`${i + 1}. ${t.description} - ₹${t.amount} - Date: ${t.date} - Created: ${t.createdAt}`);
+    });
+    console.log('=== END DEBUG ===\n');
 
     res.status(200).json(transactions);
   } catch (err) {

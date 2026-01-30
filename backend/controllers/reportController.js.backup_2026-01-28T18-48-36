@@ -1,0 +1,550 @@
+import Invoice from "../models/Invoice.js";
+import Item from "../models/Item.js";
+import Customer from "../models/Customer.js";
+import Expense from "../models/Expense.js";
+import { generateAIReport } from "../utils/aiReportHelper.js";
+import { checkStockAlerts } from "../utils/stockAlert.js";
+import { info, error } from "../utils/logger.js";
+import salesReportService from "../services/salesReportService.js";
+
+/**
+ * @desc Generate Sales Report (daily/weekly/monthly) - Only for current owner
+ * @route GET /api/reports/sales
+ */
+export const getSalesReport = async (req, res) => {
+  try {
+    // Only get invoices and items for current user
+    const invoices = await Invoice.find({ createdBy: req.user._id });
+    const items = await Item.find({ addedBy: req.user._id });
+
+    const report = generateAIReport(invoices, items);
+    const stockAlerts = await checkStockAlerts(req.user._id);
+
+    info(`Sales report generated for ${req.user.name} with ${report.summary.totalInvoices} invoices`);
+
+    res.status(200).json({ report, stockAlerts });
+  } catch (err) {
+    error(`Report Generation Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Stock Report (only for current owner)
+ * @route GET /api/reports/stock
+ */
+export const getStockReport = async (req, res) => {
+  try {
+    const items = await Item.find({ addedBy: req.user._id }).sort({ stockQty: 1 });
+    const lowStock = items.filter((i) => i.stockQty <= i.lowStockLimit);
+    res.status(200).json({ totalItems: items.length, lowStock });
+  } catch (err) {
+    error(`Stock Report Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Customer Dues Report (only for current owner)
+ * @route GET /api/reports/customers
+ */
+export const getCustomerReport = async (req, res) => {
+  try {
+    const customers = await Customer.find({
+      owner: req.user._id,
+      dues: { $gt: 0 }
+    }).sort({ dues: -1 });
+    res.status(200).json(customers);
+  } catch (err) {
+    error(`Customer Report Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Dashboard Statistics for Graphs
+ * @route GET /api/reports/dashboard-stats
+ */
+export const getDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Import additional models
+    const Item = (await import("../models/Item.js")).default;
+    const Purchase = (await import("../models/Purchase.js")).default;
+    const SalesOrder = (await import("../models/SalesOrder.js")).default;
+    const Supplier = (await import("../models/Supplier.js")).default;
+    const BankAccount = (await import("../models/BankAccount.js")).default;
+    const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
+    const PaymentIn = (await import("../models/PaymentIn.js")).default;
+    const PaymentOut = (await import("../models/PaymentOut.js")).default;
+    const Return = (await import("../models/Return.js")).default;
+    const PurchaseReturn = (await import("../models/PurchaseReturn.js")).default;
+
+    // 0. Summary metrics (Invoices/Revenue)
+    const allInvoices = await Invoice.find({ createdBy: userId });
+    const totalInvoices = allInvoices.length;
+    const totalRevenue = allInvoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+    const totalCollected = allInvoices.reduce((sum, inv) => {
+      const collected = Math.min(inv.totalAmount || 0, (inv.paidAmount || 0) + (inv.creditApplied || 0));
+      return sum + collected;
+    }, 0);
+    const totalOutstanding = Math.max(0, totalRevenue - totalCollected); // Customer receivables
+
+    // Import Bill model for supplier payables
+    const Bill = (await import("../models/Bill.js")).default;
+
+    // Supplier Outstanding (Payables - what we owe to suppliers)
+    const allBills = await Bill.find({ createdBy: userId, isDeleted: false });
+    const totalSupplierOutstanding = allBills.reduce((sum, bill) => sum + (bill.outstandingAmount || 0), 0);
+    const totalBillsAmount = allBills.reduce((sum, bill) => sum + (bill.totalAmount || 0), 0);
+    const totalBillsPaid = allBills.reduce((sum, bill) => sum + (bill.paidAmount || 0), 0);
+
+    // 1. Inventory Metrics
+    const allItems = await Item.find({ addedBy: userId });
+    const totalItems = allItems.length;
+    const lowStockItems = allItems.filter(item => item.stockQty <= item.lowStockLimit && item.stockQty > 0).length;
+    const outOfStockItems = allItems.filter(item => item.stockQty === 0).length;
+    const totalInventoryValue = allItems.reduce((sum, item) => sum + (item.stockQty * item.costPrice), 0);
+
+    // 2. Purchase Metrics
+    const allPurchases = await Purchase.find({ createdBy: userId, status: { $ne: 'cancelled' } });
+    const totalPurchases = allPurchases.length;
+    const totalPurchaseAmount = allPurchases.reduce((sum, purchase) => sum + (purchase.totalAmount || 0), 0);
+
+    // 3. Supplier Metrics
+    const allSuppliers = await Supplier.find({ owner: userId, status: 'active' });
+    const totalSuppliers = allSuppliers.length;
+
+    // Top 5 suppliers by purchase volume
+    const topSuppliers = await Purchase.aggregate([
+      { $match: { createdBy: userId, status: { $ne: 'cancelled' } } },
+      {
+        $group: {
+          _id: "$supplier",
+          totalPurchaseValue: { $sum: "$totalAmount" },
+          purchaseCount: { $sum: 1 }
+        }
+      },
+      { $sort: { totalPurchaseValue: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "suppliers",
+          localField: "_id",
+          foreignField: "_id",
+          as: "supplierInfo"
+        }
+      },
+      { $unwind: "$supplierInfo" },
+      {
+        $project: {
+          name: "$supplierInfo.businessName",
+          totalPurchaseValue: 1,
+          purchaseCount: 1
+        }
+      }
+    ]);
+
+    // 4. Sales Order Metrics
+    const allSalesOrders = await SalesOrder.find({ createdBy: userId });
+    const pendingSalesOrders = allSalesOrders.filter(order =>
+      order.status === 'Draft' || order.status === 'Confirmed' || order.status === 'Partially Delivered'
+    ).length;
+    const completedSalesOrders = allSalesOrders.filter(order =>
+      order.status === 'Delivered' || order.status === 'Invoiced'
+    ).length;
+    const totalSalesOrderValue = allSalesOrders
+      .filter(order => order.status !== 'Cancelled')
+      .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
+    // 5. Cash & Bank Metrics
+    const bankAccounts = await BankAccount.find({ userId });
+    const totalBankBalance = bankAccounts.reduce((sum, acc) => sum + acc.currentBalance, 0);
+    const bankAccountCount = bankAccounts.length;
+
+    // Calculate cash in hand
+    const mongoose = (await import("mongoose")).default;
+    const cashIn = await CashbankTransaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          toAccount: 'cash'
+        }
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    const cashOut = await CashbankTransaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          fromAccount: 'cash'
+        }
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    const cashInHand = (cashIn[0]?.total || 0) - (cashOut[0]?.total || 0);
+    const totalLiquidity = cashInHand + totalBankBalance;
+
+    // 6. Customer Metrics
+    const allCustomers = await Customer.find({ owner: userId });
+    const totalCustomers = allCustomers.length;
+
+    // Customer dues from Customer model (separate from invoice outstanding)
+    const totalCustomerDues = allCustomers.reduce((sum, customer) => sum + (customer.dues || 0), 0);
+
+    // Combined customer outstanding (invoice outstanding + customer dues)
+    const totalCustomerOutstanding = totalOutstanding + totalCustomerDues;
+
+    // 7. Payment Metrics
+    const allPaymentsIn = await PaymentIn.find({ createdBy: userId });
+    const totalPaymentsIn = allPaymentsIn.reduce((sum, payment) => sum + (payment.totalAmount || 0), 0);
+
+    const allPaymentsOut = await PaymentOut.find({ createdBy: userId, status: { $ne: 'cancelled' } });
+    const totalPaymentsOut = allPaymentsOut.reduce((sum, payment) => sum + (payment.totalAmount || 0), 0);
+
+    const netCashFlow = totalPaymentsIn - totalPaymentsOut;
+
+    // 8. Return Metrics
+    const allSalesReturns = await Return.find({ createdBy: userId });
+    const salesReturnsCount = allSalesReturns.length;
+    const salesReturnsAmount = allSalesReturns.reduce((sum, ret) => sum + (ret.totalReturnAmount || 0), 0);
+
+    const allPurchaseReturns = await PurchaseReturn.find({ createdBy: userId });
+    const purchaseReturnsCount = allPurchaseReturns.length;
+    const purchaseReturnsAmount = allPurchaseReturns.reduce((sum, ret) => sum + (ret.totalAmount || 0), 0);
+
+    // 9. Profit Metrics
+    // Get expenses from Expense model
+    const allExpenses = await Expense.find({ createdBy: userId });
+    const expenseModelTotal = allExpenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+
+    // Get expenses from CashbankTransaction (cash outflows)
+    const cashOutflows = await CashbankTransaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: 'out',
+          fromAccount: 'cash'
+        }
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const cashExpenses = cashOutflows[0]?.total || 0;
+
+    // Total expenses = Expense model + Cash outflows
+    const totalExpenses = expenseModelTotal + cashExpenses;
+
+    // Gross Profit = Revenue - COGS (approximated as: Purchase Amount - Purchase Returns + Sales Returns)
+    // This is a simplified calculation. In reality, COGS should track actual cost of items sold.
+    const approximateCOGS = totalPurchaseAmount - purchaseReturnsAmount + salesReturnsAmount;
+    // Operating Profit = Revenue - Expenses (not using COGS as it's inaccurate)
+    const operatingProfit = totalRevenue - totalExpenses;
+    const profitMargin = totalRevenue > 0 ? ((operatingProfit / totalRevenue) * 100) : 0;
+
+
+
+    // 10. Sales over time (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const dailySales = await Invoice.aggregate([
+      {
+        $match: {
+          createdBy: userId,
+          createdAt: { $gte: thirtyDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalSales: { $sum: "$totalAmount" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // 11. Revenue vs Expenses (last 6 months)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const monthlyRevenue = await Invoice.aggregate([
+      {
+        $match: {
+          createdBy: userId,
+          createdAt: { $gte: sixMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          revenue: { $sum: "$totalAmount" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const monthlyExpenses = await Expense.aggregate([
+      {
+        $match: {
+          createdBy: userId,
+          date: { $gte: sixMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$date" } },
+          expenses: { $sum: "$amount" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Combine monthly revenue and expenses
+    const months = Array.from(new Set([
+      ...monthlyRevenue.map(r => r._id),
+      ...monthlyExpenses.map(e => e._id)
+    ])).sort();
+
+    const revenueVsExpenses = months.map(month => ({
+      month,
+      revenue: monthlyRevenue.find(r => r._id === month)?.revenue || 0,
+      expenses: monthlyExpenses.find(e => e._id === month)?.expenses || 0
+    }));
+
+    // 12. Payment methods distribution (Invoices)
+    const paymentMethods = await Invoice.aggregate([
+      { $match: { createdBy: userId } },
+      {
+        $group: {
+          _id: "$paymentMethod",
+          count: { $sum: 1 },
+          amount: { $sum: "$totalAmount" }
+        }
+      }
+    ]);
+
+    // 13. Outstanding dues trend (Top 5 customers)
+    const topCustomersWithDues = await Customer.find({
+      owner: userId,
+      dues: { $gt: 0 }
+    })
+      .sort({ dues: -1 })
+      .limit(5)
+      .select('name dues');
+
+    res.status(200).json({
+      // Invoice/Revenue metrics
+      totalInvoices,
+      totalRevenue,
+      totalCollected,
+      totalOutstanding, // Invoice outstanding only
+      totalCustomerDues, // Customer.dues field
+      totalCustomerOutstanding, // Combined (invoice + customer dues)
+
+      // Supplier Payables metrics
+      totalSupplierOutstanding, // What we owe suppliers
+      totalBillsAmount,
+      totalBillsPaid,
+
+      // Inventory metrics
+      totalItems,
+      lowStockItems,
+      outOfStockItems,
+      totalInventoryValue,
+
+      // Purchase metrics
+      totalPurchases,
+      totalPurchaseAmount,
+
+      // Supplier metrics
+      totalSuppliers,
+      topSuppliers,
+
+      // Sales Order metrics
+      pendingSalesOrders,
+      completedSalesOrders,
+      totalSalesOrderValue,
+
+      // Cash & Bank metrics
+      cashInHand,
+      totalBankBalance,
+      totalLiquidity,
+      bankAccountCount,
+
+      // Customer metrics
+      totalCustomers,
+
+      // Payment metrics
+      totalPaymentsIn,
+      totalPaymentsOut,
+      netCashFlow,
+
+      // Return metrics
+      salesReturnsCount,
+      salesReturnsAmount,
+      purchaseReturnsCount,
+      purchaseReturnsAmount,
+
+      // Profit metrics
+      totalExpenses,
+      operatingProfit,
+      profitMargin,
+
+      // Charts data
+      dailySales,
+      revenueVsExpenses,
+      paymentMethods,
+      topCustomersWithDues
+    });
+  } catch (err) {
+    error(`Dashboard Stats Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Sales Report Data with Filters and Pagination
+ * @route GET /api/reports/sales/data
+ */
+export const getSalesReportData = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+
+    const result = await salesReportService.getSalesData(userId, filters, page, limit);
+
+    info(`Sales report data generated for ${req.user.name}: ${result.pagination.totalRecords} records`);
+
+    res.status(200).json(result);
+  } catch (err) {
+    error(`Sales Report Data Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Sales Report Summary KPIs
+ * @route GET /api/reports/sales/summary
+ */
+export const getSalesReportSummary = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    const summary = await salesReportService.getSalesSummary(userId, filters);
+
+    info(`Sales report summary generated for ${req.user.name}`);
+
+    res.status(200).json(summary);
+  } catch (err) {
+    error(`Sales Report Summary Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Get Sales Report Charts Data
+ * @route GET /api/reports/sales/charts
+ */
+export const getSalesReportCharts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    const charts = await salesReportService.getChartsData(userId, filters);
+
+    info(`Sales report charts generated for ${req.user.name}`);
+
+    res.status(200).json(charts);
+  } catch (err) {
+    error(`Sales Report Charts Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+/**
+ * @desc Export Sales Report to PDF/CSV
+ * @route GET /api/reports/sales/export
+ */
+export const exportSalesReport = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const format = req.query.format || 'pdf'; // pdf, csv
+
+    const filters = {
+      dateFilter: req.query.dateFilter || 'this_month',
+      customStartDate: req.query.startDate,
+      customEndDate: req.query.endDate,
+      invoiceNo: req.query.invoiceNo,
+      paymentStatus: req.query.paymentStatus ? req.query.paymentStatus.split(',') : [],
+      paymentMethod: req.query.paymentMethod ? req.query.paymentMethod.split(',') : [],
+      customerId: req.query.customerId,
+    };
+
+    // Get all data (no pagination for export)
+    const reportData = await salesReportService.getSalesData(userId, filters, 1, 10000);
+    const summary = await salesReportService.getSalesSummary(userId, filters);
+
+    const userInfo = {
+      shopName: req.user.shopName,
+      shopAddress: req.user.shopAddress,
+      gstNumber: req.user.gstNumber,
+      phone: req.user.phone,
+    };
+
+    // Dynamic import to avoid loading exporter if not needed
+    const { default: salesReportExporter } = await import('../utils/salesReportExporter.js');
+
+    if (format === 'pdf') {
+      const pdfBuffer = await salesReportExporter.exportToPDF(reportData, summary, userInfo, filters);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=sales-report-${Date.now()}.pdf`);
+      res.send(Buffer.from(pdfBuffer));
+    } else if (format === 'csv') {
+      const csvData = await salesReportExporter.exportToCSV(reportData, summary);
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=sales-report-${Date.now()}.csv`);
+      res.send(csvData);
+    } else {
+      res.status(400).json({ message: 'Invalid export format. Use pdf or csv.' });
+    }
+
+    info(`Sales report exported as ${format} for ${req.user.name}`);
+  } catch (err) {
+    error(`Sales Report Export Error: ${err.message}`);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+

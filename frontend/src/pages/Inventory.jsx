@@ -35,7 +35,8 @@ const Inventory = () => {
   const filteredItems = items.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase()));
+      (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.barcode && item.barcode.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
@@ -341,8 +342,10 @@ const Inventory = () => {
                         <td className="px-6 py-4">
                           <div>
                             <div className="text-sm font-medium text-gray-900 dark:text-[rgb(var(--color-text))]">{item.name}</div>
-                            {item.sku && (
-                              <div className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">SKU: {item.sku}</div>
+                            {(item.barcode || item.sku) && (
+                              <div className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-secondary))]">
+                                SKU: {item.barcode || item.sku}
+                              </div>
                             )}
                           </div>
                         </td>
@@ -434,37 +437,121 @@ const Inventory = () => {
         </div>
 
         {/* Delete Confirmation Modal */}
-        {deleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-6 max-w-md w-full mx-4 border dark:border-[rgb(var(--color-border))]">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4">Confirm Delete</h3>
-              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] mb-6">
-                Are you sure you want to delete this item? This action cannot be undone.
-              </p>
-              <div className="flex space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setDeleteConfirm(null)}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(deleteConfirm)}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                >
-                  Delete
-                </button>
+        {deleteConfirm && (() => {
+          const itemToDelete = items.find(item => item._id === deleteConfirm);
+          if (!itemToDelete) return null;
+
+          const availableStock = itemToDelete.stockQty - (itemToDelete.reservedStock || 0);
+
+          return (
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-6 max-w-lg w-full mx-4 border dark:border-[rgb(var(--color-border))] shadow-2xl">
+                <div className="flex items-center mb-4">
+                  <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full mr-4">
+                    <svg
+                      className="w-6 h-6 text-red-600 dark:text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                    Confirm Deletion
+                  </h3>
+                </div>
+
+                <div className="mb-6">
+                  <p className="text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-4">
+                    Are you sure you want to delete this item? This action cannot be undone.
+                  </p>
+
+                  {/* Item Details */}
+                  <div className="bg-gray-50 dark:bg-[rgb(var(--color-surface))] rounded-lg p-4 space-y-3 border dark:border-[rgb(var(--color-border))]">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-text))]">
+                          {itemToDelete.name}
+                        </p>
+                        {(itemToDelete.barcode || itemToDelete.sku) && (
+                          <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))] mt-1">
+                            SKU: {itemToDelete.barcode || itemToDelete.sku}
+                          </p>
+                        )}
+                      </div>
+                      <span className="px-2 py-1 text-xs font-medium bg-gray-200 dark:bg-[rgb(var(--color-input))] text-gray-700 dark:text-[rgb(var(--color-text))] rounded">
+                        {itemToDelete.category || 'Uncategorized'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 pt-3 border-t dark:border-[rgb(var(--color-border))]">
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Total Stock</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-1">
+                          {itemToDelete.stockQty} {itemToDelete.unit}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Reserved</p>
+                        <p className="text-sm font-bold text-orange-600 dark:text-orange-400 mt-1">
+                          {itemToDelete.reservedStock || 0} {itemToDelete.unit}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Available</p>
+                        <p className={`text-sm font-bold mt-1 ${availableStock <= 0
+                          ? 'text-red-600 dark:text-red-400'
+                          : availableStock <= itemToDelete.lowStockLimit
+                            ? 'text-yellow-600 dark:text-yellow-400'
+                            : 'text-green-600 dark:text-green-400'
+                          }`}>
+                          {availableStock} {itemToDelete.unit}
+                        </p>
+                      </div>
+                    </div>
+
+                    {itemToDelete.stockQty > 0 && (
+                      <div className="pt-3 border-t dark:border-[rgb(var(--color-border))]">
+                        <p className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Warning: {itemToDelete.stockQty} {itemToDelete.unit} remaining in stock
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirm(null)}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(deleteConfirm)}
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors shadow-sm"
+                  >
+                    Delete Item
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </Layout>
   );
 };
 
 export default Inventory;
-
-

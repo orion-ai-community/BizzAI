@@ -24,6 +24,7 @@ const EditItem = () => {
   });
 
   const [shouldNavigate, setShouldNavigate] = useState(false);
+  const [updateConfirm, setUpdateConfirm] = useState(false);
 
   const { name, sku, category, costPrice, sellingPrice, stockQty, lowStockLimit, unit } = formData;
 
@@ -38,7 +39,7 @@ const EditItem = () => {
     if (item) {
       setFormData({
         name: item.name || '',
-        sku: item.sku || '',
+        sku: item.barcode || item.sku || '', // Show barcode first, fallback to sku
         category: item.category || '',
         costPrice: item.costPrice || '',
         sellingPrice: item.sellingPrice || '',
@@ -66,7 +67,12 @@ const EditItem = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setUpdateConfirm(true); // Show confirmation dialog instead of submitting immediately
+  };
+
+  const handleConfirmUpdate = async () => {
     setShouldNavigate(true);
+    setUpdateConfirm(false);
 
     const itemData = {
       ...formData,
@@ -373,6 +379,81 @@ const EditItem = () => {
             </div>
           </form>
         </div>
+
+        {/* Update Confirmation Modal */}
+        {updateConfirm && item && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-xl p-6 max-w-2xl w-full mx-4 border dark:border-[rgb(var(--color-border))] shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mr-4">
+                  <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">Confirm Update</h3>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-700 dark:text-[rgb(var(--color-text-secondary))] mb-4 text-lg">
+                  Are you sure you want to update this item?
+                </p>
+
+                <div className="bg-gray-50 dark:bg-[rgb(var(--color-surface))] rounded-lg p-5 space-y-4 border dark:border-[rgb(var(--color-border))]">
+                  <div className="pb-3 border-b dark:border-[rgb(var(--color-border))]">
+                    <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{formData.name}</p>
+                    {formData.sku && <p className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-muted))] mt-1">SKU: {formData.sku}</p>}
+                    {formData.category && <p className="text-sm text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Category: {formData.category}</p>}
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase mb-2">Stock & Unit</p>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white dark:bg-[rgb(var(--color-card))] p-3 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Stock Quantity</p>
+                        <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-1">{formData.stockQty || 0} {formData.unit}</p>
+                      </div>
+                      <div className="bg-white dark:bg-[rgb(var(--color-card))] p-3 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Low Stock Alert</p>
+                        <p className="text-lg font-bold text-orange-600 dark:text-orange-400 mt-1">{formData.lowStockLimit || 5} {formData.unit}</p>
+                      </div>
+                      <div className="bg-white dark:bg-[rgb(var(--color-card))] p-3 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Unit Type</p>
+                        <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-1">{formData.unit}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold text-gray-600 dark:text-[rgb(var(--color-text-secondary))] uppercase mb-2">Pricing</p>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white dark:bg-[rgb(var(--color-card))] p-3 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Cost Price</p>
+                        <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-1">₹{parseFloat(formData.costPrice || 0).toFixed(2)}</p>
+                      </div>
+                      <div className="bg-white dark:bg-[rgb(var(--color-card))] p-3 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Selling Price</p>
+                        <p className="text-lg font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mt-1">₹{parseFloat(formData.sellingPrice || 0).toFixed(2)}</p>
+                      </div>
+                      <div className="bg-white dark:bg-[rgb(var(--color-card))] p-3 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-text-muted))]">Profit Margin</p>
+                        <p className={`text-lg font-bold mt-1 ${((parseFloat(formData.sellingPrice || 0) - parseFloat(formData.costPrice || 0)) / parseFloat(formData.costPrice || 1) * 100) > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                          {((parseFloat(formData.sellingPrice || 0) - parseFloat(formData.costPrice || 0)) / parseFloat(formData.costPrice || 1) * 100).toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex space-x-3">
+                <button type="button" onClick={() => setUpdateConfirm(false)} className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-[rgb(var(--color-border))] text-gray-700 dark:text-[rgb(var(--color-text))] bg-white dark:bg-[rgb(var(--color-card))] rounded-lg hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-input))] font-medium transition-colors">Cancel</button>
+                <button type="button" onClick={handleConfirmUpdate} disabled={isLoading} className="flex-1 px-4 py-2.5 bg-indigo-600 dark:bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-[rgb(var(--color-primary-hover))] font-medium transition-colors shadow-sm disabled:opacity-50">
+                  {isLoading ? 'Updating...' : 'Yes, Update Item'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

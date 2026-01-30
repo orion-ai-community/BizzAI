@@ -53,13 +53,30 @@ import Bills from './pages/purchase/Bills';
 import BillDetail from './pages/purchase/BillDetail';
 import BillAging from './pages/purchase/BillAging';
 import PaymentOut from './pages/purchase/PaymentOut';
+import PaymentOutList from './pages/purchase/PaymentOutList';
+import PaymentOutDetail from './pages/purchase/PaymentOutDetail';
 import Expenses from './pages/purchase/Expenses';
-import PurchaseOrder from './pages/purchase/PurchaseOrder';
+// Purchase Returns
 import PurchaseReturn from './pages/purchase/PurchaseReturn';
+import PurchaseReturnList from './pages/purchase/PurchaseReturnList';
+import PurchaseReturnFormNew from './pages/purchase/PurchaseReturnFormNew';
+import PurchaseReturnDetail from './pages/purchase/PurchaseReturnDetail';
+
+import PurchaseOrderList from './pages/purchase/PurchaseOrderList';
+import PurchaseOrderForm from './pages/purchase/PurchaseOrderForm';
+import PurchaseOrderDetail from './pages/purchase/PurchaseOrderDetail';
+import GRNList from './pages/purchase/GRNList';
+import GRNForm from './pages/purchase/GRNForm';
+import GRNDetail from './pages/purchase/GRNDetail';
 
 // Reports
 import ReportsDashboard from './pages/reports/ReportsDashboard';
 import SalesReport from './pages/reports/SalesReport';
+import PurchaseReturnAnalytics from './pages/reports/PurchaseReturnAnalytics';
+
+// Approvals
+import MyApprovals from './pages/approvals/MyApprovals';
+import ApprovalSettings from './pages/approvals/ApprovalSettings';
 
 // Cash & Bank
 import BankAccounts from './pages/cashbank/BankAccounts';
@@ -349,9 +366,31 @@ function App() {
               <Route path="bills/:id" element={<ProtectedRoute><BillDetail /></ProtectedRoute>} />
               <Route path="bills/aging" element={<ProtectedRoute><BillAging /></ProtectedRoute>} />
               <Route path="payment-out" element={<ProtectedRoute><PaymentOut /></ProtectedRoute>} />
+              <Route path="payment-out/list" element={<ProtectedRoute><PaymentOutList /></ProtectedRoute>} />
+              <Route path="payment-out/:id" element={<ProtectedRoute><PaymentOutDetail /></ProtectedRoute>} />
               <Route path="expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
-              <Route path="order" element={<ProtectedRoute><PurchaseOrder /></ProtectedRoute>} />
+
+              {/* Purchase Returns - Form First Pattern */}
               <Route path="return" element={<ProtectedRoute><PurchaseReturn /></ProtectedRoute>} />
+              <Route path="returns/list" element={<ProtectedRoute><PurchaseReturnList /></ProtectedRoute>} />
+              <Route path="returns/new" element={<ProtectedRoute><PurchaseReturnFormNew /></ProtectedRoute>} />
+              <Route path="returns/:id" element={<ProtectedRoute><PurchaseReturnDetail /></ProtectedRoute>} />
+              <Route path="returns/:id/edit" element={<ProtectedRoute><PurchaseReturnFormNew /></ProtectedRoute>} />
+            </Route>
+
+            {/* Purchase Order Routes */}
+            <Route path="/purchase-orders">
+              <Route index element={<ProtectedRoute><PurchaseOrderList /></ProtectedRoute>} />
+              <Route path="new" element={<ProtectedRoute><PurchaseOrderForm /></ProtectedRoute>} />
+              <Route path=":id" element={<ProtectedRoute><PurchaseOrderDetail /></ProtectedRoute>} />
+              <Route path=":id/edit" element={<ProtectedRoute><PurchaseOrderForm /></ProtectedRoute>} />
+            </Route>
+
+            {/* GRN Routes */}
+            <Route path="/grns">
+              <Route index element={<ProtectedRoute><GRNList /></ProtectedRoute>} />
+              <Route path="new" element={<ProtectedRoute><GRNForm /></ProtectedRoute>} />
+              <Route path=":id" element={<ProtectedRoute><GRNDetail /></ProtectedRoute>} />
             </Route>
 
             {/* Cash & Bank Routes */}
@@ -385,9 +424,16 @@ function App() {
               <Route path="export" element={<ProtectedRoute><DataExport /></ProtectedRoute>} />
             </Route>
 
+            {/* Approvals Routes */}
+            <Route path="/approvals">
+              <Route index element={<ProtectedRoute><MyApprovals /></ProtectedRoute>} />
+              <Route path="settings" element={<ProtectedRoute><ApprovalSettings /></ProtectedRoute>} />
+            </Route>
+
             {/* Reports Route */}
             <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
             <Route path="/reports/sales" element={<ProtectedRoute><SalesReport /></ProtectedRoute>} />
+            <Route path="/reports/purchase-returns" element={<ProtectedRoute><PurchaseReturnAnalytics /></ProtectedRoute>} />
 
             {/* 404 Route */}
             <Route path="*" element={<Navigate to="/login" replace />} />

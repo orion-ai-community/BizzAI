@@ -39,6 +39,10 @@ const purchaseItemSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    barcode: {
+        type: String,
+        default: "",
+    },
     batchNo: {
         type: String,
         default: "",

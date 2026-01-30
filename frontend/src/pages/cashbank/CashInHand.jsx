@@ -68,12 +68,15 @@ const CashInHand = () => {
         dispatch(createCashTransaction(formData));
     };
 
-    const filteredTransactions = transactions.filter(t => {
-        const matchesType = filterType === 'all' || t.type === filterType;
-        const txnDate = t.date.split('T')[0];
-        const matchesDate = (!dateRange.from || txnDate >= dateRange.from) && (!dateRange.to || txnDate <= dateRange.to);
-        return matchesType && matchesDate;
-    });
+    const filteredTransactions = (transactions || [])
+        .filter(t => {
+            const matchesType = filterType === 'all' || t.type === filterType;
+            const txnDate = t.date.split('T')[0];
+            const matchesDate = (!dateRange.from || txnDate >= dateRange.from) && (!dateRange.to || txnDate <= dateRange.to);
+            return matchesType && matchesDate;
+        });
+    // Backend already sorts by date DESC, createdAt DESC - no need to re-sort here
+
 
     const columns = [
         {
@@ -127,11 +130,17 @@ const CashInHand = () => {
         }
     ];
 
-    const categories = [
-        { group: 'Sales & Payments', items: ['Sales', 'Customer Payment', 'Service Fee'] },
-        { group: 'Expenses', items: ['Office Rent', 'Electricity', 'Water Bill', 'Internet', 'Stationery', 'Tea/Snacks', 'Other Expense'] },
-        { group: 'Bank Accounts', items: accounts.map(a => ({ value: a._id, label: `Bank: ${a.bankName}` })) }
-    ];
+    // Dynamic categories based on transaction type
+    const categories = formData.type === 'in'
+        ? [
+            { group: 'Income Sources', items: ['Sales', 'Customer Payment', 'Service Fee', 'Loan Received', 'Investment', 'Other Income'] },
+            { group: 'Bank Accounts', items: accounts.map(a => ({ value: a._id, label: `Bank: ${a.bankName}` })) }
+        ]
+        : [
+            { group: 'Expenses', items: ['Office Rent', 'Electricity', 'Water Bill', 'Internet', 'Stationery', 'Tea/Snacks', 'Salaries', 'Transportation', 'Maintenance', 'Other Expense'] },
+            { group: 'Bank Accounts', items: accounts.map(a => ({ value: a._id, label: `Bank: ${a.bankName}` })) }
+        ];
+
 
     return (
         <Layout>
@@ -141,14 +150,22 @@ const CashInHand = () => {
                 actions={[
                     <button
                         key="cash-in"
-                        onClick={() => { setFormData({ ...formData, type: 'in', otherAccount: '' }); setShowAddTransaction(true); }}
+                        onClick={() => {
+                            dispatch(reset());
+                            setFormData({ ...formData, type: 'in', otherAccount: '' });
+                            setShowAddTransaction(true);
+                        }}
                         className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition transform hover:scale-105"
                     >
                         + Cash In
                     </button>,
                     <button
                         key="cash-out"
-                        onClick={() => { setFormData({ ...formData, type: 'out', otherAccount: '' }); setShowAddTransaction(true); }}
+                        onClick={() => {
+                            dispatch(reset());
+                            setFormData({ ...formData, type: 'out', otherAccount: '' });
+                            setShowAddTransaction(true);
+                        }}
                         className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition transform hover:scale-105"
                     >
                         - Cash Out
@@ -286,14 +303,16 @@ const CashInHand = () => {
                                 required
                             />
                             <div>
-                                <label className="block text-sm font-semibold text-secondarymb-2">Category or Bank Account</label>
+                                <label className="block text-sm font-semibold text-secondary mb-2">
+                                    {formData.type === 'in' ? 'Source (Where is cash coming from?)' : 'Destination (Where is cash going?)'}
+                                </label>
                                 <select
                                     value={formData.otherAccount}
                                     onChange={(e) => setFormData({ ...formData, otherAccount: e.target.value })}
                                     className="w-full px-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-primary bg-card transition-all shadow-sm"
                                     required
                                 >
-                                    <option value="">Select origin/destination</option>
+                                    <option value="">{formData.type === 'in' ? 'Select source of cash' : 'Select where cash is going'}</option>
                                     {categories.map(group => (
                                         <optgroup key={group.group} label={group.group.toUpperCase()}>
                                             {group.items.map(item => (

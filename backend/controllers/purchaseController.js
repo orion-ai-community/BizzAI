@@ -135,6 +135,7 @@ export const createPurchase = async (req, res) => {
                 taxRate: itemData.taxRate || 0,
                 discount: itemData.discount || 0,
                 hsnCode: itemData.hsnCode || item.hsnCode || "",
+                barcode: itemData.barcode || item.barcode || "",
                 batchNo: itemData.batchNo || "",
                 expiryDate: itemData.expiryDate || null,
                 taxableValue: calculation.taxableValue,
@@ -225,6 +226,11 @@ export const createPurchase = async (req, res) => {
                 // Update selling price if provided
                 if (itemData.sellingPrice > 0) {
                     item.sellingPrice = itemData.sellingPrice;
+                }
+
+                // Update barcode if provided
+                if (itemData.barcode) {
+                    item.barcode = itemData.barcode;
                 }
 
                 // Handle batch tracking
@@ -532,6 +538,7 @@ export const updatePurchase = async (req, res) => {
                     taxRate: itemData.taxRate || 0,
                     discount: itemData.discount || 0,
                     hsnCode: itemData.hsnCode || item.hsnCode || "",
+                    barcode: itemData.barcode || item.barcode || "",
                     batchNo: itemData.batchNo || "",
                     expiryDate: itemData.expiryDate || null,
                     taxableValue: calculation.taxableValue,
@@ -649,6 +656,11 @@ export const finalizePurchase = async (req, res) => {
 
             if (itemData.sellingPrice > 0) {
                 item.sellingPrice = itemData.sellingPrice;
+            }
+
+            // Update barcode if provided
+            if (itemData.barcode) {
+                item.barcode = itemData.barcode;
             }
 
             if (item.trackBatch && itemData.batchNo) {

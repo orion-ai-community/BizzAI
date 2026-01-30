@@ -9,7 +9,22 @@ const stockMovementSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ["RESERVE", "RELEASE", "DELIVER", "IN_TRANSIT", "POS_SALE", "RETURN", "INVOICE", "PURCHASE", "PURCHASE_RETURN", "PURCHASE_CANCEL"],
+            enum: [
+                "RESERVE",
+                "RELEASE",
+                "DELIVER",
+                "IN_TRANSIT",
+                "POS_SALE",
+                "RETURN",
+                "INVOICE",
+                "PURCHASE",
+                "PURCHASE_RETURN",
+                "PURCHASE_CANCEL",
+                "PURCHASE_RETURN_PENDING",
+                "PURCHASE_RETURN_APPROVED",
+                "PURCHASE_RETURN_QUARANTINE",
+                "PURCHASE_RETURN_SCRAP"
+            ],
             required: true,
         },
         quantity: {
@@ -22,7 +37,7 @@ const stockMovementSchema = new mongoose.Schema(
         },
         sourceType: {
             type: String,
-            enum: ["SalesOrder", "DeliveryChallan", "Invoice", "Return", "Purchase", "PurchaseReturn"],
+            enum: ["SalesOrder", "DeliveryChallan", "Invoice", "Return", "Purchase", "PurchaseReturn", "GoodsReceivedNote"],
             required: true,
         },
         // Before state
@@ -50,6 +65,17 @@ const stockMovementSchema = new mongoose.Schema(
         newInTransit: {
             type: Number,
             required: true,
+        },
+        // Disposition tracking (for returns and quality issues)
+        disposition: {
+            type: String,
+            enum: ["restock", "quarantine", "scrap", "vendor_return", "repair", "none"],
+            default: "none",
+        },
+        qualityStatus: {
+            type: String,
+            enum: ["pending", "passed", "failed", "partial", "none"],
+            default: "none",
         },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,

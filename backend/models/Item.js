@@ -9,6 +9,10 @@ const itemSchema = new mongoose.Schema(
     sku: {
       type: String,
     },
+    barcode: {
+      type: String,
+      sparse: true, // Allow multiple items without barcode, but enforce uniqueness when present
+    },
     category: {
       type: String,
     },
@@ -47,6 +51,12 @@ const itemSchema = new mongoose.Schema(
     hsnCode: {
       type: String,
       default: "",
+    },
+    taxRate: {
+      type: Number,
+      default: 18, // GST rate in percentage
+      min: 0,
+      max: 100,
     },
     trackBatch: {
       type: Boolean,

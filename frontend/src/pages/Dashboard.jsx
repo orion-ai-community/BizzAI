@@ -31,6 +31,7 @@ const Dashboard = () => {
   const { bills = [] } = useSelector((state) => state.bill);
   const { dashboardStats } = useSelector((state) => state.reports);
   const [fadeIn, setFadeIn] = useState(false);
+  const [showDetailedMetrics, setShowDetailedMetrics] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -54,15 +55,15 @@ const Dashboard = () => {
     : 0;
   const thisMonthExpenses = Array.isArray(expenses)
     ? expenses
-        .filter((exp) => {
-          const expenseDate = new Date(exp.date);
-          const now = new Date();
-          return (
-            expenseDate.getMonth() === now.getMonth() &&
-            expenseDate.getFullYear() === now.getFullYear()
-          );
-        })
-        .reduce((sum, exp) => sum + exp.amount, 0)
+      .filter((exp) => {
+        const expenseDate = new Date(exp.date);
+        const now = new Date();
+        return (
+          expenseDate.getMonth() === now.getMonth() &&
+          expenseDate.getFullYear() === now.getFullYear()
+        );
+      })
+      .reduce((sum, exp) => sum + exp.amount, 0)
     : 0;
 
   // Calculate bill metrics - with safety checks
@@ -71,16 +72,15 @@ const Dashboard = () => {
     : 0;
   const totalOutstanding = Array.isArray(bills)
     ? bills
-        .filter((bill) => bill.status === "unpaid")
-        .reduce((sum, bill) => sum + bill.amount, 0)
+      .filter((bill) => bill.status === "unpaid")
+      .reduce((sum, bill) => sum + bill.amount, 0)
     : 0;
 
   return (
     <Layout>
       <div
-        className={`transition-opacity duration-300 ${
-          fadeIn ? "opacity-100" : "opacity-0"
-        }`}
+        className={`transition-opacity duration-300 ${fadeIn ? "opacity-100" : "opacity-0"
+          }`}
       >
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-2xl p-8 mb-8 text-white flex items-center justify-between">
@@ -243,197 +243,423 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          {/* Total Invoices */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+        {/* Financial Overview Section */}
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+            <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Financial Overview
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Total Revenue */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Revenue</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalRevenue || 0).toLocaleString()}</p>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Total Invoices
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              {dashboardStats?.totalInvoices || 0}
-            </p>
-          </div>
 
-          {/* Total Revenue */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+            {/* Total Collected */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Collected</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalCollected || 0).toLocaleString()}</p>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Total Revenue
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              ₹{(dashboardStats?.totalRevenue || 0).toFixed(2)}
-            </p>
-          </div>
 
-          {/* Total Expenses */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
+            {/* Total Outstanding */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-600 dark:to-yellow-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Customer Dues</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalCustomerOutstanding || 0).toLocaleString()}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">To Receive</p>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Total Expenses
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              ₹{totalExpenses.toFixed(0)}
-            </p>
-          </div>
 
-          {/* This Month Expenses */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
+            {/* Supplier Outstanding */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Supplier Dues</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalSupplierOutstanding || 0).toLocaleString()}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">To Pay</p>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              This Month Expenses
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              ₹{thisMonthExpenses.toFixed(0)}
-            </p>
-          </div>
 
-          {/* Total Bills Amount */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+            {/* Total Expenses */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
               </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Expenses</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalExpenses || 0).toLocaleString()}</p>
             </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Total Bills Amount
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              ₹{totalBillsAmount.toFixed(0)}
-            </p>
-          </div>
-
-          {/* Outstanding Bills */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-pink-500 to-pink-600 dark:from-pink-600 dark:to-pink-700 rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Outstanding Bills
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              ₹{totalOutstanding.toFixed(0)}
-            </p>
-          </div>
-
-          {/* Pending Payments */}
-          <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="p-2.5 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-600 dark:to-yellow-700 rounded-lg shadow-sm">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">
-              Pending Payments
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">
-              ₹{(dashboardStats?.totalOutstanding || 0).toFixed(2)}
-            </p>
           </div>
         </div>
+
+        {/* Profit Metrics Section */}
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+            <svg className="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            Profit & Loss
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Operating Profit */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Operating Profit</p>
+              <p className={`text-3xl font-bold ${(dashboardStats?.operatingProfit || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                ₹{(dashboardStats?.operatingProfit || 0).toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Revenue - Expenses</p>
+            </div>
+
+            {/* Profit Margin */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Profit Margin</p>
+              <p className={`text-3xl font-bold ${(dashboardStats?.profitMargin || 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {(dashboardStats?.profitMargin || 0).toFixed(1)}%
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Profit / Revenue × 100</p>
+            </div>
+
+            {/* Total Invoices */}
+            <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-lg shadow-sm">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Invoices</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalInvoices || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Toggle Button for Detailed Metrics */}
+        <div className="mb-6 flex justify-center">
+          <button
+            onClick={() => setShowDetailedMetrics(!showDetailedMetrics)}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-[rgb(var(--color-primary))] dark:to-[rgb(var(--color-primary-hover))] text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+          >
+            {showDetailedMetrics ? (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+                <span>Hide Detailed Metrics</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                <span>Show Detailed Metrics</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Detailed Metrics - Conditionally Rendered */}
+        {showDetailedMetrics && (
+          <>
+
+            {/* Inventory Section */}
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                Inventory Overview
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total Items */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-cyan-600 dark:from-cyan-600 dark:to-cyan-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Items</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalItems || 0}</p>
+                </div>
+
+                {/* Low Stock Items */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Low Stock</p>
+                  <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{dashboardStats?.lowStockItems || 0}</p>
+                </div>
+
+                {/* Out of Stock */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Out of Stock</p>
+                  <p className="text-3xl font-bold text-red-600 dark:text-red-400">{dashboardStats?.outOfStockItems || 0}</p>
+                </div>
+
+                {/* Inventory Value */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-600 dark:to-teal-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Inventory Value</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalInventoryValue || 0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cash & Bank Section */}
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Cash & Bank
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Cash in Hand */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Cash in Hand</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.cashInHand || 0).toLocaleString()}</p>
+                </div>
+
+                {/* Bank Balance */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m-9.5 0H3m2 0h5.5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Bank Balance</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalBankBalance || 0).toLocaleString()}</p>
+                </div>
+
+                {/* Total Liquidity */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Liquidity</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalLiquidity || 0).toLocaleString()}</p>
+                </div>
+
+                {/* Bank Accounts */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Bank Accounts</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.bankAccountCount || 0}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sales, Purchase & Parties Section */}
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Sales, Purchase & Parties
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Pending Sales Orders */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Pending Orders</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.pendingSalesOrders || 0}</p>
+                </div>
+
+                {/* Total Purchases */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-violet-500 to-violet-600 dark:from-violet-600 dark:to-violet-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Purchases</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalPurchases || 0}</p>
+                </div>
+
+                {/* Total Customers */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-pink-500 to-pink-600 dark:from-pink-600 dark:to-pink-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Customers</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalCustomers || 0}</p>
+                </div>
+
+                {/* Total Suppliers */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 dark:from-fuchsia-600 dark:to-fuchsia-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.5m-9.5 0H3m2 0h5.5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Total Suppliers</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.totalSuppliers || 0}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payments & Returns Section */}
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))] mb-4 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                Payments & Returns
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Payments In */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Payments In</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalPaymentsIn || 0).toLocaleString()}</p>
+                </div>
+
+                {/* Payments Out */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Payments Out</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">₹{(dashboardStats?.totalPaymentsOut || 0).toLocaleString()}</p>
+                </div>
+
+                {/* Sales Returns */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Sales Returns</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.salesReturnsCount || 0}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">₹{(dashboardStats?.salesReturnsAmount || 0).toLocaleString()}</p>
+                </div>
+
+                {/* Purchase Returns */}
+                <div className="bg-white dark:bg-[rgb(var(--color-card))] rounded-lg shadow-md dark:shadow-lg p-4 border border-gray-100 dark:border-[rgb(var(--color-border))] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-lg shadow-sm">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-[rgb(var(--color-text-secondary))] text-xs font-semibold uppercase tracking-wide mb-1.5">Purchase Returns</p>
+                  <p className="text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-text))]">{dashboardStats?.purchaseReturnsCount || 0}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">₹{(dashboardStats?.purchaseReturnsAmount || 0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Analytical Graphs */}
         {dashboardStats && (
@@ -617,10 +843,10 @@ const Dashboard = () => {
                               entry._id === "cash"
                                 ? "#10b981"
                                 : entry._id === "upi"
-                                ? "#6366f1"
-                                : entry._id === "card"
-                                ? "#f59e0b"
-                                : "#94a3b8"
+                                  ? "#6366f1"
+                                  : entry._id === "card"
+                                    ? "#f59e0b"
+                                    : "#94a3b8"
                             }
                           />
                         )

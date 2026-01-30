@@ -1,284 +1,30 @@
 import { useState } from 'react';
-import Layout from '../../components/Layout';
-import PageHeader from '../../components/PageHeader';
-import FormInput from '../../components/FormInput';
-import SupplierSelectionModal from '../../components/SupplierSelectionModal';
-import api from '../../services/api';
-import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../../components/Layout';
+import PurchaseReturnFormNew from './PurchaseReturnFormNew';
 
 const PurchaseReturn = () => {
-    const [formData, setFormData] = useState({
-        debitNoteNo: 'DN-' + Date.now(),
-        debitNoteDate: new Date().toISOString().split('T')[0],
-        originalPurchase: null,
-        supplier: null,
-        items: [{ name: '', quantity: 1, rate: 0, tax: 18, amount: 0, reason: '' }],
-        refundMethod: 'credit',
-        discount: 0,
-        notes: '',
-        bankAccount: ''
-    });
-    const [showSupplierModal, setShowSupplierModal] = useState(false);
-    const [bankAccounts, setBankAccounts] = useState([]);
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
-    useState(() => {
-        const fetchBanks = async () => {
-            try {
-                const userData = JSON.parse(localStorage.getItem('user'));
-                const token = userData?.token;
-                const response = await api.get(
-                    `/api/cashbank/accounts`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                setBankAccounts(response.data.filter(acc => acc.status === 'active'));
-            } catch (error) {
-                console.error('Error fetching banks:', error);
-            }
-        };
-        fetchBanks();
-    }, []);
-
-    const addItem = () => setFormData({ ...formData, items: [...formData.items, { name: '', quantity: 1, rate: 0, tax: 18, amount: 0, reason: '' }] });
-    const updateItem = (index, field, value) => {
-        const newItems = [...formData.items];
-        newItems[index][field] = value;
-        if (field === 'quantity' || field === 'rate') newItems[index].amount = newItems[index].quantity * newItems[index].rate;
-        setFormData({ ...formData, items: newItems });
-    };
-
-    const calculateSubtotal = () => formData.items.reduce((sum, item) => sum + item.amount, 0);
-    const calculateTax = () => formData.items.reduce((sum, item) => sum + (item.amount * item.tax / 100), 0);
-    const calculateTotal = () => calculateSubtotal() + calculateTax() - formData.discount;
-
-    const handleSubmit = async () => {
-        if (!formData.supplier) return toast.warning('Please select a supplier');
-        if (formData.items.some(item => !item.name || item.quantity <= 0)) return toast.warning('Please fill all item details');
-        if (formData.refundMethod === 'bank_transfer' && !formData.bankAccount) return toast.warning('Please select a bank account');
-
-        try {
-            setLoading(true);
-            const userData = JSON.parse(localStorage.getItem('user'));
-            const token = userData?.token;
-
-            await api.post(
-                `/api/purchase-returns`,
-                {
-                    supplierId: formData.supplier._id,
-                    items: formData.items,
-                    refundMethod: formData.refundMethod,
-                    bankAccount: formData.bankAccount,
-                    discount: formData.discount,
-                    notes: formData.notes,
-                    returnDate: formData.debitNoteDate
-                },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            toast.success('Purchase return processed successfully');
-            navigate('/purchase/bills');
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to process return');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const returnReasons = ['Damaged Product', 'Wrong Item', 'Quality Issue', 'Expired Product', 'Other'];
 
     return (
         <Layout>
-            <PageHeader title="Purchase Return / Debit Note" description="Process returns to suppliers" actions={[
-                <button
-                    key="save"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                >
-                    {loading ? 'Saving...' : 'Save Debit Note'}
-                </button>,
-                <button key="print" className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Print</button>
-            ]} />
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Debit Note Details</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormInput label="Debit Note Number" value={formData.debitNoteNo} onChange={(e) => setFormData({ ...formData, debitNoteNo: e.target.value })} required />
-                            <FormInput label="Debit Note Date" type="date" value={formData.debitNoteDate} onChange={(e) => setFormData({ ...formData, debitNoteDate: e.target.value })} required />
-                        </div>
+            {/* Header with button */}
+            <div className="mb-6">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Purchase Return</h1>
+                        <p className="text-gray-600 dark:text-gray-400 mt-1">Return purchased items to supplier</p>
                     </div>
-
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Original Purchase</h2>
-                        <button className="w-full px-4 py-3 border-2 border-dashed border-defaultrounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600">
-                            Click to select original purchase
-                        </button>
-                    </div>
-
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Supplier</h2>
-                        {formData.supplier ? (
-                            <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium text-main">{formData.supplier.businessName}</p>
-                                        <p className="text-sm text-secondary">{formData.supplier.contactPersonName}</p>
-                                        <p className="text-sm text-secondary">{formData.supplier.contactNo}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setFormData({ ...formData, supplier: null })}
-                                        className="text-red-600 hover:text-red-800"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setShowSupplierModal(true)}
-                                className="w-full px-4 py-3 border-2 border-dashed border-defaultrounded-lg text-secondary hover:border-indigo-500 hover:text-indigo-600"
-                            >
-                                Click to select supplier
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-bold text-main">Return Items</h2>
-                            <button onClick={addItem} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Item</button>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-surface border-b">
-                                    <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Item</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Qty</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Rate</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Tax %</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Amount</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase">Reason</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {formData.items.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="px-4 py-3"><input type="text" value={item.name} onChange={(e) => updateItem(index, 'name', e.target.value)} className="w-full px-2 py-1 border rounded" placeholder="Item name" /></td>
-                                            <td className="px-4 py-3"><input type="number" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)} className="w-20 px-2 py-1 border rounded" /></td>
-                                            <td className="px-4 py-3"><input type="number" value={item.rate} onChange={(e) => updateItem(index, 'rate', parseFloat(e.target.value) || 0)} className="w-24 px-2 py-1 border rounded" /></td>
-                                            <td className="px-4 py-3">
-                                                <select value={item.tax} onChange={(e) => updateItem(index, 'tax', parseFloat(e.target.value))} className="w-20 px-2 py-1 border rounded">
-                                                    <option value="0">0%</option>
-                                                    <option value="5">5%</option>
-                                                    <option value="12">12%</option>
-                                                    <option value="18">18%</option>
-                                                    <option value="28">28%</option>
-                                                </select>
-                                            </td>
-                                            <td className="px-4 py-3 font-medium">₹{item.amount.toFixed(2)}</td>
-                                            <td className="px-4 py-3">
-                                                <select value={item.reason} onChange={(e) => updateItem(index, 'reason', e.target.value)} className="w-40 px-2 py-1 border rounded">
-                                                    <option value="">Select reason</option>
-                                                    {returnReasons.map(reason => <option key={reason} value={reason}>{reason}</option>)}
-                                                </select>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div className="bg-card rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-bold text-main mb-4">Refund Details</h2>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-secondary mb-2">Refund Method</label>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                    {['credit', 'cash', 'bank_transfer', 'adjust_next_bill'].map(method => (
-                                        <button
-                                            key={method}
-                                            onClick={() => setFormData({ ...formData, refundMethod: method })}
-                                            className={`p-3 border-2 rounded-lg transition ${formData.refundMethod === method ? 'border-indigo-600 bg-indigo-50' : 'border-defaulthover:border-indigo-300'}`}
-                                        >
-                                            <div className="text-sm font-medium text-main capitalize">{method.replace('_', ' ')}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            {formData.refundMethod === 'bank_transfer' && (
-                                <div>
-                                    <label className="block text-sm font-medium text-secondary mb-2">Select Bank Account</label>
-                                    <select
-                                        value={formData.bankAccount}
-                                        onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
-                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    >
-                                        <option value="">Choose Bank Account</option>
-                                        {bankAccounts.map(acc => (
-                                            <option key={acc._id} value={acc._id}>
-                                                {acc.bankName} - ****{acc.accountNumber.slice(-4)} (₹{acc.currentBalance.toLocaleString()})
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
-                            <div>
-                                <label className="block text-sm font-medium text-secondary mb-2">Notes</label>
-                                <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-2 border rounded-lg" placeholder="Add notes..." />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="lg:col-span-1">
-                    <div className="bg-card rounded-xl shadow-sm p-6 sticky top-4">
-                        <h2 className="text-lg font-bold text-main mb-4">Return Summary</h2>
-                        <div className="space-y-3 mb-4">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-secondary">Subtotal:</span>
-                                <span className="font-medium">₹{calculateSubtotal().toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-secondary">Tax:</span>
-                                <span className="font-medium">₹{calculateTax().toFixed(2)}</span>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-secondary mb-1">Discount:</label>
-                                <input type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
-                            </div>
-                        </div>
-                        <div className="border-t pt-4 mb-6">
-                            <div className="flex justify-between items-center">
-                                <span className="text-lg font-bold">Refund Amount:</span>
-                                <span className="text-2xl font-bold text-green-600">₹{calculateTotal().toFixed(2)}</span>
-                            </div>
-                        </div>
-                        <div className="space-y-3">
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50"
-                            >
-                                {loading ? 'Saving...' : 'Save Debit Note'}
-                            </button>
-                            <button className="w-full py-3 border border-defaulttext-secondary rounded-lg hover:bg-surface">Print Debit Note</button>
-                        </div>
-                    </div>
+                    <button
+                        onClick={() => navigate('/purchase/returns/list')}
+                        className="px-4 py-2 bg-gray-700 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        View All Returns
+                    </button>
                 </div>
             </div>
 
-            <SupplierSelectionModal
-                isOpen={showSupplierModal}
-                onClose={() => setShowSupplierModal(false)}
-                onSelectSupplier={(supplier) => setFormData({ ...formData, supplier })}
-            />
+            <PurchaseReturnFormNew />
         </Layout>
     );
 };

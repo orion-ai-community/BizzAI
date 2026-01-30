@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 
-const QuickAddItemModal = ({ isOpen, onClose, onItemCreated, prefilledBarcode = '' }) => {
+const QuickAddItemModal = ({ isOpen, onClose, onItemCreated, prefilledBarcode = '', initialBarcode = '' }) => {
     const [formData, setFormData] = useState({
         name: '',
         barcode: '',
@@ -17,12 +17,13 @@ const QuickAddItemModal = ({ isOpen, onClose, onItemCreated, prefilledBarcode = 
     });
     const [isLoading, setIsLoading] = useState(false);
 
-    // Update barcode when prefilledBarcode prop changes
+    // Update barcode when prefilledBarcode or initialBarcode prop changes
     useEffect(() => {
-        if (prefilledBarcode) {
-            setFormData(prev => ({ ...prev, barcode: prefilledBarcode }));
+        const barcodeValue = initialBarcode || prefilledBarcode;
+        if (barcodeValue) {
+            setFormData(prev => ({ ...prev, barcode: barcodeValue }));
         }
-    }, [prefilledBarcode]);
+    }, [prefilledBarcode, initialBarcode]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,6 +46,7 @@ const QuickAddItemModal = ({ isOpen, onClose, onItemCreated, prefilledBarcode = 
                 barcode: formData.barcode.trim() || undefined,
                 category: formData.category.trim(),
                 hsnCode: formData.hsnCode.trim() || undefined,
+                taxRate: formData.taxRate || 18,
                 costPrice: parseFloat(formData.costPrice) || 0,
                 sellingPrice: parseFloat(formData.sellingPrice) || 0,
                 trackBatch: formData.trackBatch,

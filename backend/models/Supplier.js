@@ -58,6 +58,18 @@ const supplierSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    advanceBalance: {
+      type: Number,
+      default: 0,
+    },
+    totalAdvanceGiven: {
+      type: Number,
+      default: 0,
+    },
+    totalAdvanceUsed: {
+      type: Number,
+      default: 0,
+    },
     totalPurchases: {
       type: Number,
       default: 0,

@@ -69,7 +69,19 @@ export const getDashboardStats = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // 0. Summary metrics
+    // Import additional models
+    const Item = (await import("../models/Item.js")).default;
+    const Purchase = (await import("../models/Purchase.js")).default;
+    const SalesOrder = (await import("../models/SalesOrder.js")).default;
+    const Supplier = (await import("../models/Supplier.js")).default;
+    const BankAccount = (await import("../models/BankAccount.js")).default;
+    const CashbankTransaction = (await import("../models/CashbankTransaction.js")).default;
+    const PaymentIn = (await import("../models/PaymentIn.js")).default;
+    const PaymentOut = (await import("../models/PaymentOut.js")).default;
+    const Return = (await import("../models/Return.js")).default;
+    const PurchaseReturn = (await import("../models/PurchaseReturn.js")).default;
+
+    // 0. Summary metrics (Invoices/Revenue)
     const allInvoices = await Invoice.find({ createdBy: userId });
     const totalInvoices = allInvoices.length;
     const totalRevenue = allInvoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
@@ -77,9 +89,185 @@ export const getDashboardStats = async (req, res) => {
       const collected = Math.min(inv.totalAmount || 0, (inv.paidAmount || 0) + (inv.creditApplied || 0));
       return sum + collected;
     }, 0);
-    const totalOutstanding = Math.max(0, totalRevenue - totalCollected);
+    const totalOutstanding = Math.max(0, totalRevenue - totalCollected); // Customer receivables
 
-    // 1. Sales over time (last 30 days)
+    // Import Bill model for supplier payables
+    const Bill = (await import("../models/Bill.js")).default;
+
+    // Supplier Outstanding (Payables - what we owe to suppliers)
+    const allBills = await Bill.find({ createdBy: userId, isDeleted: false });
+    const totalSupplierOutstanding = allBills.reduce((sum, bill) => sum + (bill.outstandingAmount || 0), 0);
+    const totalBillsAmount = allBills.reduce((sum, bill) => sum + (bill.totalAmount || 0), 0);
+    const totalBillsPaid = allBills.reduce((sum, bill) => sum + (bill.paidAmount || 0), 0);
+
+    // 1. Inventory Metrics
+    const allItems = await Item.find({ addedBy: userId });
+    const totalItems = allItems.length;
+    const lowStockItems = allItems.filter(item => item.stockQty <= item.lowStockLimit && item.stockQty > 0).length;
+    const outOfStockItems = allItems.filter(item => item.stockQty === 0).length;
+    const totalInventoryValue = allItems.reduce((sum, item) => sum + (item.stockQty * item.costPrice), 0);
+
+    // 2. Purchase Metrics
+    const allPurchases = await Purchase.find({ createdBy: userId, status: { $ne: 'cancelled' } });
+    const totalPurchases = allPurchases.length;
+    const totalPurchaseAmount = allPurchases.reduce((sum, purchase) => sum + (purchase.totalAmount || 0), 0);
+
+    // 3. Supplier Metrics
+    const allSuppliers = await Supplier.find({ owner: userId, status: 'active' });
+    const totalSuppliers = allSuppliers.length;
+
+    // Top 5 suppliers by purchase volume
+    const topSuppliers = await Purchase.aggregate([
+      { $match: { createdBy: userId, status: { $ne: 'cancelled' } } },
+      {
+        $group: {
+          _id: "$supplier",
+          totalPurchaseValue: { $sum: "$totalAmount" },
+          purchaseCount: { $sum: 1 }
+        }
+      },
+      { $sort: { totalPurchaseValue: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: "suppliers",
+          localField: "_id",
+          foreignField: "_id",
+          as: "supplierInfo"
+        }
+      },
+      { $unwind: "$supplierInfo" },
+      {
+        $project: {
+          name: "$supplierInfo.businessName",
+          totalPurchaseValue: 1,
+          purchaseCount: 1
+        }
+      }
+    ]);
+
+    // 4. Sales Order Metrics
+    const allSalesOrders = await SalesOrder.find({ createdBy: userId });
+    const pendingSalesOrders = allSalesOrders.filter(order =>
+      order.status === 'Draft' || order.status === 'Confirmed' || order.status === 'Partially Delivered'
+    ).length;
+    const completedSalesOrders = allSalesOrders.filter(order =>
+      order.status === 'Delivered' || order.status === 'Invoiced'
+    ).length;
+    const totalSalesOrderValue = allSalesOrders
+      .filter(order => order.status !== 'Cancelled')
+      .reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
+    // 5. Cash & Bank Metrics
+    const bankAccounts = await BankAccount.find({ userId });
+    const totalBankBalance = bankAccounts.reduce((sum, acc) => sum + acc.currentBalance, 0);
+    const bankAccountCount = bankAccounts.length;
+
+    // Calculate cash in hand
+    const mongoose = (await import("mongoose")).default;
+    const cashIn = await CashbankTransaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          toAccount: 'cash'
+        }
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    const cashOut = await CashbankTransaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          fromAccount: 'cash'
+        }
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    const cashInHand = (cashIn[0]?.total || 0) - (cashOut[0]?.total || 0);
+    const totalLiquidity = cashInHand + totalBankBalance;
+
+    // 6. Customer Metrics - ENTERPRISE-READY
+    const allCustomers = await Customer.find({ owner: userId });
+    const totalCustomers = allCustomers.length;
+
+    // Invoice-based outstanding (ONLY positive receivables)
+    const invoiceOutstanding = allInvoices.reduce((sum, inv) => {
+      const outstanding = (inv.totalAmount || 0) - (inv.paidAmount || 0) - (inv.creditApplied || 0);
+      return sum + Math.max(0, outstanding);
+    }, 0);
+
+    // Customer model dues (ONLY positive)
+    const customerDuesPositive = allCustomers.reduce((sum, customer) => {
+      return sum + Math.max(0, customer.dues || 0);
+    }, 0);
+
+    // Invoice overpayments (customer credit)
+    const invoiceOverpayments = allInvoices.reduce((sum, inv) => {
+      const overpaid = (inv.paidAmount || 0) + (inv.creditApplied || 0) - (inv.totalAmount || 0);
+      return sum + Math.max(0, overpaid);
+    }, 0);
+
+    // Customer model negative dues = credit
+    const customerDuesNegative = allCustomers.reduce((sum, customer) => {
+      return sum + Math.abs(Math.min(0, customer.dues || 0));
+    }, 0);
+
+    // FINAL VALUES (GUARANTEED >= 0)
+    // Customer Outstanding = ONLY from Customer.dues field (not invoices)
+    const totalCustomerOutstanding = customerDuesPositive;
+    const totalCustomerCredit = invoiceOverpayments + customerDuesNegative;
+
+    // 7. Payment Metrics
+    const allPaymentsIn = await PaymentIn.find({ createdBy: userId });
+    const totalPaymentsIn = allPaymentsIn.reduce((sum, payment) => sum + (payment.totalAmount || 0), 0);
+
+    const allPaymentsOut = await PaymentOut.find({ createdBy: userId, status: { $ne: 'cancelled' } });
+    const totalPaymentsOut = allPaymentsOut.reduce((sum, payment) => sum + (payment.totalAmount || 0), 0);
+
+    const netCashFlow = totalPaymentsIn - totalPaymentsOut;
+
+    // 8. Return Metrics
+    const allSalesReturns = await Return.find({ createdBy: userId });
+    const salesReturnsCount = allSalesReturns.length;
+    const salesReturnsAmount = allSalesReturns.reduce((sum, ret) => sum + (ret.totalReturnAmount || 0), 0);
+
+    const allPurchaseReturns = await PurchaseReturn.find({ createdBy: userId });
+    const purchaseReturnsCount = allPurchaseReturns.length;
+    const purchaseReturnsAmount = allPurchaseReturns.reduce((sum, ret) => sum + (ret.totalAmount || 0), 0);
+
+    // 9. Profit Metrics
+    // Get expenses from Expense model
+    const allExpenses = await Expense.find({ createdBy: userId });
+    const expenseModelTotal = allExpenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+
+    // Get expenses from CashbankTransaction (cash outflows)
+    const cashOutflows = await CashbankTransaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: 'out',
+          fromAccount: 'cash'
+        }
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const cashExpenses = cashOutflows[0]?.total || 0;
+
+    // Total expenses = Expense model + Cash outflows
+    const totalExpenses = expenseModelTotal + cashExpenses;
+
+    // Gross Profit = Revenue - COGS (approximated as: Purchase Amount - Purchase Returns + Sales Returns)
+    // This is a simplified calculation. In reality, COGS should track actual cost of items sold.
+    const approximateCOGS = totalPurchaseAmount - purchaseReturnsAmount + salesReturnsAmount;
+    // Operating Profit = Revenue - Expenses (not using COGS as it's inaccurate)
+    const operatingProfit = totalRevenue - totalExpenses;
+    const profitMargin = totalRevenue > 0 ? ((operatingProfit / totalRevenue) * 100) : 0;
+
+
+
+    // 10. Sales over time (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -99,7 +287,7 @@ export const getDashboardStats = async (req, res) => {
       { $sort: { _id: 1 } }
     ]);
 
-    // 2. Revenue vs Expenses (last 6 months)
+    // 11. Revenue vs Expenses (last 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -147,7 +335,7 @@ export const getDashboardStats = async (req, res) => {
       expenses: monthlyExpenses.find(e => e._id === month)?.expenses || 0
     }));
 
-    // 3. Payment methods distribution (Invoices)
+    // 12. Payment methods distribution (Invoices)
     const paymentMethods = await Invoice.aggregate([
       { $match: { createdBy: userId } },
       {
@@ -159,7 +347,7 @@ export const getDashboardStats = async (req, res) => {
       }
     ]);
 
-    // 4. Outstanding dues trend (Top 5 customers)
+    // 13. Outstanding dues trend (Top 5 customers)
     const topCustomersWithDues = await Customer.find({
       owner: userId,
       dues: { $gt: 0 }
@@ -169,10 +357,63 @@ export const getDashboardStats = async (req, res) => {
       .select('name dues');
 
     res.status(200).json({
+      // Invoice/Revenue metrics
       totalInvoices,
       totalRevenue,
       totalCollected,
-      totalOutstanding,
+      totalCustomerOutstanding, // Receivables (always >= 0)
+      totalCustomerCredit,      // Advances / Overpayments (always >= 0)
+
+      // Supplier Payables metrics
+      totalSupplierOutstanding, // What we owe suppliers
+      totalBillsAmount,
+      totalBillsPaid,
+
+      // Inventory metrics
+      totalItems,
+      lowStockItems,
+      outOfStockItems,
+      totalInventoryValue,
+
+      // Purchase metrics
+      totalPurchases,
+      totalPurchaseAmount,
+
+      // Supplier metrics
+      totalSuppliers,
+      topSuppliers,
+
+      // Sales Order metrics
+      pendingSalesOrders,
+      completedSalesOrders,
+      totalSalesOrderValue,
+
+      // Cash & Bank metrics
+      cashInHand,
+      totalBankBalance,
+      totalLiquidity,
+      bankAccountCount,
+
+      // Customer metrics
+      totalCustomers,
+
+      // Payment metrics
+      totalPaymentsIn,
+      totalPaymentsOut,
+      netCashFlow,
+
+      // Return metrics
+      salesReturnsCount,
+      salesReturnsAmount,
+      purchaseReturnsCount,
+      purchaseReturnsAmount,
+
+      // Profit metrics
+      totalExpenses,
+      operatingProfit,
+      profitMargin,
+
+      // Charts data
       dailySales,
       revenueVsExpenses,
       paymentMethods,
@@ -326,3 +567,4 @@ export const exportSalesReport = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
+
