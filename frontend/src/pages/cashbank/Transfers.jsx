@@ -9,7 +9,7 @@ const Transfers = () => {
     const [formData, setFormData] = useState({
         fromAccount: '',
         toAccount: '',
-        amount: 0,
+        amount: '',
         description: ''
     });
     const [hasShownToast, setHasShownToast] = useState(false);
@@ -35,7 +35,7 @@ const Transfers = () => {
             setFormData({
                 fromAccount: '',
                 toAccount: '',
-                amount: 0,
+                amount: '',
                 description: ''
             });
             dispatch(getAccounts());

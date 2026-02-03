@@ -14,7 +14,7 @@ const Cheques = () => {
     const [formData, setFormData] = useState({
         chequeNo: '',
         partyName: '',
-        amount: 0,
+        amount: '',
         date: new Date().toISOString().split('T')[0],
         bankName: '',
         type: 'received',

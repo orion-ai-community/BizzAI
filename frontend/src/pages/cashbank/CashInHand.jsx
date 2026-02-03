@@ -28,7 +28,7 @@ const CashInHand = () => {
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
         description: '',
-        amount: 0,
+        amount: '',
         type: 'in',
         otherAccount: '', // Can be category string or bank account ID
         reference: ''
@@ -47,7 +47,7 @@ const CashInHand = () => {
             setFormData({
                 date: new Date().toISOString().split('T')[0],
                 description: '',
-                amount: 0,
+                amount: '',
                 type: 'in',
                 otherAccount: '',
                 reference: ''

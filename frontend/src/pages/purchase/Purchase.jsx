@@ -134,11 +134,11 @@ const Purchase = () => {
                             </div>
                             <div>
                                 <label className="block text-sm text-secondary mb-1">Discount:</label>
-                                <input type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
+                                <input type="number" value={formData.discount} onChange={(e) => setFormData({ ...formData, discount: e.target.value })} className="w-full px-3 py-2 border rounded-lg" placeholder="Enter discount" />
                             </div>
                             <div>
                                 <label className="block text-sm text-secondary mb-1">Shipping:</label>
-                                <input type="number" value={formData.shippingCharges} onChange={(e) => setFormData({ ...formData, shippingCharges: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-lg" />
+                                <input type="number" value={formData.shippingCharges} onChange={(e) => setFormData({ ...formData, shippingCharges: e.target.value })} className="w-full px-3 py-2 border rounded-lg" placeholder="Enter charges" />
                             </div>
                         </div>
                         <div className="border-t pt-4">

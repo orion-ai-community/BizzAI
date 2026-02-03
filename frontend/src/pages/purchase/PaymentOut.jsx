@@ -30,7 +30,7 @@ const PaymentOut = () => {
             chequeBank: '',
         },
         allocatedBills: [],
-        advanceAmount: 0,
+        advanceAmount: '',
     });
 
     // UI state
@@ -97,7 +97,7 @@ const PaymentOut = () => {
                 totalAmount: bill.totalAmount,
                 paidAmount: bill.paidAmount,
                 outstandingAmount: bill.outstandingAmount,
-                allocatedAmount: 0,
+                allocatedAmount: '',
             }));
 
             setFormData(prev => ({
@@ -122,7 +122,7 @@ const PaymentOut = () => {
     };
 
     const handleBillAllocationChange = (billId, amount) => {
-        const allocatedAmount = parseFloat(amount) || 0;
+        const allocatedAmount = amount === '' ? '' : parseFloat(amount) || 0;
 
         setFormData(prev => ({
             ...prev,

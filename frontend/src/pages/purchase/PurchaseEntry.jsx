@@ -42,9 +42,9 @@ const PurchaseEntry = () => {
         referenceNo: '',
         notes: '',
         items: [{ item: null, quantity: 1, purchaseRate: 0, sellingPrice: 0, taxRate: 18, discount: 0, hsnCode: '', batchNo: '', expiryDate: '' }],
-        billDiscount: 0,
-        shippingCharges: 0,
-        paidAmount: 0,
+        billDiscount: '',
+        shippingCharges: '',
+        paidAmount: '',
         paymentMethod: 'cash',
         bankAccount: '',
         paymentReference: '',
@@ -763,7 +763,7 @@ const PurchaseEntry = () => {
                                         <input
                                             type="number"
                                             value={formData.billDiscount}
-                                            onChange={(e) => setFormData({ ...formData, billDiscount: parseFloat(e.target.value) || 0 })}
+                                            onChange={(e) => setFormData({ ...formData, billDiscount: e.target.value })}
                                             className="w-full px-3 py-2 border rounded-lg"
                                             min="0"
                                             step="0.01"
@@ -776,7 +776,7 @@ const PurchaseEntry = () => {
                                         <input
                                             type="number"
                                             value={formData.shippingCharges}
-                                            onChange={(e) => setFormData({ ...formData, shippingCharges: parseFloat(e.target.value) || 0 })}
+                                            onChange={(e) => setFormData({ ...formData, shippingCharges: e.target.value })}
                                             className="w-full px-3 py-2 border rounded-lg"
                                             min="0"
                                             step="0.01"

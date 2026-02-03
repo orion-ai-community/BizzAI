@@ -417,7 +417,7 @@ const SalesOrder = () => {
                                 <input
                                     type="number"
                                     value={formData.discount}
-                                    onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
+                                    onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                                     className="w-full px-3 py-2 border rounded-lg"
                                 />
                             </div>

@@ -13,11 +13,11 @@ const LoanAccounts = () => {
     const [formData, setFormData] = useState({
         lenderName: '',
         loanType: 'borrowed',
-        loanAmount: 0,
-        interestRate: 0,
+        loanAmount: '',
+        interestRate: '',
         tenure: 12,
         startDate: new Date().toISOString().split('T')[0],
-        emiAmount: 0,
+        emiAmount: '',
         purpose: '',
         notes: ''
     });

@@ -27,7 +27,7 @@ const PaymentIn = () => {
     paymentMethods: [
       {
         method: "cash",
-        amount: 0,
+        amount: "",
         reference: "",
         bankAccount: "",
         cardType: "",
@@ -135,7 +135,7 @@ const PaymentIn = () => {
         ...formData.paymentMethods,
         {
           method: "cash",
-          amount: 0,
+          amount: "",
           reference: "",
           bankAccount: "",
           cardType: "",
@@ -558,11 +558,11 @@ const PaymentIn = () => {
                           updatePaymentMethod(
                             index,
                             "amount",
-                            parseFloat(e.target.value) || 0
+                            e.target.value
                           )
                         }
                         className="w-full px-3 py-2 border border-default rounded-lg"
-                        placeholder="0.00"
+                        placeholder="Enter amount"
                         min="0"
                         step="0.01"
                       />
