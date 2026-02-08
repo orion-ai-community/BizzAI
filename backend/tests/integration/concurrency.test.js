@@ -12,7 +12,7 @@ import Invoice from '../../models/Invoice.js';
 import StockLedger from '../../models/StockLedger.js';
 import FinancialPeriod from '../../models/FinancialPeriod.js';
 
-describe.skip('Stock Concurrency Tests', () => {
+describe('Concurrency Tests', () => {
     let organization, user, financialPeriod;
 
     beforeAll(async () => {
