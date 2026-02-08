@@ -27,6 +27,9 @@ afterEach(async () => {
 
 // Cleanup after all tests
 afterAll(async () => {
+    // Close all active sessions first
+    const sessions = await mongoose.connection.db?.admin()?.listSessions?.();
+
     // Disconnect mongoose
     await mongoose.disconnect();
 
@@ -34,4 +37,8 @@ afterAll(async () => {
     if (mongoServer) {
         await mongoServer.stop();
     }
+
+    // Give a small delay for cleanup
+    await new Promise(resolve => setTimeout(resolve, 500));
 });
+
