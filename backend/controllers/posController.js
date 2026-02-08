@@ -177,20 +177,8 @@ export const createInvoice = async (req, res) => {
     // Determine payment status based on effective payment (cash + credit) - USE CENTRALIZED FUNCTION
     const paymentStatus = calculatePaymentStatus(totalAmount, actualPaidAmount, creditApplied);
 
-    // Generate unique invoice number - find most recent invoice and increment
-    const lastInvoice = await Invoice.findOne({ createdBy: req.user._id })
-      .sort({ createdAt: -1 })
-      .select('invoiceNo');
-
-    let invoiceNumber = 1;
-    if (lastInvoice && lastInvoice.invoiceNo) {
-      // Extract number from format INV-00001
-      const match = lastInvoice.invoiceNo.match(/INV-(\d+)/);
-      if (match) {
-        invoiceNumber = parseInt(match[1]) + 1;
-      }
-    }
-
+    // Generate unique invoice number using atomic counter
+    const invoiceNumber = await Counter.getNextSequence("invoice", req.user._id);
     const invoiceNo = `INV-${String(invoiceNumber).padStart(5, "0")}`;
 
     // Save invoice
