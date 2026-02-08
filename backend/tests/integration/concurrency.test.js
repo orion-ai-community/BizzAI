@@ -5,12 +5,13 @@
  */
 
 import mongoose from 'mongoose';
-import Organization from '../../models/Organization.js';
 import User from '../../models/User.js';
+import Organization from '../../models/Organization.js';
 import Item from '../../models/Item.js';
 import Invoice from '../../models/Invoice.js';
 import StockLedger from '../../models/StockLedger.js';
 import FinancialPeriod from '../../models/FinancialPeriod.js';
+import Counter from '../../models/Counter.js';
 
 describe('Concurrency Tests', () => {
     let organization, user, financialPeriod;
@@ -55,39 +56,32 @@ describe('Concurrency Tests', () => {
             const item = await Item.create({
                 name: 'Concurrent Test Item',
                 sku: 'CONC-001',
-                addedBy: user._id,
+                stockQty: 100,
                 costPrice: 50,
                 sellingPrice: 100,
-                purchasePrice: 50,
-                stockQty: 100,
-                organization: organization._id,
-                createdBy: user._id,
+                addedBy: user._id,
                 organizationId: organization._id
             });
 
-            // Simulate 10 concurrent stock updates
-            const updates = Array.from({ length: 10 }, (_, i) => {
-                return StockLedger.create({
-                    item: item._id,
-                    transactionType: 'SALE',
-                    quantityChange: -5,
-                    runningBalance: 0, // Will be calculated
-                    costPerUnit: 50,
-                    totalValue: -250,
-                    sourceDocument: {
-                        type: 'Invoice',
-                        id: new mongoose.Types.ObjectId()
+            // Simulate 10 concurrent stock deductions (like POS sales)
+            const updates = Array.from({ length: 10 }, () => {
+                // Use atomic updateOne like our fixed controllers do
+                return Item.updateOne(
+                    {
+                        _id: item._id,
+                        stockQty: { $gte: 5 }
                     },
-                    organizationId: organization._id,
-                    createdBy: user._id
-                });
+                    {
+                        $inc: { stockQty: -5 }
+                    }
+                );
             });
 
-            await Promise.all(updates);
+            const results = await Promise.allSettled(updates);
 
-            // Verify all entries created
-            const entries = await StockLedger.find({ item: item._id }).sort({ timestamp: 1 });
-            expect(entries).toHaveLength(10);
+            // All should succeed since we have enough stock (100 >= 50)
+            const successful = results.filter(r => r.status === 'fulfilled' && r.value.modifiedCount === 1);
+            expect(successful.length).toBe(10);
 
             // Verify final stock
             const finalItem = await Item.findById(item._id);
@@ -142,22 +136,40 @@ describe('Concurrency Tests', () => {
 
     describe('Concurrent Invoice Creation', () => {
         test('should handle concurrent invoice creation with unique numbers', async () => {
-            // Create 20 invoices concurrently
-            const invoices = Array.from({ length: 20 }, (_, i) => {
+            // Create 20 invoices concurrently using Counter.getNextSequence
+            const createInvoice = async () => {
+                const invoiceNumber = await Counter.getNextSequence("invoice", user._id);
+                const invoiceNo = `INV-${String(invoiceNumber).padStart(5, "0")}`;
+
                 return Invoice.create({
-                    invoiceNo: `INV-CONC-${Date.now()}-${i}`,
-                    customerName: `Customer ${i}`,
-                    items: [{ itemName: 'Test', quantity: 1, rate: 100 }],
+                    invoiceNo,
+                    items: [{
+                        item: new mongoose.Types.ObjectId(),
+                        quantity: 1,
+                        price: 100,
+                        total: 100
+                    }],
+                    subtotal: 100,
                     totalAmount: 100,
+                    paidAmount: 100,
                     paymentStatus: 'paid',
+                    paymentMethod: 'cash',
                     createdBy: user._id,
                     organizationId: organization._id
                 });
-            });
+            };
 
-            const results = await Promise.allSettled(invoices);
+            const invoicePromises = Array.from({ length: 20 }, () => createInvoice());
+            const results = await Promise.allSettled(invoicePromises);
 
             const successful = results.filter(r => r.status === 'fulfilled');
+            const failed = results.filter(r => r.status === 'rejected');
+
+            // Log first failure for debugging
+            if (failed.length > 0) {
+                console.log('First invoice creation failure:', failed[0].reason.message);
+            }
+
             expect(successful.length).toBe(20);
 
             // Verify all have unique invoice numbers
