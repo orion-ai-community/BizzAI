@@ -235,6 +235,12 @@ export const createInvoice = async (req, res) => {
     // Update stock and log movements
     for (const it of items) {
       const item = await Item.findById(it.item);
+      if (!item) {
+        return res.status(404).json({
+          success: false,
+          message: `Item not found: ${it.item}`,
+        });
+      }
 
       // Capture previous state
       const previousState = {
@@ -243,24 +249,38 @@ export const createInvoice = async (req, res) => {
         inTransitStock: item.inTransitStock || 0,
       };
 
-      // Update stock
-      item.stockQty -= it.quantity;
+      // Atomic stock deduction with oversell protection
+      const updateResult = await Item.updateOne(
+        {
+          _id: it.item,
+          stockQty: { $gte: it.quantity }
+        },
+        {
+          $inc: { stockQty: -it.quantity }
+        }
+      );
 
-      // Validate stock levels
-      validateStockLevels(item);
+      // Check if update succeeded (stock was sufficient)
+      if (updateResult.modifiedCount === 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient stock for item ${item.name}. Available: ${item.stockQty}, Required: ${it.quantity}`,
+        });
+      }
 
-      await item.save();
+      // Get updated item for logging
+      const updatedItem = await Item.findById(it.item);
 
       // Capture new state
       const newState = {
-        stockQty: item.stockQty,
-        reservedStock: item.reservedStock,
-        inTransitStock: item.inTransitStock || 0,
+        stockQty: updatedItem.stockQty,
+        reservedStock: updatedItem.reservedStock,
+        inTransitStock: updatedItem.inTransitStock || 0,
       };
 
       // Log stock movement
       await logStockMovement(
-        item,
+        updatedItem,
         "POS_SALE",
         it.quantity,
         invoice._id,

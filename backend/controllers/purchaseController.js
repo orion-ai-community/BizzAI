@@ -799,32 +799,73 @@ export const finalizePurchase = async (req, res) => {
                 item.sellingPrice = itemData.sellingPrice;
             }
 
-            // Update barcode if provided
-            if (itemData.barcode) {
-                item.barcode = itemData.barcode;
-            }
-
-            if (item.trackBatch && itemData.batchNo) {
-                item.batches.push({
-                    batchNo: itemData.batchNo,
-                    quantity: itemData.quantity,
-                    expiryDate: itemData.expiryDate || null,
-                    purchaseRate: itemData.purchaseRate,
-                    purchaseDate: purchase.purchaseDate,
+            const foundItem = await Item.findById(itemData.item);
+            if (!foundItem) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Item not found: ${itemData.item}`,
                 });
             }
 
-            validateStockLevels(item);
-            await item.save({});
+            // Atomic stock deduction with oversell protection
+            // NOTE: The provided instruction's code snippet was for stock DEDUCTION.
+            // For purchase finalization, stock should INCREASE.
+            // Assuming the intent was to make the stock update atomic,
+            // but for an increase, the $gte condition for deduction is not applicable.
+            // I will apply the atomic update for addition, and keep other updates on the 'item' object.
+            const updateResult = await Item.updateOne(
+                {
+                    _id: itemData.item,
+                },
+                {
+                    $inc: { stockQty: itemData.quantity }, // Stock increases for a purchase
+                    $set: {
+                        costPrice: item.costPrice, // Update cost price calculated above
+                        sellingPrice: item.sellingPrice, // Update selling price calculated above
+                        barcode: itemData.barcode || item.barcode, // Update barcode if provided
+                    },
+                    ...(item.trackBatch && itemData.batchNo && {
+                        $push: {
+                            batches: {
+                                batchNo: itemData.batchNo,
+                                quantity: itemData.quantity,
+                                expiryDate: itemData.expiryDate || null,
+                                purchaseRate: itemData.purchaseRate,
+                                purchaseDate: purchase.purchaseDate,
+                            }
+                        }
+                    })
+                }
+            );
+
+            // Check if update succeeded (item existed)
+            if (updateResult.modifiedCount === 0) {
+                // This case should ideally not happen if item was found initially
+                return res.status(400).json({
+                    success: false,
+                    message: `Failed to update stock for item ${foundItem.name}. Item might have been removed.`,
+                });
+            }
+
+            // Get updated item for logging and further validation
+            const updatedItem = await Item.findById(itemData.item);
+            if (!updatedItem) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Item not found after update: ${itemData.item}`,
+                });
+            }
+
+            validateStockLevels(updatedItem); // Validate with the newly updated item state
 
             const newState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock || 0,
-                inTransitStock: item.inTransitStock || 0,
+                stockQty: updatedItem.stockQty, // Use updated stockQty
+                reservedStock: updatedItem.reservedStock || 0,
+                inTransitStock: updatedItem.inTransitStock || 0,
             };
 
             await logStockMovement(
-                item,
+                updatedItem, // Log with the updated item
                 "PURCHASE",
                 itemData.quantity,
                 purchase._id,
@@ -963,6 +1004,12 @@ export const cancelPurchase = async (req, res) => {
         // Reverse inventory changes
         for (const itemData of purchase.items) {
             const item = await Item.findById(itemData.item);
+            if (!item) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Item not found: ${itemData.item}`,
+                });
+            }
 
             const previousState = {
                 stockQty: item.stockQty,
@@ -970,40 +1017,59 @@ export const cancelPurchase = async (req, res) => {
                 inTransitStock: item.inTransitStock || 0,
             };
 
-            // Decrease stock
-            item.stockQty -= itemData.quantity;
+            // Atomic stock deduction with oversell protection
+            const updateResult = await Item.updateOne(
+                {
+                    _id: itemData.item,
+                    stockQty: { $gte: itemData.quantity }
+                },
+                {
+                    $inc: { stockQty: -itemData.quantity }
+                }
+            );
 
-            // If stock goes negative, set to 0 (stock was already sold)
-            if (item.stockQty < 0) {
-                item.stockQty = 0;
+            // Check if update succeeded (stock was sufficient)
+            if (updateResult.modifiedCount === 0) {
+                // Stock insufficient - allow cancellation but set to 0
+                await Item.updateOne(
+                    { _id: itemData.item },
+                    { $set: { stockQty: 0 } }
+                );
+                info(`Stock went negative during cancel, set to 0 for item ${item.name}`);
             }
 
             // Remove batch if tracked
             if (item.trackBatch && itemData.batchNo) {
-                const batchIndex = item.batches.findIndex((b) => b.batchNo === itemData.batchNo);
-                if (batchIndex !== -1) {
-                    item.batches.splice(batchIndex, 1);
-                }
+                await Item.updateOne(
+                    { _id: itemData.item },
+                    { $pull: { batches: { batchNo: itemData.batchNo } } }
+                );
             }
 
-            validateStockLevels(item);
-            await item.save({});
+            // Get updated item for logging
+            const updatedItem = await Item.findById(itemData.item);
+            if (!updatedItem) {
+                error(`Item not found after update during purchase cancellation: ${itemData.item}`);
+                continue;
+            }
 
             const newState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock || 0,
-                inTransitStock: item.inTransitStock || 0,
+                stockQty: updatedItem.stockQty,
+                reservedStock: updatedItem.reservedStock || 0,
+                inTransitStock: updatedItem.inTransitStock || 0,
             };
 
+            // Log stock movement
             await logStockMovement(
-                item,
+                updatedItem,
                 "PURCHASE_CANCEL",
-                itemData.quantity,
+                -itemData.quantity,
                 purchase._id,
                 "Purchase",
                 req.user._id,
                 previousState,
-                newState);
+                newState
+            );
         }
 
         // Reverse supplier balance

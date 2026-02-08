@@ -512,10 +512,40 @@ export const convertToInvoice = async (req, res) => {
                             inTransitStock: item.inTransitStock || 0,
                         };
 
-                        // OPTION A: Reduce ALL THREE (ONLY place stockQty is reduced)
-                        item.stockQty -= challanItem.deliveredQty;           // PHYSICAL SALE
+                        const itemToUpdate = await Item.findById(challanItem.item);
+                        if (!itemToUpdate) {
+                            return res.status(404).json({
+                                success: false,
+                                message: `Item not found: ${challanItem.item}`,
+                            });
+                        }
+
+                        if (challanItem.deliveredQty > 0) {
+                            // Atomic stock deduction with oversell protection
+                            const updateResult = await Item.updateOne(
+                                {
+                                    _id: challanItem.item,
+                                    stockQty: { $gte: challanItem.deliveredQty }
+                                },
+                                {
+                                    $inc: {
+                                        stockQty: -challanItem.deliveredQty,
+                                        inTransitStock: -challanItem.deliveredQty
+                                    }
+                                }
+                            );
+
+                            // Check if update succeeded (stock was sufficient)
+                            if (updateResult.modifiedCount === 0) {
+                                return res.status(400).json({
+                                    success: false,
+                                    message: `Insufficient stock for item ${itemToUpdate.name}. Available: ${itemToUpdate.stockQty}, Required: ${challanItem.deliveredQty}`,
+                                });
+                            }
+                        }
+
+                        // Update reserved stock separately as it's not part of the atomic stockQty/inTransitStock update
                         item.reservedStock -= challanItem.deliveredQty;      // RELEASE LOCK
-                        item.inTransitStock = Math.max(0, (item.inTransitStock || 0) - challanItem.deliveredQty); // CLEAR DC
 
                         // STRICT VALIDATION: Reserved stock cannot be negative
                         if (item.reservedStock < 0) {

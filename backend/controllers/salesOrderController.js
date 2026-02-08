@@ -540,6 +540,12 @@ export const convertToDeliveryChallan = async (req, res) => {
 
             // ERP-GRADE: Update stock with in-transit tracking
             const item = await Item.findById(dcItem.item);
+            if (!item) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Item not found: ${dcItem.item}`,
+                });
+            }
 
             const previousState = {
                 stockQty: item.stockQty,
@@ -547,37 +553,59 @@ export const convertToDeliveryChallan = async (req, res) => {
                 inTransitStock: item.inTransitStock || 0,
             };
 
-            item.stockQty -= dcItem.quantity;
-            item.inTransitStock = (item.inTransitStock || 0) + dcItem.quantity;
+            // Atomic stock deduction with oversell protection
+            const updateResult = await Item.updateOne(
+                {
+                    _id: dcItem.item,
+                    stockQty: { $gte: dcItem.quantity }
+                },
+                {
+                    $inc: { stockQty: -dcItem.quantity }
+                }
+            );
 
-            validateStockLevels(item);
-            await item.save();
+            // Check if update succeeded (stock was sufficient)
+            if (updateResult.modifiedCount === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient stock for item ${item.name}. Available: ${item.stockQty}, Required: ${dcItem.quantity}`,
+                });
+            }
+
+            // Update in-transit stock separately
+            await Item.updateOne(
+                { _id: dcItem.item },
+                { $inc: { inTransitStock: dcItem.quantity } }
+            );
+
+            // Get updated item for logging
+            const updatedItem = await Item.findById(dcItem.item);
 
             const newState = {
-                stockQty: item.stockQty,
-                reservedStock: item.reservedStock,
-                inTransitStock: item.inTransitStock,
+                stockQty: updatedItem.stockQty,
+                reservedStock: updatedItem.reservedStock,
+                inTransitStock: updatedItem.inTransitStock,
             };
 
             await logStockMovement(
-                item,
+                updatedItem,
                 "DELIVER",
                 dcItem.quantity,
                 salesOrder._id,
                 "SalesOrder",
                 req.user._id,
                 previousState,
-                { ...previousState, stockQty: item.stockQty }
+                { ...previousState, stockQty: updatedItem.stockQty }
             );
 
             await logStockMovement(
-                item,
+                updatedItem,
                 "IN_TRANSIT",
                 dcItem.quantity,
                 salesOrder._id,
                 "SalesOrder",
                 req.user._id,
-                { ...previousState, stockQty: item.stockQty },
+                { ...previousState, stockQty: updatedItem.stockQty },
                 newState
             );
         }
