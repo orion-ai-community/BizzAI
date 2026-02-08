@@ -1,0 +1,2982 @@
+﻿
+> backend@2.0.0 test
+> cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand --passWithNoTests
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ≡ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+npm : (node:15828) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+At line:1 char:1
++ npm test 2>&1 | Out-File -FilePath "test-results.txt" -Encoding utf8; ...
++ ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:15828) Ex...nge at any time:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-08 16:15:46 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"b0e0ac14...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '03ec4a53d5b62fbb',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:46 +0000] "POST /api/auth/login HTTP/1.1" 200 559 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:46 +0000] "GET /api/financial-periods HTTP/1.1" 403 105 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:46 +0000] "GET /api/financial-periods?status=open HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:46 +0000] "POST /api/financial-periods HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:46 +0000] "POST /api/financial-periods HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:46 +0000] "POST /api/financial-periods/generate/2028 HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:47 +0000] "PUT /api/financial-periods/6988695a2a1d378b592ac34c/lock HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:47 +0000] "PUT /api/financial-periods/6988695a2a1d378b592ac351/unlock HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:47 +0000] "PUT /api/financial-periods/6988695b2a1d378b592ac4d2/close HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:47 +0000] "PUT /api/financial-periods/6988695a2a1d378b592ac353/unlock HTTP/1.1" 401 28 "-" "-"
+FAIL tests/integration/financialPeriod.test.js (20.21 s)
+  Financial Period Locking Integration Tests
+    Period Management APIs
+      ├ù should list all periods (293 ms)
+      ├ù should filter periods by status (115 ms)
+      ├ù should create new period (84 ms)
+      ├ù should prevent overlapping periods (132 ms)
+      ├ù should generate periods for fiscal year (137 ms)
+      ├ù should lock period (96 ms)
+      ├ù should unlock period (136 ms)
+      ├ù should close period (123 ms)
+      ├ù should prevent unlocking closed period (142 ms)
+    Period Locking Enforcement
+      ├ù should allow transaction in open period (49 ms)
+      ├ù should prevent transaction in locked period (33 ms)
+      ├ù should prevent transaction in closed period (39 ms)
+    Period Model Methods
+      ΓêÜ should check if period contains date (26 ms)
+      ├ù should get current open period (32 ms)
+      ΓêÜ should prevent modification of closed period (31 ms)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should list all periods
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 403
+
+    [0m [90m 104 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 105 |[39m
+    [31m[1m>[22m[39m[90m 106 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 107 |[39m             
+expect(res[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 108 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata)[33m.[39mtoHaveLength([35m3[39m)[33m;[39m
+     [90m 109 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:106:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should filter periods by status
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 114 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 115 |[39m
+    [31m[1m>[22m[39m[90m 116 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 117 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata)[33m.[39mtoHaveLength([35m1[39m)[33m;[39m
+     [90m 118 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[[35m0[39m][33m.[39mstatus)[33m.[39mtoBe([32m'open'[39m)[33m;[39m
+     [90m 119 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:116:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should create new period
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 401
+
+    [0m [90m 130 |[39m                 })[33m;[39m
+     [90m 131 |[39m
+    [31m[1m>[22m[39m[90m 132 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 133 |[39m             
+expect(res[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 134 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[33m.[39mstatus)[33m.[39mtoBe([32m'open'[39m)[33m;[39m
+     [90m 135 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:132:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should prevent overlapping periods
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 401
+
+    [0m [90m 146 |[39m                 })[33m;[39m
+     [90m 147 |[39m
+    [31m[1m>[22m[39m[90m 148 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 149 |[39m             
+expect(res[33m.[39mbody[33m.[39mmessage)[33m.[39mtoContain([32m'overlap'[39m)[33m;[39m
+     [90m 150 |[39m         })[33m;[39m
+     [90m 151 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:148:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should generate periods for fiscal year
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 401
+
+    [0m [90m 155 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 156 |[39m
+    [31m[1m>[22m[39m[90m 157 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 158 |[39m             
+expect(res[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 159 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata)[33m.[39mtoHaveLength([35m12[39m)[33m;[39m [90m// 12 monthly 
+periods[39m
+     [90m 160 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:157:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should lock period
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 165 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 166 |[39m
+    [31m[1m>[22m[39m[90m 167 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 168 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[33m.[39mstatus)[33m.[39mtoBe([32m'locked'[39m)[33m;[39m
+     [90m 169 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[33m.[39mlockedAt)[33m.[39mtoBeDefined()[33m;[39m
+     [90m 170 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:167:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should unlock period
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 175 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 176 |[39m
+    [31m[1m>[22m[39m[90m 177 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 178 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[33m.[39mstatus)[33m.[39mtoBe([32m'open'[39m)[33m;[39m
+     [90m 179 |[39m         })[33m;[39m
+     [90m 180 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:177:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should close period
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 194 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 195 |[39m
+    [31m[1m>[22m[39m[90m 196 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 197 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[33m.[39mstatus)[33m.[39mtoBe([32m'closed'[39m)[33m;[39m
+     [90m 198 |[39m             
+expect(res[33m.[39mbody[33m.[39mdata[33m.[39mclosedAt)[33m.[39mtoBeDefined()[33m;[39m
+     [90m 199 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:196:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Management APIs ΓÇ║ should prevent unlocking closed period
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 401
+
+    [0m [90m 204 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${authToken}`[39m)[33m;[39m
+     [90m 205 |[39m
+    [31m[1m>[22m[39m[90m 206 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 207 |[39m             
+expect(res[33m.[39mbody[33m.[39mmessage)[33m.[39mtoContain([32m'closed'[39m)[33m;[39m
+     [90m 208 |[39m         })[33m;[39m
+     [90m 209 |[39m     })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:206:32)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Locking Enforcement ΓÇ║ should allow transaction in open 
+period
+
+    TypeError: Cannot read properties of null (reading 'status')
+
+    [0m [90m 219 |[39m
+     [90m 220 |[39m             expect(period)[33m.[39mtoBeDefined()[33m;[39m
+    [31m[1m>[22m[39m[90m 221 |[39m             
+expect(period[33m.[39mstatus)[33m.[39mtoBe([32m'open'[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 222 |[39m             expect(period[33m.[39misOpen())[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 223 |[39m         })[33m;[39m
+     [90m 224 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:221:27)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Locking Enforcement ΓÇ║ should prevent transaction in 
+locked period
+
+    TypeError: Cannot read properties of null (reading 'status')
+
+    [0m [90m 230 |[39m
+     [90m 231 |[39m             expect(period)[33m.[39mtoBeDefined()[33m;[39m
+    [31m[1m>[22m[39m[90m 232 |[39m             
+expect(period[33m.[39mstatus)[33m.[39mtoBe([32m'locked'[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 233 |[39m             expect(period[33m.[39misOpen())[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 234 |[39m         })[33m;[39m
+     [90m 235 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:232:27)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Locking Enforcement ΓÇ║ should prevent transaction in 
+closed period
+
+    TypeError: Cannot read properties of null (reading 'status')
+
+    [0m [90m 241 |[39m
+     [90m 242 |[39m             expect(period)[33m.[39mtoBeDefined()[33m;[39m
+    [31m[1m>[22m[39m[90m 243 |[39m             
+expect(period[33m.[39mstatus)[33m.[39mtoBe([32m'closed'[39m)[33m;[39m
+     [90m     |[39m                           [31m[1m^[22m[39m
+     [90m 244 |[39m             expect(period[33m.[39misOpen())[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m 245 |[39m         })[33m;[39m
+     [90m 246 |[39m     })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:243:27)
+
+  ΓùÅ Financial Period Locking Integration Tests ΓÇ║ Period Model Methods ΓÇ║ should get current open period
+
+    TypeError: Cannot read properties of null (reading 'status')
+
+    [0m [90m 256 |[39m
+     [90m 257 |[39m             expect(currentPeriod)[33m.[39mtoBeDefined()[33m;[39m
+    [31m[1m>[22m[39m[90m 258 |[39m             
+expect(currentPeriod[33m.[39mstatus)[33m.[39mtoBe([32m'open'[39m)[33m;[39m
+     [90m     |[39m                                  [31m[1m^[22m[39m
+     [90m 259 |[39m         })[33m;[39m
+     [90m 260 |[39m
+     [90m 261 |[39m         test([32m'should prevent modification of closed period'[39m[33m,[39m [36masync[39m 
+() [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/financialPeriod.test.js:258:34)
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ΓÜÖ∩╕Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-08 16:15:53 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"7d83acb3...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:53 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:15:54 [[32minfo[39m]: Stock movement logged: PURCHASE | Item: Test Item | Qty: 50 | Source: Purchase:6988696227364300795bfeab {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Purchase created by Test User: PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:54 +0000] "POST /api/purchases HTTP/1.1" 201 - "-" "-"
+2026-02-08 16:15:54 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"95a6a9eb...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:54 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:15:54 [[32minfo[39m]: Stock movement logged: PURCHASE | Item: Test Item | Qty: 20 | Source: Purchase:6988696227364300795bff50 {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Stock movement logged: PURCHASE | Item: Item 2 | Qty: 30 | Source: Purchase:6988696227364300795bff50 {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Purchase created by Test User: PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:54 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:54 +0000] "POST /api/purchases HTTP/1.1" 201 - "-" "-"
+2026-02-08 16:15:55 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"2e2fdeb1...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:55 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:15:55 [[32minfo[39m]: Stock movement logged: PURCHASE | Item: Test Item | Qty: 10 | Source: Purchase:6988696327364300795bffd9 {"service":"bizzai-backend"}
+2026-02-08 16:15:55 [[32minfo[39m]: Purchase created by Test User: PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:55 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:55 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:55 +0000] "POST /api/purchases HTTP/1.1" 201 - "-" "-"
+2026-02-08 16:15:56 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"f60d4291...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:56 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:15:56 [[32minfo[39m]: Stock movement logged: PURCHASE | Item: Test Item | Qty: 10 | Source: Purchase:6988696427364300795c003a {"service":"bizzai-backend"}
+2026-02-08 16:15:56 [[32minfo[39m]: Purchase created by Test User: PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:56 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+2026-02-08 16:15:56 [[32minfo[39m]: Bill BILL-20260208-001 auto-created from Purchase PUR-00001 {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:56 +0000] "POST /api/purchases HTTP/1.1" 201 - "-" "-"
+2026-02-08 16:15:56 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"0a073d96...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:56 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:56 +0000] "POST /api/purchases HTTP/1.1" 400 89 "-" "-"
+2026-02-08 16:15:57 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"b4610b29...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:57 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:57 +0000] "GET /api/purchases HTTP/1.1" 200 - "-" "-"
+2026-02-08 16:15:57 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"baee7199...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:57 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:57 +0000] "GET /api/purchases?supplier=6988696527364300795c0108 HTTP/1.1" 200 - "-" "-"
+2026-02-08 16:15:57 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"3b6a9ebf...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:57 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:57 +0000] "GET /api/purchases HTTP/1.1" 200 - "-" "-"
+2026-02-08 16:15:58 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"0daaf6d3...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:58 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:15:58 [[32minfo[39m]: Stock movement logged: PURCHASE_CANCEL | Item: Test Item | Qty: -20 | Source: Purchase:6988696627364300795c01a7 {"service":"bizzai-backend"}
+2026-02-08 16:15:58 [[32minfo[39m]: Purchase cancelled: PUR-CANCEL-001 {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:45:58 +0000] "PUT /api/purchases/6988696627364300795c01a7/cancel HTTP/1.1" 200 - "-" "-"
+FAIL tests/integration/purchase.test.js (10.933 s)
+  Purchase API Integration Tests
+    POST /api/purchases
+      ├ù should create purchase and update stock (1603 ms)
+      ΓêÜ should handle multiple items in purchase (665 ms)
+      ΓêÜ should apply bill discount correctly (842 ms)
+      ΓêÜ should handle credit purchase (343 ms)
+      ΓêÜ should fail with invalid item (624 ms)
+    GET /api/purchases
+      ΓêÜ should get all purchases for authenticated user (311 ms)
+      ΓêÜ should filter purchases by supplier (305 ms)
+      ΓêÜ should not return other users' purchases (410 ms)
+    PUT /api/purchases/:id/cancel
+      ├ù should cancel purchase and revert stock (338 ms)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ POST /api/purchases ΓÇ║ should create purchase and update stock
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 405
+    Received: 0
+
+    [0m [90m 85 |[39m             [90m// Verify purchase calculations[39m
+     [90m 86 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39msubtotal)[33m.[39mtoBe([35m4500[39m)[33m;[39m 
+[90m// 50 * 90[39m
+    [31m[1m>[22m[39m[90m 87 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mtotalCGST)[33m.[39mtoBe([35m405[39m)[33m;[39m 
+[90m// 9% of 4500[39m
+     [90m    |[39m                                                      [31m[1m^[22m[39m
+     [90m 88 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mtotalSGST)[33m.[39mtoBe([35m405[39m)[33m;[39m 
+[90m// 9% of 4500[39m
+     [90m 89 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mtotalAmount)[33m.[39mtoBe([35m5310[39m)[33m;[39m 
+[90m// 4500 + 810[39m
+     [90m 90 |[39m         })[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/purchase.test.js:87:54)
+
+  ΓùÅ Purchase API Integration Tests ΓÇ║ PUT /api/purchases/:id/cancel ΓÇ║ should cancel purchase and revert stock
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: undefined
+
+    [0m [90m 347 |[39m                 [33m.[39mexpect([35m200[39m)[33m;[39m
+     [90m 348 |[39m
+    [31m[1m>[22m[39m[90m 349 |[39m             
+expect(response[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m     |[39m                                           [31m[1m^[22m[39m
+     [90m 350 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mstatus)[33m.[39mtoBe([32m'cancelled'[39m)[33m;[39m
+     [90m 351 |[39m             
+expect(response[33m.[39mbody[33m.[39mpurchase[33m.[39mcancelReason)[33m.[39mtoBe([32m'Supplier cancelled 
+order'[39m)[33m;[39m
+     [90m 352 |[39m[0m
+
+      at Object.<anonymous> (tests/integration/purchase.test.js:349:43)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/003-create-default-financial-period.js:113:21)
+
+  console.log
+    ≡ƒôà Creating default financial periods...
+
+      at runMigration (migrations/003-create-default-financial-period.js:25:21)
+
+  console.log
+    
+    ≡ƒôè Processing organization: Migration Test Org
+
+      at runMigration (migrations/003-create-default-financial-period.js:38:25)
+
+  console.log
+    Γ£à Created default period: FY 2025-2026
+
+      at runMigration (migrations/003-create-default-financial-period.js:85:25)
+
+  console.log
+    Γ£à Updated 0 journal entries
+
+      at runMigration (migrations/003-create-default-financial-period.js:100:25)
+
+  console.log
+    
+    Γ£à Default financial periods created successfully
+
+      at runMigration (migrations/003-create-default-financial-period.js:103:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/003-create-default-financial-period.js:113:21)
+
+  console.log
+    ≡ƒôà Creating default financial periods...
+
+      at runMigration (migrations/003-create-default-financial-period.js:25:21)
+
+  console.log
+    
+    ≡ƒôè Processing organization: Migration Test Org
+
+      at runMigration (migrations/003-create-default-financial-period.js:38:25)
+
+  console.log
+    Γ£à Created default period: FY 2025-2026
+
+      at runMigration (migrations/003-create-default-financial-period.js:85:25)
+
+  console.log
+    Γ£à Updated 0 journal entries
+
+      at runMigration (migrations/003-create-default-financial-period.js:100:25)
+
+  console.log
+    
+    Γ£à Default financial periods created successfully
+
+      at runMigration (migrations/003-create-default-financial-period.js:103:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/003-create-default-financial-period.js:113:21)
+
+  console.log
+    ≡ƒôà Creating default financial periods...
+
+      at runMigration (migrations/003-create-default-financial-period.js:25:21)
+
+  console.log
+    
+    ≡ƒôè Processing organization: Migration Test Org
+
+      at runMigration (migrations/003-create-default-financial-period.js:38:25)
+
+  console.log
+    Γ£à Created default period: FY 2025-2026
+
+      at runMigration (migrations/003-create-default-financial-period.js:85:25)
+
+  console.log
+    Γ£à Updated 0 journal entries
+
+      at runMigration (migrations/003-create-default-financial-period.js:100:25)
+
+  console.log
+    
+    Γ£à Default financial periods created successfully
+
+      at runMigration (migrations/003-create-default-financial-period.js:103:21)
+
+  console.log
+    ≡ƒöä Running rollback without transactions (standalone MongoDB)
+
+      at Object.down (migrations/003-create-default-financial-period.js:158:21)
+
+  console.log
+    ≡ƒöä Rolling back default financial periods...
+
+      at runRollback (migrations/003-create-default-financial-period.js:134:21)
+
+  console.log
+    Γ£à Removed 1 financial periods
+
+      at runRollback (migrations/003-create-default-financial-period.js:147:21)
+
+  console.log
+    Γ£à Rollback complete
+
+      at runRollback (migrations/003-create-default-financial-period.js:148:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/003-create-default-financial-period.js:113:21)
+
+  console.log
+    ≡ƒôà Creating default financial periods...
+
+      at runMigration (migrations/003-create-default-financial-period.js:25:21)
+
+  console.log
+    
+    ≡ƒôè Processing organization: Migration Test Org
+
+      at runMigration (migrations/003-create-default-financial-period.js:38:25)
+
+  console.log
+    Γ£à Created default period: FY 2025-2026
+
+      at runMigration (migrations/003-create-default-financial-period.js:85:25)
+
+  console.log
+    Γ£à Updated 0 journal entries
+
+      at runMigration (migrations/003-create-default-financial-period.js:100:25)
+
+  console.log
+    
+    Γ£à Default financial periods created successfully
+
+      at runMigration (migrations/003-create-default-financial-period.js:103:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/003-create-default-financial-period.js:113:21)
+
+  console.log
+    ≡ƒôà Creating default financial periods...
+
+      at runMigration (migrations/003-create-default-financial-period.js:25:21)
+
+  console.log
+    
+    ≡ƒôè Processing organization: Migration Test Org
+
+      at runMigration (migrations/003-create-default-financial-period.js:38:25)
+
+  console.log
+    Γ£à Period already exists for FY 2025
+
+      at runMigration (migrations/003-create-default-financial-period.js:63:29)
+
+  console.log
+    
+    Γ£à Default financial periods created successfully
+
+      at runMigration (migrations/003-create-default-financial-period.js:103:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running rollback without transactions (standalone MongoDB)
+
+      at Object.down (migrations/004-add-organization-to-all-models.js:153:21)
+
+  console.log
+    ≡ƒöä Rolling back organizationId from all models...
+
+      at runRollback (migrations/004-add-organization-to-all-models.js:119:21)
+
+  console.log
+    Γ£à Rollback complete
+
+      at runRollback (migrations/004-add-organization-to-all-models.js:143:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 100 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+  console.log
+    ≡ƒöä Running migration without transactions (standalone MongoDB)
+
+      at Object.up (migrations/004-add-organization-to-all-models.js:98:21)
+
+  console.log
+    ≡ƒÅó Adding organizationId to all models...
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:36:21)
+
+  console.log
+    
+    ≡ƒôè Using default organization: Migration Test Org
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:47:21)
+
+  console.log
+    Γ£à Purchase: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Purchase: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Invoice: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Invoice: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Item: Updated 1 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Item: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Customer: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Customer: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Supplier: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Supplier: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Bill: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Bill: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentIn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentIn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PaymentOut: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PaymentOut: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Return: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Return: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à PurchaseReturn: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à PurchaseReturn: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à Expense: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à Expense: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à BankAccount: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à BankAccount: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    Γ£à StockLedger: Updated 0 documents
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:74:29)
+
+  console.log
+    Γ£à StockLedger: Created organizationId index
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:81:29)
+
+  console.log
+    
+    Γ£à Multi-tenant migration complete
+
+      at runMigration (migrations/004-add-organization-to-all-models.js:88:21)
+
+FAIL tests/integration/migrations.test.js (5.876 s)
+  Migration Tests
+    Migration 003: Create Default Financial Period
+      ├ù should create default financial period for organization (499 ms)
+      ΓêÜ should assign existing journal entries to default period (398 ms)
+      ΓêÜ should rollback correctly (225 ms)
+      ΓêÜ should be idempotent (173 ms)
+    Migration 004: Add Organization to All Models
+      ΓêÜ should add organizationId to items (226 ms)
+      ΓêÜ should add organizationId to invoices (220 ms)
+      ΓêÜ should create indexes for organizationId (237 ms)
+      ├ù should assign documents to default organization (245 ms)
+      ΓêÜ should rollback correctly (299 ms)
+      ΓêÜ should handle large datasets efficiently (428 ms)
+    Migration Safety
+      ΓêÜ should not lose data during migration (210 ms)
+      ΓêÜ should maintain referential integrity (223 ms)
+
+  ΓùÅ Migration Tests ΓÇ║ Migration 003: Create Default Financial Period ΓÇ║ should create default financial period 
+for organization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2026
+    Received: 2025
+
+    [0m [90m 61 |[39m             expect(period)[33m.[39mtoBeDefined()[33m;[39m
+     [90m 62 |[39m             expect(period[33m.[39mstatus)[33m.[39mtoBe([32m'open'[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 63 |[39m             expect(period[33m.[39mfiscalYear)[33m.[39mtoBe([36mnew[39m 
+[33mDate[39m()[33m.[39mgetFullYear())[33m;[39m
+     [90m    |[39m                                       [31m[1m^[22m[39m
+     [90m 64 |[39m         })[33m;[39m
+     [90m 65 |[39m
+     [90m 66 |[39m         test([32m'should assign existing journal entries to default period'[39m[33m,[39m 
+[36masync[39m () [33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/migrations.test.js:63:39)
+
+  ΓùÅ Migration Tests ΓÇ║ Migration 004: Add Organization to All Models ΓÇ║ should assign documents to default 
+organization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "6988696b982a1477ad4c965c"
+    Received: "6988696b982a1477ad4c9657"
+
+    [0m [90m 229 |[39m             [90m// Verify assigned to default org[39m
+     [90m 230 |[39m             [36mconst[39m updatedItem [33m=[39m [36mawait[39m 
+[33mItem[39m[33m.[39mfindById(item[33m.[39m_id)[33m;[39m
+    [31m[1m>[22m[39m[90m 231 |[39m             expect(updatedItem[33m.[39morganizationId[33m.[39mtoString())
+[33m.[39mtoBe(defaultOrg[33m.[39m_id[33m.[39mtoString())[33m;[39m
+     [90m     |[39m                                                           [31m[1m^[22m[39m
+     [90m 232 |[39m         })[33m;[39m
+     [90m 233 |[39m
+     [90m 234 |[39m         test([32m'should rollback correctly'[39m[33m,[39m [36masync[39m () [33m=>[39m 
+{[0m
+
+      at Object.<anonymous> (tests/integration/migrations.test.js:231:59)
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ΓÜÖ∩╕Å  write to custom object with { processEnv: myObject }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-08 16:16:10 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"eb948ab7...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '238f99de3114657e',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:10 +0000] "POST /api/auth/login HTTP/1.1" 200 528 "-" "-"
+2026-02-08 16:16:10 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"5f9ceb3d...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '82b0bc9b60e6d1bd',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:10 +0000] "POST /api/auth/login HTTP/1.1" 200 528 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:10 +0000] "GET /api/inventory HTTP/1.1" 200 555 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:10 +0000] "GET /api/inventory HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:10 +0000] "GET /api/inventory/69886972ef758d2333bbb5a8 HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "PUT /api/inventory/69886972ef758d2333bbb5a6 HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "DELETE /api/inventory/69886972ef758d2333bbb5a8 HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "GET /api/sales-invoice HTTP/1.1" 404 156 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "GET /api/sales-invoice HTTP/1.1" 404 156 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "GET /api/purchases HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "GET /api/purchases HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "GET /api/reports/dashboard HTTP/1.1" 401 28 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:11 +0000] "GET /api/reports/dashboard HTTP/1.1" 401 28 "-" "-"
+FAIL tests/integration/multiTenancy.test.js (6.591 s)
+  Multi-Tenancy Integration Tests
+    Tenant Isolation - Items
+      ΓêÜ user1 should only see org1 items (237 ms)
+      ├ù user2 should only see org2 items (174 ms)
+      ├ù user1 cannot access org2 item by ID (139 ms)
+      ├ù user2 cannot update org1 item (93 ms)
+      ├ù user1 cannot delete org2 item (76 ms)
+    Tenant Isolation - Invoices
+      ├ù user1 should only see org1 invoices (45 ms)
+      ├ù user2 should only see org2 invoices (43 ms)
+    Tenant Isolation - Purchases
+      ├ù user1 should only see org1 purchases (51 ms)
+      ├ù user2 should only see org2 purchases (49 ms)
+    Cross-Tenant Prevention
+      ├ù should prevent cross-tenant data leakage in aggregations (54 ms)
+      ΓêÜ should enforce organizationId in all queries (38 ms)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Items ΓÇ║ user2 should only see org2 items
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 115 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user2Token}`[39m)[33m;[39m
+     [90m 116 |[39m
+    [31m[1m>[22m[39m[90m 117 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 118 |[39m             [36mconst[39m items [33m=[39m res[33m.[39mbody[33m.[39mitems [33m||[39m 
+res[33m.[39mbody[33m;[39m
+     [90m 119 |[39m             expect(items[33m.[39msome(i [33m=>[39m i[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m item2[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 120 |[39m             expect(items[33m.[39msome(i [33m=>[39m i[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m item1[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mfalse[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:117:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Items ΓÇ║ user1 cannot access org2 item by ID
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 404
+    Received: 401
+
+    [0m [90m 126 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user1Token}`[39m)[33m;[39m
+     [90m 127 |[39m
+    [31m[1m>[22m[39m[90m 128 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m404[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 129 |[39m         })[33m;[39m
+     [90m 130 |[39m
+     [90m 131 |[39m         test([32m'user2 cannot update org1 item'[39m[33m,[39m [36masync[39m () 
+[33m=>[39m {[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:128:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Items ΓÇ║ user2 cannot update org1 item
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 404
+    Received: 401
+
+    [0m [90m 135 |[39m                 [33m.[39msend({ stockQty[33m:[39m [35m999[39m })[33m;[39m
+     [90m 136 |[39m
+    [31m[1m>[22m[39m[90m 137 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m404[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 138 |[39m
+     [90m 139 |[39m             [90m// Verify item not modified[39m
+     [90m 140 |[39m             [36mconst[39m item [33m=[39m [36mawait[39m 
+[33mItem[39m[33m.[39mfindById(item1[33m.[39m_id)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:137:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Items ΓÇ║ user1 cannot delete org2 item
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 404
+    Received: 401
+
+    [0m [90m 147 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user1Token}`[39m)[33m;[39m
+     [90m 148 |[39m
+    [31m[1m>[22m[39m[90m 149 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m404[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 150 |[39m
+     [90m 151 |[39m             [90m// Verify item still exists[39m
+     [90m 152 |[39m             [36mconst[39m item [33m=[39m [36mawait[39m 
+[33mItem[39m[33m.[39mfindById(item2[33m.[39m_id)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:149:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Invoices ΓÇ║ user1 should only see org1 invoices
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+    [0m [90m 223 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user1Token}`[39m)[33m;[39m
+     [90m 224 |[39m
+    [31m[1m>[22m[39m[90m 225 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 226 |[39m             [36mconst[39m invoices [33m=[39m res[33m.[39mbody[33m.[39minvoices 
+[33m||[39m res[33m.[39mbody[33m;[39m
+     [90m 227 |[39m             expect(invoices[33m.[39msome(i [33m=>[39m i[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m invoice1[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 228 |[39m             expect(invoices[33m.[39msome(i [33m=>[39m i[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m invoice2[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mfalse[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:225:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Invoices ΓÇ║ user2 should only see org2 invoices
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+    [0m [90m 234 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user2Token}`[39m)[33m;[39m
+     [90m 235 |[39m
+    [31m[1m>[22m[39m[90m 236 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 237 |[39m             [36mconst[39m invoices [33m=[39m res[33m.[39mbody[33m.[39minvoices 
+[33m||[39m res[33m.[39mbody[33m;[39m
+     [90m 238 |[39m             expect(invoices[33m.[39msome(i [33m=>[39m i[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m invoice2[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 239 |[39m             expect(invoices[33m.[39msome(i [33m=>[39m i[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m invoice1[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mfalse[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:236:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Purchases ΓÇ║ user1 should only see org1 purchases
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 345 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user1Token}`[39m)[33m;[39m
+     [90m 346 |[39m
+    [31m[1m>[22m[39m[90m 347 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 348 |[39m             [36mconst[39m purchases [33m=[39m res[33m.[39mbody[33m.[39mpurchases 
+[33m||[39m res[33m.[39mbody[33m;[39m
+     [90m 349 |[39m             expect(purchases[33m.[39msome(p [33m=>[39m p[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m purchase1[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 350 |[39m             expect(purchases[33m.[39msome(p [33m=>[39m p[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m purchase2[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mfalse[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:347:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Tenant Isolation - Purchases ΓÇ║ user2 should only see org2 purchases
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 356 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user2Token}`[39m)[33m;[39m
+     [90m 357 |[39m
+    [31m[1m>[22m[39m[90m 358 |[39m             
+expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 359 |[39m             [36mconst[39m purchases [33m=[39m res[33m.[39mbody[33m.[39mpurchases 
+[33m||[39m res[33m.[39mbody[33m;[39m
+     [90m 360 |[39m             expect(purchases[33m.[39msome(p [33m=>[39m p[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m purchase2[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 361 |[39m             expect(purchases[33m.[39msome(p [33m=>[39m p[33m.[39m_id[33m.[39mtoString() 
+[33m===[39m purchase1[33m.[39m_id[33m.[39mtoString()))[33m.[39mtoBe([36mfalse[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:358:32)
+
+  ΓùÅ Multi-Tenancy Integration Tests ΓÇ║ Cross-Tenant Prevention ΓÇ║ should prevent cross-tenant data leakage in 
+aggregations
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 375 |[39m                 [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer 
+${user2Token}`[39m)[33m;[39m
+     [90m 376 |[39m
+    [31m[1m>[22m[39m[90m 377 |[39m             
+expect(res1[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                                 [31m[1m^[22m[39m
+     [90m 378 |[39m             expect(res2[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m 379 |[39m
+     [90m 380 |[39m             [90m// Dashboards should have different data[39m[0m
+
+      at Object.<anonymous> (tests/integration/multiTenancy.test.js:377:33)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/integration/autoPosting.test.js
+  Auto-Posting Service Integration Tests
+    Purchase Auto-Posting
+      ├ù should create journal entry for cash purchase (73 ms)
+      ├ù should create journal entry for credit purchase (61 ms)
+      ├ù should reject posting to locked period (40 ms)
+      ├ù should reject posting without financial period (39 ms)
+    Sale Auto-Posting
+      ├ù should create revenue and COGS journal entries (38 ms)
+      ├ù should handle credit sales correctly (19 ms)
+    Payment Auto-Posting
+      ├ù should create journal entry for payment (19 ms)
+    Transaction Safety
+      ├ù should rollback on error (17 ms)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Purchase Auto-Posting ΓÇ║ should create journal entry for cash 
+purchase
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Purchase Auto-Posting ΓÇ║ should create journal entry for credit 
+purchase
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Purchase Auto-Posting ΓÇ║ should reject posting to locked period
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Purchase Auto-Posting ΓÇ║ should reject posting without financial 
+period
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Sale Auto-Posting ΓÇ║ should create revenue and COGS journal entries
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Sale Auto-Posting ΓÇ║ should handle credit sales correctly
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Payment Auto-Posting ΓÇ║ should create journal entry for payment
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  ΓùÅ Auto-Posting Service Integration Tests ΓÇ║ Transaction Safety ΓÇ║ should rollback on error
+
+    MongoServerError: E11000 duplicate key error collection: test.chartofaccounts index: code_1 dup key: { code: 
+"1120" }
+
+      at InsertOneOperation.handleOk (node_modules/mongoose/node_modules/mongodb/src/operations/insert.ts:79:13)
+      at tryOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:290:26)
+      at executeOperation (node_modules/mongoose/node_modules/mongodb/src/operations/execute_operation.ts:119:12)
+      at Collection.insertOne (node_modules/mongoose/node_modules/mongodb/src/collection.ts:294:12)
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ΓÜÖ∩╕Å  enable debug logging with { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-08 16:16:19 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"10ee05cc...","sameSite":"strict","secure":false}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:19 +0000] "POST /api/auth/register HTTP/1.1" 201 521 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:19 +0000] "POST /api/auth/register HTTP/1.1" 400 49 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:19 +0000] "POST /api/auth/register HTTP/1.1" 400 61 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:19 +0000] "POST /api/auth/register HTTP/1.1" 400 61 "-" "-"
+2026-02-08 16:16:20 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"a1b0481a...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '9f514e36d9d61641',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:20 +0000] "POST /api/auth/login HTTP/1.1" 200 583 "-" "-"
+2026-02-08 16:16:21 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"9f514e36d9d61641","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:21 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+2026-02-08 16:16:21 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"04e8703fcfb60849","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:21 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+2026-02-08 16:16:21 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"9f514e36d9d61641","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:21 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+2026-02-08 16:16:21 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"9f514e36d9d61641","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:21 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+2026-02-08 16:16:21 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"9f514e36d9d61641","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:21 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+2026-02-08 16:16:22 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"9f514e36d9d61641","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+2026-02-08 16:16:22 [[33mwarn[39m]: SECURITY: Login attempt failed {"service":"bizzai-backend","ip":"::ffff:127.0.0.1","accountHash":"9f514e36d9d61641","correlationId":"unknown"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "POST /api/auth/login HTTP/1.1" 401 49 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "POST /api/auth/login HTTP/1.1" 423 135 "-" "-"
+2026-02-08 16:16:22 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"49c8f80a...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "GET /api/auth/me HTTP/1.1" 200 210 "-" "-"
+2026-02-08 16:16:22 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"29636a77...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:22 +0000] "GET /api/auth/me HTTP/1.1" 401 59 "-" "-"
+2026-02-08 16:16:23 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"755edb01...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:23 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+  console.error
+    Auth Middleware Error: JsonWebTokenError {
+      name: 'JsonWebTokenError',
+      message: 'jwt malformed'
+    }
+
+    [0m [90m 116 |[39m     }
+     [90m 117 |[39m   } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 118 |[39m     console[33m.[39merror([32m"Auth Middleware Error:"[39m[33m,[39m error)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 119 |[39m
+     [90m 120 |[39m     [90m// Provide more specific error messages for debugging[39m
+     [90m 121 |[39m     [36mlet[39m errorMessage [33m=[39m [32m"Invalid or expired token"[39m[33m;[39m[0m
+
+      at protect (middlewares/authMiddleware.js:118:13)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at logger (node_modules/morgan/index.js:144:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cors (node_modules/cors/lib/index.js:188:7)
+      at node_modules/cors/lib/index.js:224:17
+      at origin (config/cors.config.js:58:13)
+      at node_modules/cors/lib/index.js:219:13
+      at optionsCallback (node_modules/cors/lib/index.js:199:9)
+      at corsMiddleware (node_modules/cors/lib/index.js:204:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cookieParser (node_modules/cookie-parser/index.js:57:14)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:91:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at middlewares/timeout.js:35:9
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at requestId (middlewares/requestId.js:17:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at compression (node_modules/compression/index.js:243:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express-mongo-sanitize/index.js:122:5
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at internalNext (node_modules/helmet/index.mjs:533:6)
+      at xXssProtectionMiddleware (node_modules/helmet/index.mjs:311:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xPoweredByMiddleware (node_modules/helmet/index.mjs:304:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xPermittedCrossDomainPoliciesMiddleware (node_modules/helmet/index.mjs:297:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xFrameOptionsMiddleware (node_modules/helmet/index.mjs:281:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xDownloadOptionsMiddleware (node_modules/helmet/index.mjs:261:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xDnsPrefetchControlMiddleware (node_modules/helmet/index.mjs:254:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xContentTypeOptionsMiddleware (node_modules/helmet/index.mjs:246:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at strictTransportSecurityMiddleware (node_modules/helmet/index.mjs:239:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at referrerPolicyMiddleware (node_modules/helmet/index.mjs:207:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at originAgentClusterMiddleware (node_modules/helmet/index.mjs:182:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at crossOriginResourcePolicyMiddleware (node_modules/helmet/index.mjs:175:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+
+  console.error
+    JWT Malformed Error Details: { message: 'jwt malformed', token: 'invalid_token...' }
+
+    [0m [90m 123 |[39m     [36mif[39m (error[33m.[39mname [33m===[39m [32m'JsonWebTokenError'[39m) {
+     [90m 124 |[39m       errorMessage [33m=[39m [32m"Invalid token format"[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 125 |[39m       console[33m.[39merror([32m"JWT Malformed Error Details:"[39m[33m,[39m {
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 126 |[39m         message[33m:[39m error[33m.[39mmessage[33m,[39m
+     [90m 127 |[39m         token[33m:[39m token [33m?[39m [32m`${token.substring(0, 20)}...`[39m [33m:[39m [32m'undefined'[39m
+     [90m 128 |[39m       })[33m;[39m[0m
+
+      at protect (middlewares/authMiddleware.js:125:15)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at logger (node_modules/morgan/index.js:144:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cors (node_modules/cors/lib/index.js:188:7)
+      at node_modules/cors/lib/index.js:224:17
+      at origin (config/cors.config.js:58:13)
+      at node_modules/cors/lib/index.js:219:13
+      at optionsCallback (node_modules/cors/lib/index.js:199:9)
+      at corsMiddleware (node_modules/cors/lib/index.js:204:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cookieParser (node_modules/cookie-parser/index.js:57:14)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:91:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at middlewares/timeout.js:35:9
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at requestId (middlewares/requestId.js:17:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at compression (node_modules/compression/index.js:243:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express-mongo-sanitize/index.js:122:5
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at internalNext (node_modules/helmet/index.mjs:533:6)
+      at xXssProtectionMiddleware (node_modules/helmet/index.mjs:311:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xPoweredByMiddleware (node_modules/helmet/index.mjs:304:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xPermittedCrossDomainPoliciesMiddleware (node_modules/helmet/index.mjs:297:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xFrameOptionsMiddleware (node_modules/helmet/index.mjs:281:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xDownloadOptionsMiddleware (node_modules/helmet/index.mjs:261:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xDnsPrefetchControlMiddleware (node_modules/helmet/index.mjs:254:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at xContentTypeOptionsMiddleware (node_modules/helmet/index.mjs:246:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at strictTransportSecurityMiddleware (node_modules/helmet/index.mjs:239:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at referrerPolicyMiddleware (node_modules/helmet/index.mjs:207:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at originAgentClusterMiddleware (node_modules/helmet/index.mjs:182:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+      at crossOriginResourcePolicyMiddleware (node_modules/helmet/index.mjs:175:3)
+      at internalNext (node_modules/helmet/index.mjs:531:6)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:23 +0000] "GET /api/auth/me HTTP/1.1" 401 50 "-" "-"
+2026-02-08 16:16:23 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"514cf2ea...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:23 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:23 +0000] "POST /api/auth/logout HTTP/1.1" 200 52 "-" "-"
+PASS tests/integration/auth.test.js (9.263 s)
+  Authentication API Integration Tests
+    POST /api/auth/register
+      ΓêÜ should register a new user successfully (1099 ms)
+      ΓêÜ should fail with duplicate email (290 ms)
+      ΓêÜ should fail with weak password (120 ms)
+      ΓêÜ should fail with missing required fields (134 ms)
+    POST /api/auth/login
+      ΓêÜ should login successfully with correct credentials (733 ms)
+      ΓêÜ should fail with incorrect password (387 ms)
+      ΓêÜ should fail with non-existent email (195 ms)
+      ΓêÜ should lock account after 5 failed attempts (946 ms)
+    GET /api/auth/me
+      ΓêÜ should get current user with valid token (332 ms)
+      ΓêÜ should fail without token (297 ms)
+      ΓêÜ should fail with invalid token (331 ms)
+    POST /api/auth/logout
+      ΓêÜ should logout successfully (306 ms)
+
+  console.log
+    [dotenv@17.2.3] injecting env (12) from .env -- tip: ΓÜÖ∩╕Å  override existing env vars with { override: true }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    ΓÜá∩╕Å  Sentry not configured (SENTRY_DSN not set)
+
+      at initSentry (config/sentry.js:13:17)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"entryNumber":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-08 16:16:29 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"5b2ce012...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:29 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:16:29 [[32minfo[39m]: Item added by Test User: New Test Item {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:29 +0000] "POST /api/inventory HTTP/1.1" 201 573 "-" "-"
+2026-02-08 16:16:29 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"4ba21757...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:29 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:29 +0000] "POST /api/inventory HTTP/1.1" 400 67 "-" "-"
+2026-02-08 16:16:30 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"039eb4c5...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:30 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:16:30 [[32minfo[39m]: Item added by Test User: Stock Test Item {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:30 +0000] "POST /api/inventory HTTP/1.1" 201 508 "-" "-"
+2026-02-08 16:16:30 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"050b1de2...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:30 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:30 +0000] "GET /api/inventory HTTP/1.1" 200 - "-" "-"
+2026-02-08 16:16:31 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"f4d0fb94...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:31 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:31 +0000] "GET /api/inventory?category=Category%20A HTTP/1.1" 200 - "-" "-"
+2026-02-08 16:16:31 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"cbc3d40e...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:31 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:31 +0000] "GET /api/inventory?search=Item%202 HTTP/1.1" 200 559 "-" "-"
+2026-02-08 16:16:31 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"ce923212...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:31 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:32 +0000] "GET /api/inventory HTTP/1.1" 200 - "-" "-"
+2026-02-08 16:16:32 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"e309cc8e...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:32 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:16:32 [[32minfo[39m]: Item updated by Test User: Test Item {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:32 +0000] "PUT /api/inventory/6988698885311d4292179973 HTTP/1.1" 200 574 "-" "-"
+2026-02-08 16:16:32 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"d7d71cf5...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:32 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:32 +0000] "PUT /api/inventory/6988698885311d42921799bd HTTP/1.1" 404 60 "-" "-"
+2026-02-08 16:16:33 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"87c2c1e6...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:33 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+2026-02-08 16:16:33 [[32minfo[39m]: Item deleted by Test User: Test Item {"service":"bizzai-backend"}
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:33 +0000] "DELETE /api/inventory/6988698985311d42921799fa HTTP/1.1" 200 41 "-" "-"
+2026-02-08 16:16:33 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"8cfdd15e...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:33 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:33 +0000] "DELETE /api/inventory/6988698985311d4292179a43 HTTP/1.1" 404 60 "-" "-"
+2026-02-08 16:16:34 [[32minfo[39m]: ≡ƒì¬ Set deviceId cookie {"service":"bizzai-backend","deviceId":"cdf408fe...","sameSite":"strict","secure":false}
+  console.log
+    Γ£à Login successful - rate limit counters reset {
+      ip: '::ffff:127.0.0.1',
+      accountHash: '973dfe463ec85785',
+      correlationId: 'unknown'
+    }
+
+      at handleLoginAttempt (middlewares/rateLimiter.js:332:17)
+
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:34 +0000] "POST /api/auth/login HTTP/1.1" 200 582 "-" "-"
+::ffff:127.0.0.1 - - [08/Feb/2026:10:46:34 +0000] "GET /api/inventory/low-stock HTTP/1.1" 200 566 "-" "-"
+PASS tests/integration/inventory.test.js (10.684 s)
+  Inventory API Integration Tests
+    POST /api/inventory
+      ΓêÜ should create new item successfully (1600 ms)
+      ΓêÜ should fail with duplicate item name for same user (804 ms)
+      ΓêÜ should calculate available stock correctly (467 ms)
+    GET /api/inventory
+      ΓêÜ should get all items for authenticated user (382 ms)
+      ΓêÜ should filter items by category (337 ms)
+      ΓêÜ should search items by name (338 ms)
+      ΓêÜ should not return items from other users (457 ms)
+    PUT /api/inventory/:id
+      ΓêÜ should update item successfully (328 ms)
+      ΓêÜ should not allow updating another user's item (581 ms)
+    DELETE /api/inventory/:id
+      ΓêÜ should delete item successfully (344 ms)
+      ΓêÜ should not allow deleting another user's item (434 ms)
+    GET /api/inventory/low-stock
+      ΓêÜ should return only low stock items (315 ms)
+
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+PASS tests/unit/utils/gstCalculator.test.js
+  GST Calculator Utilities
+    calculateGST
+      ΓêÜ should calculate GST correctly for intrastate transaction (4 ms)
+      ΓêÜ should calculate GST correctly for interstate transaction (1 ms)
+      ΓêÜ should handle zero tax rate (1 ms)
+      ΓêÜ should handle decimal amounts correctly (1 ms)
+      ΓêÜ should apply discount before calculating GST (1 ms)
+    calculateItemTotal
+      ΓêÜ should calculate item total with GST (2 ms)
+      ΓêÜ should handle item-level discount (1 ms)
+    calculateBillTotal
+      ΓêÜ should calculate bill total with multiple items (1 ms)
+      ΓêÜ should apply bill-level discount
+      ΓêÜ should add shipping charges
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"code":1} found. This is often due to declaring an index 
+using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+2026-02-08 16:16:39 [[32minfo[39m]: Stock movement logged: RESERVE | Item: Test Item | Qty: 10 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:39 [[32minfo[39m]: Stock movement logged: RESERVE | Item: Test Item | Qty: 50 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:39 [[32minfo[39m]: Stock movement logged: RESERVE | Item: Test Item | Qty: 30 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:39 [[32minfo[39m]: Stock movement logged: RELEASE | Item: Test Item | Qty: -30 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:40 [[32minfo[39m]: Stock movement logged: RESERVE | Item: Test Item | Qty: 30 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:40 [[32minfo[39m]: Stock movement logged: RESERVE | Item: Test Item | Qty: 20 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:40 [[32minfo[39m]: Stock movement logged: DELIVER | Item: Test Item | Qty: -20 | Source: DeliveryChallan:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:40 [[32minfo[39m]: Stock movement logged: RESERVE | Item: Test Item | Qty: 20 | Source: SalesOrder:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+2026-02-08 16:16:40 [[32minfo[39m]: Stock movement logged: DELIVER | Item: Test Item | Qty: -20 | Source: DeliveryChallan:507f1f77bcf86cd799439011 {"service":"bizzai-backend"}
+PASS tests/unit/utils/stockReservation.test.js
+  Stock Reservation Utilities
+    reserveStock
+      ΓêÜ should reserve stock successfully (597 ms)
+      ΓêÜ should fail when insufficient stock available (205 ms)
+      ΓêÜ should handle partial reservation correctly (199 ms)
+      ΓêÜ should prevent negative reservation (183 ms)
+    releaseStock
+      ΓêÜ should release reserved stock successfully (182 ms)
+      ΓêÜ should fail when releasing more than reserved (177 ms)
+    deliverStock
+      ΓêÜ should deliver stock successfully (173 ms)
+      ΓêÜ should handle over-committed stock gracefully (191 ms)
+
+(node:15828) [MONGOOSE] Warning: Duplicate schema index on {"subdomain":1} found. This is often due to declaring an 
+index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(node:15828) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since 
+Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:15828) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect 
+since Node.js Driver version 4.0.0 and will be removed in the next major version
+  console.log
+    Concurrent oversells: 5 succeeded, 0 failed
+
+      at Object.<anonymous> (tests/integration/concurrency.test.js:129:21)
+
+PASS tests/integration/concurrency.test.js
+  Concurrency Tests
+    Concurrent Stock Updates
+      ΓêÜ should handle concurrent stock ledger entries correctly (160 ms)
+      ΓêÜ should prevent race conditions in stock updates (89 ms)
+    Concurrent Invoice Creation
+      ΓêÜ should handle concurrent invoice creation with unique numbers (127 ms)
+    Concurrent Period Locking
+      ΓêÜ should handle concurrent period lock attempts (21 ms)
+    Transaction Isolation
+      ΓêÜ should maintain isolation between concurrent transactions (32 ms)
+      ΓêÜ should rollback failed transactions without affecting others (19 ms)
+    Deadlock Prevention
+      ΓêÜ should handle potential deadlocks gracefully (40 ms)
+
+Test Suites: 5 failed, 5 passed, 10 total
+Tests:       34 failed, 70 passed, 104 total
+Snapshots:   0 total
+Time:        75.953 s, estimated 160 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after 
+all tests finished?

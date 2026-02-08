@@ -20,6 +20,17 @@ const PERMISSIONS = {
         "read:reports",
         "read:audit_logs",
         "read:settings",
+        "read:purchase",
+        "read:supplier",
+        "read:financialperiod",
+        "read:accounting",
+        "read:journal",
+        "read:ledger",
+        "read:chartofaccounts",
+        "read:deliverychallan",
+        "read:grn",
+        "read:expense",
+        "read:pos",
 
         // Write permissions
         "write:invoice",
@@ -29,6 +40,17 @@ const PERMISSIONS = {
         "write:salesorder",
         "write:payment",
         "write:settings",
+        "write:purchase",
+        "write:supplier",
+        "write:financialperiod",
+        "write:accounting",
+        "write:journal",
+        "write:ledger",
+        "write:chartofaccounts",
+        "write:deliverychallan",
+        "write:grn",
+        "write:expense",
+        "write:pos",
 
         // Delete permissions
         "delete:invoice",
@@ -38,11 +60,18 @@ const PERMISSIONS = {
         "delete:salesorder",
         "delete:payment",
         "delete:user",
+        "delete:purchase",
+        "delete:supplier",
+        "delete:deliverychallan",
+        "delete:grn",
+        "delete:expense",
 
         // Management permissions
         "manage:users",
         "manage:roles",
         "export:data",
+        "manage:organization",
+        "manage:periods",
     ],
     staff: [
         // Read permissions only
