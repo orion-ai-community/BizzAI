@@ -13,6 +13,7 @@ import JournalEntry from '../../models/JournalEntry.js';
 import Purchase from '../../models/Purchase.js';
 import Invoice from '../../models/Invoice.js';
 import { postPurchase, postSale, postPayment } from '../../services/autoPostingService.js';
+import { createDefaultChartOfAccounts } from '../setup/fixtures.js';
 
 describe('Auto-Posting Service Integration Tests', () => {
     let organization, user, financialPeriod, testSupplier;
@@ -45,54 +46,16 @@ describe('Auto-Posting Service Integration Tests', () => {
             createdBy: user._id
         });
 
-        // Create chart of accounts
-        inventoryAccount = await ChartOfAccounts.create({
-            code: '1140',
-            name: 'Inventory',
-            accountType: 'ASSET',
-            normalBalance: 'DEBIT',
-            organization: organization._id
-        });
+        // Create chart of accounts using helper
+        const accounts = await createDefaultChartOfAccounts(organization._id);
 
-        apAccount = await ChartOfAccounts.create({
-            code: '2110',
-            name: 'Accounts Payable',
-            accountType: 'LIABILITY',
-            normalBalance: 'CREDIT',
-            organization: organization._id
-        });
-
-        cashAccount = await ChartOfAccounts.create({
-            code: '1110',
-            name: 'Cash',
-            accountType: 'ASSET',
-            normalBalance: 'DEBIT',
-            organization: organization._id
-        });
-
-        arAccount = await ChartOfAccounts.create({
-            code: '1130',
-            name: 'Accounts Receivable',
-            accountType: 'ASSET',
-            normalBalance: 'DEBIT',
-            organization: organization._id
-        });
-
-        revenueAccount = await ChartOfAccounts.create({
-            code: '4100',
-            name: 'Sales Revenue',
-            accountType: 'REVENUE',
-            normalBalance: 'CREDIT',
-            organization: organization._id
-        });
-
-        cogsAccount = await ChartOfAccounts.create({
-            code: '6000',
-            name: 'Cost of Goods Sold',
-            accountType: 'EXPENSE',
-            normalBalance: 'DEBIT',
-            organization: organization._id
-        });
+        // Assign to test variables for easy access
+        cashAccount = accounts.cash;
+        inventoryAccount = accounts.inventory;
+        apAccount = accounts.accounts_payable;
+        arAccount = accounts.accounts_receivable;
+        revenueAccount = accounts.sales_revenue;
+        cogsAccount = accounts.cost_of_goods_sold;
 
         // Also create bank account for payment tests
         const bankAccount = await ChartOfAccounts.create({
