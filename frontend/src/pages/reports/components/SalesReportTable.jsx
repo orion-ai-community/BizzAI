@@ -21,6 +21,7 @@ const SalesReportTable = ({ data, pagination, isLoading, onPageChange }) => {
 
     const [sortField, setSortField] = useState(null);
     const [sortDirection, setSortDirection] = useState('asc');
+    const [showColumnDropdown, setShowColumnDropdown] = useState(false);
 
     const toggleColumn = (column) => {
         setVisibleColumns({ ...visibleColumns, [column]: !visibleColumns[column] });
@@ -74,26 +75,39 @@ const SalesReportTable = ({ data, pagination, isLoading, onPageChange }) => {
             {/* Table Header with Column Toggle */}
             <div className="p-4 border-b border-border flex justify-between items-center">
                 <h3 className="text-lg font-bold text-main">Sales Transactions</h3>
-                <details className="relative">
-                    <summary className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition">
+                <div className="relative">
+                    <button
+                        onClick={() => setShowColumnDropdown(!showColumnDropdown)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    >
                         Columns
-                    </summary>
-                    <div className="absolute right-0 mt-2 bg-card border border-border rounded-lg shadow-lg p-4 z-10 w-64">
-                        {Object.keys(visibleColumns).map((col) => (
-                            <label key={col} className="flex items-center gap-2 mb-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={visibleColumns[col]}
-                                    onChange={() => toggleColumn(col)}
-                                    className="w-4 h-4"
-                                />
-                                <span className="text-sm text-main">
-                                    {col.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
-                </details>
+                    </button>
+                    {showColumnDropdown && (
+                        <>
+                            {/* Backdrop to close dropdown when clicking outside */}
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setShowColumnDropdown(false)}
+                            />
+                            {/* Dropdown menu */}
+                            <div className="absolute right-0 mt-2 bg-card border border-border rounded-lg shadow-lg p-4 z-50 w-64 max-h-96 overflow-y-auto">
+                                {Object.keys(visibleColumns).map((col) => (
+                                    <label key={col} className="flex items-center gap-2 mb-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-1 rounded">
+                                        <input
+                                            type="checkbox"
+                                            checked={visibleColumns[col]}
+                                            onChange={() => toggleColumn(col)}
+                                            className="w-4 h-4"
+                                        />
+                                        <span className="text-sm text-main">
+                                            {col.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
 
             {/* Table */}
@@ -253,10 +267,10 @@ const SalesReportTable = ({ data, pagination, isLoading, onPageChange }) => {
                                     <td className="px-4 py-3 text-center">
                                         <span
                                             className={`px-2 py-1 text-xs rounded-full ${row.paymentStatus === 'paid'
-                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                                    : row.paymentStatus === 'partial'
-                                                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                                                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                                : row.paymentStatus === 'partial'
+                                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
                                                 }`}
                                         >
                                             {row.paymentStatus}
